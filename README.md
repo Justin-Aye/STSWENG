@@ -7,6 +7,12 @@ Clone the repository, then run:
 ```bash
 npm install --dev
 ```
+or
+```bash
+npm install
+```
+
+<br>
 
 ## Project Scripts
 
@@ -44,7 +50,7 @@ npm start
 
 ### Run Jest Test Runner
 
-Runs unit tests specified in `./__tests__`.
+Runs unit tests specified in `__tests__` directory.
 
 ```bash
 npm test
@@ -52,15 +58,7 @@ npm test
 
 <br>
 
-### Run Linter
-
-Run the ESLinter to check for code errors, bugs, and stylistic mistakes.
-
-```bash
-npm run lint
-```
-
-# References
+# References you can use:
 
 ### Frontend
 
@@ -68,7 +66,6 @@ npm run lint
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs/installation)
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Mantine](https://mantine.dev/pages/getting-started/) - a React component library.
 
 ### Backend
 
