@@ -16,9 +16,7 @@ npm install
 
 ## Project Scripts
 
-### Run Development Server
-
-Used for developing and implementing features in the web app.
+### Run Development Server (Preferably)
 
 ```bash
 npm run dev
