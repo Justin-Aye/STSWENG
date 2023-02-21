@@ -1,26 +1,64 @@
 
 import React from "react";
+import { useState, useEffect } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
+import { useRouter } from "next/router";
+
 
 export default function Login(){
 
+    const router = useRouter();
+
+    const [email, setEmail] = useState("");
+    const [password, setPass] = useState("");
+
+    const [wrongCred, setWrongCred] = useState(false);
+
     function handleSubmit(){
         console.log("Form Submitted")
+
+        signInWithEmailAndPassword(auth, email, password)
+        .then((user) => {
+            router.push("/")
+        })
+        .catch((error) => {
+            setWrongCred(true)
+            console.log(error)
+        })
     }
+    
+    useEffect(() => {
+        auth.onAuthStateChanged((user) => {
+            if(user)
+                router.push("/")
+        })
+    }, [])
 
     return (
         <div className="flex flex-col p-10">
             <h1 className="mx-auto mb-10">Login page</h1>
             
-            <form className="flex flex-col mx-auto w-2/5 h-[400px] py-5 rounded-xl bg-white shadow-lg" onSubmit={() => handleSubmit()}>
-                
-                <label className="w-2/3 mx-auto mt-10" htmlFor="email">Email:</label>
-                <input className="w-2/3 h-10 mx-auto mb-10 border border-black rounded-md px-2" placeholder="Email..." type="text" name="email" id="email" />
+            <div className="flex flex-col mx-auto w-2/5 h-auto py-5 rounded-xl bg-white shadow-lg">
+                <p className={`${wrongCred ? "" : "hidden"} text-red-500 mx-auto`}>Incorrect Email or Password</p>
 
-                <label className="w-2/3 mx-auto" htmlFor="email">Password:</label>
-                <input className="w-2/3 h-10 mx-auto mb-10 border border-black rounded-md px-2" placeholder="Password..." type="text" name="email" id="email" />
+                <form className="flex flex-col mx-auto w-full h-[400px] py-5 rounded-xl">
+                    
+                    <label className="w-2/3 mx-auto mt-10" htmlFor="email">Email:</label>
+                    <input className="w-2/3 h-10 mx-auto mb-10 border border-black rounded-md px-2" placeholder="Email..." type="text" name="email" id="email" 
+                        onChange={(e) => setEmail(e.target.value) } required onKeyDown={(e) => {e.key == 'enter' ? handleSubmit() : ""}}
+                    />
 
-                <button className="w-1/3 mx-auto py-2 rounded-[20px] bg-slate-200" type="submit">Submit</button>
-            </form>
+                    <label className="w-2/3 mx-auto" htmlFor="email">Password:</label>
+                    <input className="w-2/3 h-10 mx-auto mb-10 border border-black rounded-md px-2" placeholder="Password..." type="password" name="password" id="password" 
+                        onChange={(e) => setPass(e.target.value) } required onKeyDown={(e) => {e.key == 'enter' ? handleSubmit() : ""}}
+                    />
+                    
+                </form>
+            
+                <button className="w-1/3 mx-auto mb-10 py-2 rounded-[20px] bg-slate-200" type="submit" 
+                    onClick={() => handleSubmit()}>Submit</button>
+            </div>
         </div>
     )
 }
