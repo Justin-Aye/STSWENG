@@ -1,49 +1,63 @@
 
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
-import { addDoc, collection, setDoc, doc } from "firebase/firestore";
+import { addDoc, collection, setDoc, doc, query, where, getDocs } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "firebaseConfig";
+import { useRouter } from "next/router";
 
 export default function Signup(){
 
-    function handleSubmit(){
-        console.log("Form Submitted")
+    const [email, setEmail] = useState("")
+    const [password, setPass] = useState("")
+    const [repeatPassword, setRepPass] = useState("")
 
+    const [emailExists, setEmailExists] = useState(false)
+    const [samePass, setSamePass] = useState(true)
+
+    const router = useRouter()
+
+    function handleSubmit(){
         if(password != repeatPassword)
             setSamePass(false)
 
-        createUserWithEmailAndPassword(auth, email, password)
-        .then( (userCredential) => {
-            
-            const user = userCredential.user;
-            try {
-                setDoc( doc(db, "users", user.uid), {
-                    email: email,
-                    profPic: "",
-                    commentIDs: [],
-                    liked: [],
-                    disliked: []
-                })
-            } catch (error) {
+        if(samePass)
+            createUserWithEmailAndPassword(auth, email, password)
+            .then( (userCredential) => {
+                
+                const user = userCredential.user;
+                try {
+                    setDoc( doc(db, "users", user.uid), {
+                        email: email,
+                        profPic: "",
+                        commentIDs: [],
+                        liked: [],
+                        disliked: []
+                    }).then(() => {
+                        console.log("User has been added")
+                    })
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+            .catch((error) => {
+                const errorCode = error.code
+                const errorMessage = error.message
+
+                setEmailExists(true)
+                
                 console.log(error)
-            }
-        })
-        .catch((error) => {
-            const errorCode = error.code
-            const errorMessage = error.message
-            console.log(error)
-        });
+            });
     }
 
-    const [email, setEmail] = useState("");
-    const [password, setPass] = useState("");
-    const [repeatPassword, setRepPass] = useState("");
-
-    const [emailExists, setEmailExists] = useState(false);
-    const [samePass, setSamePass] = useState(true);
+    useEffect(() => {
+        auth.onAuthStateChanged((user) => {
+            if(user)
+                router.push("/")
+        })
+    }, [])
 
     return (
         <div className="flex flex-col p-10">

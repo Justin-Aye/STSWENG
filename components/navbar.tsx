@@ -34,7 +34,7 @@ export default function Navbar() {
             </div>
 
             <div className="mx-auto my-auto w-1/2 flex justify-end">
-                <input className="my-auto h-14 w-1/2 p-5 rounded-[20px]" 
+                <input className="my-auto h-14 w-1/2 p-5 rounded-sm text-black focus:outline-blue-100" 
                     onKeyDown={(e) => {
                         console.log(e.key)
                     }} type="text" placeholder="Search..."/>
