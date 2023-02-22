@@ -33,7 +33,7 @@ export default function Login(){
             if(user)
                 router.push("/")
         })
-    }, [])
+    })
 
     return (
         <div className="flex flex-col p-10">
