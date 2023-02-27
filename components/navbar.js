@@ -1,7 +1,7 @@
 
 
 import Link from "next/link";
-import { auth } from "@/firebaseConfig";
+import { auth } from "../firebaseConfig";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -28,7 +28,7 @@ export default function Navbar() {
     }, [currUser])
 
     return (
-        <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white">
+        <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white" data-testid="nav_container">
             <div className="my-auto w-1/4">
                 <Link href="/" className="hover:text-violet-800">Image Here</Link>
             </div>
@@ -41,11 +41,11 @@ export default function Navbar() {
             </div>
             
             <div className="ml-auto flex gap-5 w-1/4 justify-end">
-                <div className={`my-auto ${currUser ? "hidden" : ""}`}>
+                <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="signup_link">
                     <Link href="/signup" className="hover:text-violet-400">Signup</Link>
                 </div>
 
-                <div className={`my-auto ${currUser ? "hidden" : ""}`}>
+                <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="login_link">
                     <Link href="/login" className="hover:text-violet-400">Login</Link>
                 </div>
 

@@ -7,7 +7,7 @@ exports[`renders card unchanged 1`] = `
   >
     <div
       class="flex mb-5 gap-5"
-      data-testid="user"
+      data-testid="user_container"
     >
       <img
         alt=""
@@ -17,14 +17,23 @@ exports[`renders card unchanged 1`] = `
         class="my-auto text-left"
       />
     </div>
-    <img
-      alt=""
-      class="rounded-lg w-fit mb-5"
+    <div
+      class="w-full h-full min-h-[400px] mb-5 relative"
       data-testid="image"
-    />
+    >
+      <img
+        alt=""
+        class="rounded-lg"
+        data-nimg="fill"
+        decoding="async"
+        loading="lazy"
+        src=""
+        style="position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"
+      />
+    </div>
     <div
       class="flex gap-5 mb-5"
-      data-testid="buttons"
+      data-testid="buttons_container"
     >
       <div
         class="flex gap-1"
@@ -109,7 +118,7 @@ exports[`renders homepage unchanged 1`] = `
     >
       <div
         class="flex mb-5 gap-5"
-        data-testid="user"
+        data-testid="user_container"
       >
         <img
           alt=""
@@ -122,15 +131,25 @@ exports[`renders homepage unchanged 1`] = `
           Username
         </p>
       </div>
-      <img
-        alt=""
-        class="rounded-lg w-fit mb-5"
+      <div
+        class="w-full h-full min-h-[400px] mb-5 relative"
         data-testid="image"
-        src="/images/mountain.jpg"
-      />
+      >
+        <img
+          alt=""
+          class="rounded-lg"
+          data-nimg="fill"
+          decoding="async"
+          loading="lazy"
+          sizes="100vw"
+          src="/_next/image?url=%2Fimages%2Fmountain.jpg&w=3840&q=75"
+          srcset="/_next/image?url=%2Fimages%2Fmountain.jpg&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=750&q=75 750w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=828&q=75 828w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1080&q=75 1080w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1920&q=75 1920w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=2048&q=75 2048w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=3840&q=75 3840w"
+          style="position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"
+        />
+      </div>
       <div
         class="flex gap-5 mb-5"
-        data-testid="buttons"
+        data-testid="buttons_container"
       >
         <div
           class="flex gap-1"
@@ -200,7 +219,7 @@ exports[`renders homepage unchanged 1`] = `
     >
       <div
         class="flex mb-5 gap-5"
-        data-testid="user"
+        data-testid="user_container"
       >
         <img
           alt=""
@@ -213,15 +232,25 @@ exports[`renders homepage unchanged 1`] = `
           Username
         </p>
       </div>
-      <img
-        alt=""
-        class="rounded-lg w-fit mb-5"
+      <div
+        class="w-full h-full min-h-[400px] mb-5 relative"
         data-testid="image"
-        src="/images/mountain.jpg"
-      />
+      >
+        <img
+          alt=""
+          class="rounded-lg"
+          data-nimg="fill"
+          decoding="async"
+          loading="lazy"
+          sizes="100vw"
+          src="/_next/image?url=%2Fimages%2Fmountain.jpg&w=3840&q=75"
+          srcset="/_next/image?url=%2Fimages%2Fmountain.jpg&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=750&q=75 750w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=828&q=75 828w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1080&q=75 1080w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1920&q=75 1920w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=2048&q=75 2048w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=3840&q=75 3840w"
+          style="position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"
+        />
+      </div>
       <div
         class="flex gap-5 mb-5"
-        data-testid="buttons"
+        data-testid="buttons_container"
       >
         <div
           class="flex gap-1"
@@ -291,7 +320,7 @@ exports[`renders homepage unchanged 1`] = `
     >
       <div
         class="flex mb-5 gap-5"
-        data-testid="user"
+        data-testid="user_container"
       >
         <img
           alt=""
@@ -304,15 +333,25 @@ exports[`renders homepage unchanged 1`] = `
           Username
         </p>
       </div>
-      <img
-        alt=""
-        class="rounded-lg w-fit mb-5"
+      <div
+        class="w-full h-full min-h-[400px] mb-5 relative"
         data-testid="image"
-        src="/images/mountain.jpg"
-      />
+      >
+        <img
+          alt=""
+          class="rounded-lg"
+          data-nimg="fill"
+          decoding="async"
+          loading="lazy"
+          sizes="100vw"
+          src="/_next/image?url=%2Fimages%2Fmountain.jpg&w=3840&q=75"
+          srcset="/_next/image?url=%2Fimages%2Fmountain.jpg&w=640&q=75 640w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=750&q=75 750w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=828&q=75 828w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1080&q=75 1080w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=1920&q=75 1920w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=2048&q=75 2048w, /_next/image?url=%2Fimages%2Fmountain.jpg&w=3840&q=75 3840w"
+          style="position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"
+        />
+      </div>
       <div
         class="flex gap-5 mb-5"
-        data-testid="buttons"
+        data-testid="buttons_container"
       >
         <div
           class="flex gap-1"

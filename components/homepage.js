@@ -1,17 +1,24 @@
 
 import React from "react";
 import Card from "./card";
-import Link from "next/link";
+import { useRouter } from "next/router";
+import { auth } from "../firebaseConfig";
+
 export default function Homepage() {
 
     // Data holders
-    var Userame="Username"
+    var Username="Username"
     var Caption="Best Image" 
     var ImageSrc="/images/mountain.jpg" 
     var Profpic="/images/user_icon.png"
 
+    const router = useRouter()
+
     function handlePost(){
-        console.log("clicked")
+        auth.onAuthStateChanged((user) => {
+            if(!user)
+                router.push("/login")
+        })
     }
 
     return (
@@ -22,9 +29,9 @@ export default function Homepage() {
                 <p className="text-[20px] text-white">POST AN IMAGE</p>
             </div>
             
-            <Card username={Userame} caption={Caption} imageSrc={ImageSrc} profpic={Profpic}/>
-            <Card username={Userame} caption={Caption} imageSrc={ImageSrc} profpic={Profpic}/>
-            <Card username={Userame} caption={Caption} imageSrc={ImageSrc} profpic={Profpic} />
+            <Card username={Username} caption={Caption} imageSrc={ImageSrc} profpic={Profpic}/>
+            <Card username={Username} caption={Caption} imageSrc={ImageSrc} profpic={Profpic}/>
+            <Card username={Username} caption={Caption} imageSrc={ImageSrc} profpic={Profpic} />
         </div>
     )
 }
