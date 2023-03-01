@@ -30,7 +30,7 @@ export default function Signup(){
                 try {
                     setDoc( doc(db, "users", user.uid), {
                         email: email,
-                        profPic: "",
+                        profPic: "https://firebasestorage.googleapis.com/v0/b/practice-a80a2.appspot.com/o/images%2Fuser_icon.png?alt=media&token=0958e30c-dd7c-4feb-81ed-9ea1f0c3a948",
                         commentIDs: [],
                         liked: [],
                         disliked: [],
