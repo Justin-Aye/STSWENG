@@ -21,8 +21,6 @@ export default function Card( { username, imageSrc, caption, profpic } ) {
                 <Image className="rounded-lg" src={imageSrc} alt={""} fill/>    
             </div>
             
-            {/* <img className="rounded-lg w-fit mb-5" src={imageSrc} alt="" data-testid="image" /> */}
-            
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
                     <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
