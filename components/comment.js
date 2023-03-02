@@ -1,6 +1,6 @@
 
 import { db, auth, storage } from "../firebaseConfig";
-import { getDocs, doc, collection, addDoc, query, arrayUnion, updateDoc, where, documentId, getDoc} from "@firebase/firestore";
+import { getDocs, doc, collection, addDoc, query, arrayUnion, updateDoc, where, documentId, getDoc, deleteDoc} from "@firebase/firestore";
 import { ref, getDownloadURL, uploadBytesResumable, deleteObject, } from 'firebase/storage';
 import { useRouter } from "next/router";
 import React, { useEffect, useState, useRef } from "react";
@@ -14,7 +14,7 @@ export default function Comment(){
 
     // Data for test Adds
     const [caption, setCaption] = useState('')
-    const [image, setImage] = useState('')
+    const [image, setImage] = useState(null)
     const [imgUrl, setUrl] = useState('')
     const [comment, setComment] = useState('')
 
@@ -25,13 +25,17 @@ export default function Comment(){
     const [editImgUrl, setEditImgUrl] = useState()
     const [newEditImgUrl, setNewEditImgUrl] = useState()
     const [testComment, setTestComment] = useState()
+    const [deletePostID, setDeletePostID] = useState('')
+    const [deleteCommentID, setDeleteCommentID] = useState('')
+    
 
     // Show divs
     const [testPost, setTestPost] = useState(false)
     const [testEditPost, setEditPost] = useState(false)
     const [testAddComment, setTestAddComment] = useState(false)
     const [testEditComment, setTestEditComment] = useState(false)
-
+    const [testDeletePost, setTestDeletePost] = useState(false)
+    const [testDeleteComment, setTestDeleteComment] = useState(false)
 
     // Test Document Ids
     var test_Post_ID = "dGD50NbeoT7W1ARstuxF"
@@ -148,6 +152,8 @@ export default function Comment(){
         // Get Post's array of comments
         const post = await getDoc(doc(db, "posts", test_Post_ID))
         const comments = post.data().commentsID
+        if(comments.length == 0)
+            return []
 
         // For every comment in list 
         const arr = [];
@@ -251,6 +257,40 @@ export default function Comment(){
                 console.log(error)
             });
         }
+    }
+
+    async function deletePost(){
+        const post = await getDoc(doc(db, "posts", deletePostID))
+        const data = post.data()
+
+        if(currUser.uid != data.creatorID)
+            console.log("Error: You did not create this post")
+        else{
+            var commentIDs = data.commentsID
+            
+            // Delete Every Comment in the post
+            const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
+            querySnapshot.forEach((doc) => {
+                deleteDoc(doc.ref)
+            })
+
+            // Delete Post
+            deleteDoc(doc(db, "posts", deletePostID)).then(() => {
+                console.log("Successfully deleted")
+                window.location.reload()
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+    }
+
+    async function deleteComment(){
+        deleteDoc(doc(db, "comments", deleteCommentID)).then(() => {
+            console.log("Comment Deleted")
+            window.location.reload()
+        }).catch((error) => {
+            console.log(error)
+        })
     }
 
     async function getPost( postID ){
@@ -423,6 +463,46 @@ export default function Comment(){
             }
             <button className={`mx-auto border border-black p-2 ${ testEditComment ? "bg-red-300" : "bg-gray-300"} my-5`}
                 onClick={() => setTestEditComment(!testEditComment)}>Test Edit Comment
+            </button>
+
+
+            {/* TEST DELETING POST BY POST ID */}
+            {   testDeletePost &&
+                <div className="flex flex-col">
+                    <p className="text-center text-red-500">*You can only delete posts you've made</p>
+                    <div className="flex gap-2">                    
+                        <p className="text-center w-fit ml-auto">Enter Post ID to Delete:</p>
+                        <input className="w-1/6 mr-auto p-2 border border-black" type="text" id=""
+                            onChange={(e) => {setDeletePostID(e.target.value)}}
+                        />
+                    </div>
+                    <button className="border border-black w-[100px] mx-auto bg-green-200 mb-10" onClick={() => {deletePost()}}>
+                        Delete Post
+                    </button>
+                </div>
+            }
+            <button className={`mx-auto border border-black p-2 ${ testDeletePost ? "bg-red-300" : "bg-gray-300"} my-5`}
+                onClick={() => setTestDeletePost(!testDeletePost)}>Test Delete Post
+            </button>
+
+
+            {/* TEST DELETING COMMENT BY COMMENT ID */}
+            {   testDeleteComment &&
+                <div className="flex flex-col">
+                    <p className="text-center text-red-500">*You can only delete comments you've made</p>
+                    <div className="flex gap-2">                    
+                        <p className="text-center w-fit ml-auto">Enter Comment ID to Delete:</p>
+                        <input className="w-1/6 mr-auto p-2 border border-black" type="text" id=""
+                            onChange={(e) => {setDeleteCommentID(e.target.value)}}
+                        />     
+                    </div>
+                    <button className="border border-black w-[100px] mx-auto bg-green-200 mb-10" onClick={() => {deleteComment()}}>
+                        Delete Comment
+                    </button>
+                </div>
+            }
+            <button className={`mx-auto border border-black p-2 ${ testDeleteComment ? "bg-red-300" : "bg-gray-300"} my-5`}
+                onClick={() => setTestDeleteComment(!testDeleteComment)}>Test Delete Comment
             </button>
         </div>
     )
