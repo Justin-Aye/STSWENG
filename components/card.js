@@ -14,18 +14,18 @@ export default function Card( { username, imageSrc, caption, profpic } ) {
 
             <div className="flex mb-5 gap-5" data-testid="user_container">
                 <img className="w-[50px] h-[50px] rounded-[50%]" src={profpic} alt="" />
-                <p className="my-auto text-left">{username}</p>
+                <p className="my-auto text-left font-bold text-[20px]">{username}</p>
             </div>
             
             <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
-                <Image className="rounded-lg" src={imageSrc} alt={""} fill/>    
+                <Image className="rounded-lg object-cover" src={imageSrc} alt={""} fill/>    
             </div>
             
             {/* <img className="rounded-lg w-fit mb-5" src={imageSrc} alt="" data-testid="image" /> */}
             
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-green-500" : "text-gray-800"} hover:opacity-75`}/>
                     <p className="my-auto">100k</p>
                 </div>
                 
@@ -45,10 +45,10 @@ export default function Card( { username, imageSrc, caption, profpic } ) {
                         <div className="flex relative w-[30px] h-[30px]">
                             <Image className="rounded-[50%]" src={imageSrc} alt="" fill />
                         </div>
-                        <p className="ml-5">{username}</p>
+                        <p className="ml-5 font-semibold">{username}</p>
                     </div>
                     
-                    <p className="text-left ">Great image! Love your work</p>
+                    <p className="text-left ml-12">Great image! Love your work</p>
 
                     
                 </div>
