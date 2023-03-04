@@ -1,37 +1,28 @@
-
-import Link from "next/link";
-import { auth, db } from "../firebaseConfig";
-import { doc, getDoc, onSnapshot } from "firebase/firestore"
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { auth, db } from "../firebaseConfig";
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function Navbar() {
-
+    // FIXME: keep data even after refreshing
     const router = useRouter();
-    const [currUser, setUser] = useState(false)
-    const [currName, setName] = useState("")
+    const [currUser, setUser] = useState(false);
+    const [currName, setName] = useState("");
 
     function logout(){
         auth.signOut().then(() => {
-            setUser(false)
-            router.push("/login")
+            setUser(false);
+            router.push("/login");
         }).catch((error) => {
-            console.log(error)
+            console.log(error);
         })
     }
-    
-    
-    useEffect(() => {
-        auth.onAuthStateChanged((user) => {
-            if(user)
-                setUser(true)
-        })
-    }, [currUser])
 
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if (user) {
+                setUser(true);
                 const docRef = doc(db, "users", auth.currentUser.uid);
                 onSnapshot(docRef, (doc) => {
                     setName(doc.data().displayName);
@@ -39,7 +30,7 @@ export default function Navbar() {
                 
             }
         })
-    }, [currName])
+    }, [])
 
     return (
         <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white" data-testid="nav_container">

@@ -1,19 +1,29 @@
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { db } from "../firebaseConfig"
-import { collection, query, where, getDocs } from "firebase/firestore"
+import { auth, db } from "../firebaseConfig";
+import { collection, query, where, getDocs, onSnapshot, doc } from "firebase/firestore";
 
-// TODO: if user doesn't exist, display "user doesn't exist", if user exists, display the user's profile
 
 export default function Profile( ) {
-    const router = useRouter()
-    const { displayName } = router.query 
+    const router = useRouter();
+    const { displayName } = router.query; 
+    const [profileData, setData] = useState(null);
+    const [currUser, setUser] = useState("")
 
-    const [userExists, setUser] = useState(false)
-    const [userData, setData] = useState({})
-
-    // check if user exists
+    // check if the currently logged in user owns the profile
+    useEffect(() => {
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const docRef = doc(db, "users", auth.currentUser.uid);
+                onSnapshot(docRef, (doc) => {
+                    setUser(doc.data().displayName);
+                })
+            }
+        })
+    }, [])
+    
     useEffect(() => {
         try {
             const users = collection(db, "users")
@@ -23,36 +33,35 @@ export default function Profile( ) {
                 qSnapshot.then((snapshot) => {
                     snapshot.docs.forEach(doc => {
                         if (doc.data().displayName == displayName) {
-                            setUser(true)
                             setData(doc.data())
-                            console.log(userData)
                         }
                     })
                 })
             }
         } catch {
-            setUser(false)
-            setData({})
-        }
-    }, [userExists]);
+            console.log("user data check failed");
 
-    if (userExists) {
-        return (
-            <div>
-                {Object.entries(userData).map(([key, value]) => (
-                    <p key={key}>
-                        {key}: {value}
-                    </p>
-                ))}
-            </div>
-        )
-    }
-    else {
-        return (
-            <h2>
-                User {displayName} does not exist!
-            </h2>
-        )
-    }
+        }
+    }, [displayName]);
+    
+    
+    // #FIXME: should keep data even after refresh
+    return (
+        <div>
+            {profileData ? (
+                <div>
+                    <h2>
+                        Bio: {profileData["bio"].trim() ? profileData["bio"] : `User ${displayName} has no bio!`}
+                    </h2>
+                    <h2> Display Name: {profileData["displayName"]}</h2>
+                    <h2> Email: {profileData["email"]}</h2>
+                    <br></br>
+                    { currUser == displayName ? <Link href="/settings"> settings </Link> : ""}
+                </div>
+            ) : <h2>
+                    User {displayName} does not exist!
+                </h2>}
+        </div>
+    )
     
 }
