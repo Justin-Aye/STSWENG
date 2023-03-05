@@ -3,64 +3,33 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { auth, db } from "../firebaseConfig";
-import { collection, query, where, getDocs, onSnapshot, doc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
-
-export default function Profile( ) {
+export default function Profile({ props }) {
     const router = useRouter();
-    const { displayName } = router.query; 
-    const [profileData, setData] = useState(null);
-    const [currUser, setUser] = useState("")
+    const profileUID = router.query.uid;
 
-    // check if the currently logged in user owns the profile
-    useEffect(() => {
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                const docRef = doc(db, "users", auth.currentUser.uid);
-                onSnapshot(docRef, (doc) => {
-                    setUser(doc.data().displayName);
-                })
-            }
-        })
-    }, [])
-    
-    useEffect(() => {
-        try {
-            const users = collection(db, "users")
-            const q = query(users, where("displayName", "==", displayName))
-            if (q) {
-                const qSnapshot = getDocs(q)
-                qSnapshot.then((snapshot) => {
-                    snapshot.docs.forEach(doc => {
-                        if (doc.data().displayName == displayName) {
-                            setData(doc.data())
-                        }
-                    })
-                })
-            }
-        } catch {
-            console.log("user data check failed");
-
-        }
-    }, [displayName]);
-    
-    
-    // #FIXME: should keep data even after refresh
     return (
         <div>
-            {profileData ? (
+            {!props.data ? <h2> User does not exist!</h2>
+            : (
                 <div>
                     <h2>
-                        Bio: {profileData["bio"].trim() ? profileData["bio"] : `User ${displayName} has no bio!`}
+                        Bio: {props.data.bio.trim() ? props.data.bio : `User ${props.data.displayName} has no bio!`}
                     </h2>
-                    <h2> Display Name: {profileData["displayName"]}</h2>
-                    <h2> Email: {profileData["email"]}</h2>
+                    <h2> Display Name: {props.data.displayName}</h2>
+                    <h2> Email: {props.data.email}</h2>
+
                     <br></br>
-                    { currUser == displayName ? <Link href="/settings"> settings </Link> : ""}
+
+                    <h2> profpic: </h2>               
+                    <img src={props.data.profPic} alt="" width={100} height={100}/>
+                    
+                    <br></br>
+                    
+                    { props.UID == profileUID ? <Link href="/settings"> settings </Link> : ""}
                 </div>
-            ) : <h2>
-                    User {displayName} does not exist!
-                </h2>}
+            )}
         </div>
     )
     

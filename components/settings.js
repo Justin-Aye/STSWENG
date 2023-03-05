@@ -1,30 +1,35 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { auth, db, storage } from "../firebaseConfig";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 
-export default function Settings( ) {
+export default function Settings() {
     const [user, setUser] = useState(false);
     const [displayName, setDisplayName] = useState("");
     const [bio, setBio] = useState("");
-    const [profPic, setProfPic] = useState(null);
+    const [profPic, setProfPic] = useState("");
+    const [preview, setProfPicPreview] = useState("")
     
     // get logged in user's data
+    // FIXME: doc.data(), reader.result, auth.currentUser error warnings
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if (user) {
                 setUser(true);
-                const docRef = doc(db, "users", auth.currentUser.uid);
-                onSnapshot(docRef, (doc) => {
+                const docRef = doc(db, "users", user.uid);
+                getDoc(docRef).then((doc) => {
                     setDisplayName(doc.data().displayName);
                     setBio(doc.data().bio);
-                    setProfPic(doc.data().profPic);
+                    setProfPic(doc.data().profPic)
+                    setProfPicPreview(doc.data().profPic);
                 })
             }
         })
     }, []);
 
+    // TODO: refactor
     const handleNameChange = function (e) {
         setDisplayName(e.target.value);
     };
@@ -35,15 +40,35 @@ export default function Settings( ) {
 
     const handleProfPicChange = function (e) {
         const file = e.target.files[0];
-        setProfPic(file);
+        if (file) {
+            setProfPic(file);
+            const reader = new FileReader();
+            reader.onload = function () {
+                setProfPicPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+        
     }
 
-    const saveName = function () {
-        const docRef = doc(db, "users", auth.currentUser.uid);
+    const saveName = async function () {
         try {
-            updateDoc(docRef, {
-                displayName: displayName
-            });
+            const usersRef = collection(db, "users")
+            const qDisplayName = query(usersRef, where("displayName", "==", displayName))
+            const matchingUsers = await getDocs(qDisplayName);
+
+            if (matchingUsers.size > 0) {
+                // TODO: dont use alert
+                console.log("entered displayname already exists");
+                alert("name already exists");
+                return
+            }
+            else {
+                const docRef = doc(db, "users", auth.currentUser.uid);
+                updateDoc(docRef, {
+                    displayName: displayName
+                });
+            }
         } catch {
             console.log("error saving displayname");
         }
@@ -60,12 +85,22 @@ export default function Settings( ) {
         }
     }
 
-    const saveProfPic = function () {
+    const saveProfPic = async function () {
         // TODO:
-        return
+        const storageRef = ref(storage, `images/${profPic.name}`)
+        await uploadBytes(storageRef, profPic);
+
+        const profPicUrl = await getDownloadURL(storageRef);
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        try {
+            updateDoc(docRef, {
+                profPic: profPicUrl
+            });
+        } catch {
+            console.log("error uploading profPic");
+        }
     }
 
-    // TODO: input form 
     return (
         <div>
             { user ? (
@@ -92,7 +127,22 @@ export default function Settings( ) {
                             />
                             <button onClick={saveBio}> Save Bio </button>
                         </form>
-                    </div>   
+                    </div>
+
+                    <div>
+                        <h2> change profpic </h2>
+                        <form onSubmit={(e) => e.preventDefault()}>
+                            <input
+                            type="file"
+                            accept="/image/*"
+                            onChange={handleProfPicChange}
+                            required
+                            />
+                            <button onClick={saveProfPic}> Save profPic </button>
+                            <img src={preview} alt="" width={100} height={100}></img>
+
+                        </form>
+                    </div>  
 
                 </div>
             ) :

@@ -7,12 +7,12 @@ import { doc, onSnapshot } from "firebase/firestore";
 export default function Navbar() {
     // FIXME: keep data even after refreshing
     const router = useRouter();
-    const [currUser, setUser] = useState(false);
+    const [currUser, setUser] = useState(null);
     const [currName, setName] = useState("");
 
     function logout(){
         auth.signOut().then(() => {
-            setUser(false);
+            setUser(null);
             router.push("/login");
         }).catch((error) => {
             console.log(error);
@@ -25,6 +25,7 @@ export default function Navbar() {
                 setUser(true);
                 const docRef = doc(db, "users", auth.currentUser.uid);
                 onSnapshot(docRef, (doc) => {
+                    setUser(auth.currentUser.uid);
                     setName(doc.data().displayName);
                 })
                 
@@ -55,7 +56,7 @@ export default function Navbar() {
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                <Link href={`/profile/${currName}`} className="hover:text-violet-400"> {currName} </Link>
+                <Link href={`/profile/${currUser}`} className="hover:text-violet-400"> {currName} </Link>
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
