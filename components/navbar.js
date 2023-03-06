@@ -1,7 +1,7 @@
 
-
 import Link from "next/link";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
+import { doc, getDoc, onSnapshot } from "firebase/firestore"
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -10,6 +10,7 @@ export default function Navbar() {
 
     const router = useRouter();
     const [currUser, setUser] = useState(false)
+    const [currName, setName] = useState("")
 
     function logout(){
         auth.signOut().then(() => {
@@ -19,13 +20,26 @@ export default function Navbar() {
             console.log(error)
         })
     }
-
+    
+    
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if(user)
                 setUser(true)
         })
     }, [currUser])
+
+    useEffect(() => {
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const docRef = doc(db, "users", auth.currentUser.uid);
+                onSnapshot(docRef, (doc) => {
+                    setName(doc.data().displayName);
+                })
+                
+            }
+        })
+    }, [currName])
 
     return (
         <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white" data-testid="nav_container">

@@ -26,7 +26,6 @@ export default function Signup(){
         if(samePass)
             createUserWithEmailAndPassword(auth, email, password)
             .then( (userCredential) => {
-                
                 const user = userCredential.user;
                 try {
                     setDoc( doc(db, "users", user.uid), {
@@ -34,7 +33,9 @@ export default function Signup(){
                         profPic: "https://firebasestorage.googleapis.com/v0/b/practice-a80a2.appspot.com/o/images%2Fuser_icon.png?alt=media&token=0958e30c-dd7c-4feb-81ed-9ea1f0c3a948",
                         commentIDs: [],
                         liked: [],
-                        disliked: []
+                        disliked: [],
+                        displayName: email.substring(0, email.indexOf("@")),
+                        bio: ""
                     }).then(() => {
                         console.log("User has been added")
                     })
