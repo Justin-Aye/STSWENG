@@ -15,6 +15,7 @@ module.exports = {
         'card_bg': 'white',
         'nav_bg': '#6096B4',
         'doc_bg': '#ECF9FF',
+        'card_comment': '#F2F2F2'
       },
     },
   },
