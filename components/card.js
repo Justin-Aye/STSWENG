@@ -2,21 +2,22 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
+import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { useRouter } from "next/router";
 
-export default function Card( { currUser, username, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
+export default function Card( { currUser, username, imageSrc, caption, profpic, likes, dislikes, commentsID, postID, creator } ) {
 
     var hasVoted = false;
     
-    const [ commentsid, setCommentsid ] = useState(commentsID)
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
 
+    const [ commentsid, setCommentsid ] = useState(commentsID)
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([])
 
-    // const [ lastComment, setLastComment ] = useState()
+    const router = useRouter()
 
     function handleInsertComment(){
         if(addComment.length > 0)
@@ -68,6 +69,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
     }, [])
 
     return (
+        <>
         <div className="mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
@@ -76,6 +78,24 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
                 <p className="my-auto text-left">{username}</p>
+
+                {
+                    (currUser.uid == creator) &&
+                    <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
+                        onClick={() => {router.push({
+                            pathname: '/editpost',
+                            query: {
+                                caption: caption,
+                                postID: postID,
+                                profpic: profpic,
+                                imageSrc: imageSrc,
+                                username: username
+                            },
+                        }, 'edit_post')}}
+                    >
+                        <Image src={"/images/edit_icon.png"} alt={""} fill sizes="(max-width: 500px)"/>
+                    </div>
+                }
             </div>
             
             {/* IMAGE OF POST, IF AVAILABLE */}
@@ -164,8 +184,9 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     {showComments ? "Hide Comments" : "View Comments"}
                 </p>
 
-
             </div>
         </div>
+        </>
+        
     )
 }

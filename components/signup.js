@@ -7,6 +7,7 @@ import { addDoc, collection, setDoc, doc, query, where, getDocs } from "firebase
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function Signup(){
 
@@ -18,6 +19,7 @@ export default function Signup(){
     const [samePass, setSamePass] = useState(true)
 
     const router = useRouter()
+    const [ loading, setLoading ] = useState(true)
 
     function handleSubmit(){
         if(password != repeatPassword)
@@ -57,8 +59,18 @@ export default function Signup(){
         auth.onAuthStateChanged((user) => {
             if(user)
                 router.push("/")
+            else
+                setLoading(false)
         })
     })
+
+    if(loading){
+        return (
+            <div className="w-[100px] h-[100px] mx-auto mb-5 relative justify-center">
+                <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col p-10">
