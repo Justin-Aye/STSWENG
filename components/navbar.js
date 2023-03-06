@@ -55,21 +55,23 @@ export default function Navbar() {
             </div>
             
             <div className="ml-auto flex gap-5 w-1/4 justify-end">
-                <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="signup_link">
-                    <Link href="/signup" className="hover:text-violet-400">Signup</Link>
-                </div>
+                { !currUser && 
+                    <div className="my-auto" data-testid="signup_link">
+                        <Link href="/signup" className="hover:text-violet-400">Signup</Link>
+                    </div>
+                }
 
-                <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="login_link">
-                    <Link href="/login" className="hover:text-violet-400">Login</Link>
-                </div>
-
-                <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                <Link href={`/profile/${currName}`} className="hover:text-violet-400"> {currName} </Link>
-                </div>
-
-                <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <p className="hover:text-violet-400 cursor-pointer" onClick={() => logout()}>Logout</p>
-                </div>
+                { !currUser && 
+                    <div className="my-auto" data-testid="login_link">
+                        <Link href="/login" className="hover:text-violet-400">Login</Link>
+                    </div>
+                }
+                
+                { currUser && 
+                    <div className="my-auto">
+                        <p className="hover:text-violet-400 cursor-pointer" onClick={() => logout()}>Logout</p>
+                    </div>
+                } 
             </div>
         </div>
     )
