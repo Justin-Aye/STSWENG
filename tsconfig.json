@@ -19,6 +19,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/comment.js", "components/dashboard.js", "components/homepage.js", "components/login.js", "components/navbar.js", "components/signup.js", "pages/index.js", "pages/login.js", "pages/signup.js", "pages/test.js", "components/card.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/Test_backend.js", "components/dashboard.js", "components/homepage.js", "components/login.js", "components/navbar.js", "components/signup.js", "pages/index.js", "pages/login.js", "pages/signup.js", "pages/test.js", "components/card.js"],
   "exclude": ["node_modules"]
 }

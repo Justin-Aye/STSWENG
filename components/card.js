@@ -3,7 +3,7 @@ import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
+import { db } from "../firebaseConfig";
 
 export default function Card( { currUser, username, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
 

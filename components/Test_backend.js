@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState, useRef } from "react";
 import { uuidv4 } from "@firebase/util";
 
-export default function Comment(){
+export default function Test_backend(){
 
     const router = useRouter()
     const [commentDocs, setCommentDocs] = useState()
