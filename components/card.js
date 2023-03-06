@@ -72,7 +72,9 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
 
             {/* USER PROFILE PIC */}
             <div className="flex mb-5 gap-5" data-testid="user_container">
-                <img className="w-[50px] h-[50px] rounded-[50%]" src={profpic} alt="" />
+                <div className="flex relative w-[50px] h-[50px]">
+                    <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
+                </div>
                 <p className="my-auto text-left">{username}</p>
             </div>
             
