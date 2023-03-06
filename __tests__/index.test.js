@@ -6,7 +6,6 @@ import Signup from '../components/signup'
 import '@testing-library/jest-dom'
 
 // Unit Test Per Component
-
 import { useRouter } from 'next/router'
 
 jest.mock('next/router', () => ({
@@ -15,7 +14,11 @@ jest.mock('next/router', () => ({
 
 describe('Card Component', () => {
   it('renders a heading', () => {
-    render(<Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}/>)
+    render(
+      <Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
+        likes={0} dislikes={0} commentsID={[]} 
+      />
+    )
     expect(screen.getByTestId("user_container")).toBeInTheDocument();
     expect(screen.getByTestId("image")).toBeInTheDocument();
     expect(screen.getByTestId("buttons_container")).toBeInTheDocument();
