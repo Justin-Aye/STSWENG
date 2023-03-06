@@ -2,6 +2,8 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React from "react";
 import Image from "next/image";
+import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
 
 export default function Card( { username, imageSrc, caption, profpic } ) {
 
@@ -13,7 +15,9 @@ export default function Card( { username, imageSrc, caption, profpic } ) {
         <div className="mx-auto mb-28 w-2/5 h-1/2 min-h-[500px] bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             <div className="flex mb-5 gap-5" data-testid="user_container">
-                <img className="w-[50px] h-[50px] rounded-[50%]" src={profpic} alt="" />
+                <div className="flex relative w-[50px] h-[50px]">
+                    <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
+                </div>
                 <p className="my-auto text-left">{username}</p>
             </div>
             
