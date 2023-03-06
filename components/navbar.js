@@ -50,25 +50,26 @@ export default function Navbar() {
     }
 
     return (
-        <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white sticky top-0 z-50"
+        <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white sticky top-0 z-50
+                        grid grid-flow-col auto-col-max"
                 data-testid="nav_container">
 
-            <div className="my-auto w-1/4">
+            <div className="my-auto w-fit">
                 <Link href="/" className="hover:transition duration-300 hover:text-violet-800 w-fit flex items-center">
-                    <Image src={"/images/logo.png"} width={50} height={50} />
+                    <Image src={"/images/logo.png"} width={50} height={50} alt="FaceGram logo" />
                     <span className="w-fit px-2 text-[32px] font-logo">FaceGram</span>
                 </Link>
             </div>
             
 
-            <div className="mx-auto my-auto w-2/3 flex justify-end">
+            <div className="mx-auto my-auto w-full flex justify-end col-span-3">
                 <input className="my-auto h-12 w-1/2 px-5 rounded-full text-black focus:outline-blue-100" 
                     onKeyDown={(e) => {
                         console.log(e.key)
-                    }} type="text" placeholder="Search..."/>
+                    }} type="text" size="75" placeholder="Search..."/>
             </div>
             
-            <div className="ml-auto flex gap-5 w-1/4 justify-end">
+            <div className="ml-auto pl-3 flex gap-5 w-fit justify-end">
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
                     <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
                         onClick={() => handlePost()}>
@@ -82,7 +83,7 @@ export default function Navbar() {
                 
 
                 <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="signup_link">
-                    <Link href="/signup" className="hover:transition duration-300 hover:text-violet-800">Signup</Link>
+                    <Link href="/signup" className="hover:transition duration-300 hover:text-violet-800">Sign Up</Link>
                 </div>
 
                 <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="login_link">

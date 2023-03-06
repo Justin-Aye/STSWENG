@@ -22,7 +22,12 @@ module.exports = {
         'nav_bg_dark': '#3AA1A3',
         'doc_bg': '#ECF9FF',
         'feed_bg': '#D0DBE5',
+        'icon_color': '#583A71', 
       },
+      backgroundImage: {
+        'signup_page': "url('/images/signup_bg.png')",
+        'login_page': "url('/images/login_bg.png')",
+      }
     },
   },
   plugins: [],

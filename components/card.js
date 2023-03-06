@@ -38,7 +38,9 @@ export default function Card( { username, imageSrc, caption, profpic } ) {
             <p className="mb-5 text-left" data-testid="caption">{caption}</p>
 
             <div className="flex-col w-full">
-                <p className="px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none">Comments ...</p>
+                <p className="px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none">
+                    <i class="fa fa-comment pr-2" />Comments ...
+                </p>
 
                 <div className="flex flex-col mt-5">
                     <div className="flex w-full">

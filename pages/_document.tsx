@@ -16,7 +16,7 @@ export default function Document() {
         <title>FaceGram</title>
         
       </Head>
-      <body className='bg-doc_bg'>
+      <body className='bg-doc_bg text-gray-800'>
         <Main />
         <NextScript />
       </body>
