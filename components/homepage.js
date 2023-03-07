@@ -10,9 +10,9 @@ import Image from "next/image";
 export default function Homepage() {
 
     // Static Data holders
-    var Username="Username"
-    var Caption="Best Image" 
-    var ImageSrc="/images/mountain.jpg" 
+    // var Username="Username"
+    // var Caption="Best Image" 
+    // var ImageSrc="/images/mountain.jpg" 
     var Profpic="/images/user_icon.png"
 
     // Fetched data
@@ -31,6 +31,9 @@ export default function Homepage() {
         auth.onAuthStateChanged((user) => {
             if(!user)
                 router.push("/login")
+            else{
+                router.push("/addpost")
+            }
         })
     }
 
@@ -110,9 +113,17 @@ export default function Homepage() {
                 posts.map((post, index) => {
                     console.log(post.creatorID);
                     return (
-                        <Card key={index} owner={post.creatorID}
-                            caption={post.caption} imageSrc={post.imageSrc} profpic={Profpic} postID={postIDs[index]}
-                            currUser={currUser} likes={post.likes} dislikes={post.dislikes} commentsID={post.commentsID}
+                        <Card key={index} 
+                            username={"Display Name"} 
+                            caption={post.caption} 
+                            imageSrc={post.imageSrc} 
+                            profpic={Profpic} 
+                            postID={postIDs[index]}
+                            currUser={currUser} 
+                            likes={post.likes} 
+                            dislikes={post.dislikes} 
+                            commentsID={post.commentsID}
+                            creator={post.creatorID}
                         />
                     )
                 })
