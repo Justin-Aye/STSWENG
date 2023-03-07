@@ -123,7 +123,7 @@ export default function Homepage() {
                             likes={post.likes} 
                             dislikes={post.dislikes} 
                             commentsID={post.commentsID}
-                            creator={post.creatorID}
+                            owner={post.creatorID}
                         />
                     )
                 })

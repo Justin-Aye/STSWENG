@@ -8,7 +8,7 @@ import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
 
 
-export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID, creator } ) {
+export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
 
     var hasVoted = false;
     
@@ -136,7 +136,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
 
                 {/* Triple Dot Button */}
                 {
-                    (currUser && currUser.uid == creator) &&
+                    (currUser && currUser.uid == owner) &&
                     <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
                         onClick={() => setShowOptions(true)}
                     >
