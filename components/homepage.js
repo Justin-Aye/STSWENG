@@ -6,6 +6,7 @@ import { auth, db } from "../firebaseConfig";
 import { collection, query, getDocs, orderBy, limit, startAfter } from "firebase/firestore";
 import Image from "next/image";
 
+
 export default function Homepage() {
 
     // Static Data holders
@@ -97,15 +98,20 @@ export default function Homepage() {
     }, [])
 
     return (
-        <div className="text-center mt-5">
-            <div className="mb-5 w-1/4 mx-auto bg-[#4487d4] rounded-lg py-2 cursor-pointer hover:brightness-90"
-                onClick={() => handlePost()}
-            >
-                <p className="text-[20px] text-white">POST AN IMAGE</p>
+        <div className="text-center mt-0 flex flex-col">
+            {/* <div className="bg-feed_bg w-4/5 self-center pt-8"> //use this if we add extra stuff on the right of feed */}
+            <div className="bg-doc_bg w-full self-center pt-8"> 
+                <div className="mb-5 w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
+                                 hover:bg-nav_bg_dark flex justify-center items-center"
+                    onClick={() => handlePost()}
+                >
+                    <img src="/images/add_image_icon_w.png" className="w-[60px] h-[51px]" />
+                    <span className="text-[20px] text-white w-fit h-fit">Create New Post</span>
+                </div>
             </div>
-
             {
                 posts.map((post, index) => {
+                    console.log(post.creatorID);
                     return (
                         <Card key={index} 
                             username={"Display Name"} 
@@ -146,9 +152,6 @@ export default function Homepage() {
                 </p>
             }
 
-            {/* <Card username={Username} caption={Caption} imageSrc={ImageSrc} profpic={Profpic}/>
-            <Card username={Username} caption={Caption} imageSrc={ImageSrc} profpic={Profpic}/>
-            <Card username={Username} caption={Caption} imageSrc={ImageSrc} profpic={Profpic} /> */}
         </div>
     )
 }

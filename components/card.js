@@ -7,7 +7,8 @@ import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
 
-export default function Card( { currUser, username, imageSrc, caption, profpic, likes, dislikes, commentsID, postID, creator } ) {
+
+export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID, creator } ) {
 
     var hasVoted = false;
     
@@ -19,8 +20,20 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
     const [ commentsid, setCommentsid ] = useState(commentsID)
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([])
-
+    
     const router = useRouter()
+
+    const [ postOwner, setPostOwner ] = useState("")
+    const [ commentOwner, setCommentOwner ] = useState("")
+    // const [ lastComment, setLastComment ] = useState()
+
+    useEffect(() => {
+        const postOwnerRef = doc(db, "users", owner);
+        getDoc(postOwnerRef).then((doc) => {
+            setPostOwner(doc.data().email); // TODO: change to displayName later
+        });
+    }, [currUser.uid, owner])
+
 
     function handleInsertComment(){
         if(addComment.length > 0)
@@ -36,7 +49,11 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     setLoading(true)
                     setAddComment('')
                     getDoc(com).then((snap) => {
-                        setComments((comments) => [...comments, snap.data()])
+                        const userRef = doc(db, "users", snap.data().creator);
+                        getDoc(userRef).then((userDoc) => {
+                            setComments((comments) => [...comments, {commentData: snap.data(), userData: userDoc.data().email}]);
+                        })
+                        //setComments((comments) => [...comments, snap.data()])
                         setLoading(false)
                     })
 
@@ -58,9 +75,15 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
             setLoading(true)
             const q = query(collection(db, "comments"), where(documentId(), "in", commentsid))
             getDocs(q).then((docs) => {
-                docs.forEach((doc) => {
-                    setComments((comments) => [...comments, doc.data()])
-                    // setLastComment(doc)
+                docs.forEach((commentDoc) => {
+                    //console.log(commentDoc.data().creator)
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setComments((comments) => [...comments, {commentData: commentDoc.data(), userData: userDoc.data().email}])
+                        console.log(userDoc.data().email);
+                    })
+                    ;
+                    // setLastComment(commentDoc)
                 })
                 setLoading(false)
             })
@@ -108,7 +131,8 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                 <div className="flex relative w-[50px] h-[50px]">
                     <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
-                <p className="my-auto text-left">{username}</p>
+
+                <p className="my-auto text-left">{postOwner}</p>
 
                 {/* Triple Dot Button */}
                 {
@@ -132,7 +156,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                                     postID: postID,
                                     profpic: profpic,
                                     imageSrc: imageSrc,
-                                    username: username
+                                    username: postOwner
                                 },
                             }, 'edit_post')}}
                         >
@@ -190,18 +214,17 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
                     <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{likes.toLocaleString('en-US')}</p>
+                    <p className="my-auto">{likes ? likes.toLocaleString('en-US') : 0}</p>
                 </div>
                 
                 <div className="flex gap-1">
                     <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{dislikes.toLocaleString('en-US')}</p>
+                    <p className="my-auto">{dislikes ? dislikes.toLocaleString('en-US') : 0}</p>
                 </div>
             </div>
 
             {/* COMMENTS CONTAINER */}
             <div className="flex flex-col w-full rounded-lg">
-
                 {/* ADD COMMENT INPUT */}
                 {
                     showComments &&
@@ -220,21 +243,21 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     </div>
                 }
 
-
-                {/* SHOW ALL COMMENTS */}
+                
+                {/* SHOW ALL COMMENTS FIXME: */}
                 {
                     showComments &&
                     comments.map((item, index) => {
                         return (
-                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 shadow-xl rounded-lg border border-gray-300">
+                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">
                                 <div className="flex w-full mb-2">
                                     <div className="flex relative w-[30px] h-[30px]">
                                         <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
                                     </div>
-                                    <p className="ml-5 w-full text-left my-auto">{username}</p>
+                                    <p className="ml-5 w-full text-left my-auto">{item.userData}</p>
                                 </div>
                                 
-                                <p className="text-left w-full">{item.comment}</p>
+                                <p className="text-left w-full">{item.commentData.comment}</p>
                             </div>
                         )
                     })
@@ -248,8 +271,8 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     </div>
                 }
 
-                {/* SHOW COMEMTNS BUTTON */}
-                <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
+                {/* SHOW COMMENTS BUTTON */}
+                {/* <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
                     onClick={() => {
                         setShowComments(!showComments)
 
@@ -259,8 +282,20 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     }}
                 >
                     {showComments ? "Hide Comments" : "View Comments"}
-                </p>
 
+                </p> */}
+                
+                <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                    onClick={() => {
+                        setShowComments(!showComments)
+
+                        if(commentsid.length > 0){
+                            fetchComments()
+                        }
+                    }}
+                >
+                    <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
+                </p>
             </div>
         </div>
         </>

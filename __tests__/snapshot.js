@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 import { render } from '@testing-library/react'
 import Card from '../components/card'
 import Homepage from '../components/homepage'

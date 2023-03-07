@@ -1,58 +1,36 @@
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { db } from "../firebaseConfig"
-import { collection, query, where, getDocs } from "firebase/firestore"
+import { auth, db } from "../firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
-// TODO: if user doesn't exist, display "user doesn't exist", if user exists, display the user's profile
+export default function Profile({ props }) {
+    const router = useRouter();
+    const profileUID = router.query.uid;
 
-export default function Profile( ) {
-    const router = useRouter()
-    const { displayName } = router.query 
+    return (
+        <div>
+            {!props.data ? <h2> User does not exist!</h2>
+            : (
+                <div>
+                    <h2>
+                        Bio: {props.data.bio.trim() ? props.data.bio : `User ${props.data.displayName} has no bio!`}
+                    </h2>
+                    <h2> Display Name: {props.data.displayName}</h2>
+                    <h2> Email: {props.data.email}</h2>
 
-    const [userExists, setUser] = useState(false)
-    const [userData, setData] = useState({})
+                    <br></br>
 
-    // check if user exists
-    useEffect(() => {
-        try {
-            const users = collection(db, "users")
-            const q = query(users, where("displayName", "==", displayName))
-            if (q) {
-                const qSnapshot = getDocs(q)
-                qSnapshot.then((snapshot) => {
-                    snapshot.docs.forEach(doc => {
-                        if (doc.data().displayName == displayName) {
-                            setUser(true)
-                            setData(doc.data())
-                            console.log(userData)
-                        }
-                    })
-                })
-            }
-        } catch {
-            setUser(false)
-            setData({})
-        }
-    }, [userExists]);
-
-    if (userExists) {
-        return (
-            <div>
-                {Object.entries(userData).map(([key, value]) => (
-                    <p key={key}>
-                        {key}: {value}
-                    </p>
-                ))}
-            </div>
-        )
-    }
-    else {
-        return (
-            <h2>
-                User {displayName} does not exist!
-            </h2>
-        )
-    }
+                    <h2> profpic: </h2>               
+                    <img src={props.data.profPic} alt="" width={100} height={100}/>
+                    
+                    <br></br>
+                    
+                    { props.UID == profileUID ? <Link href="/settings"> settings </Link> : ""}
+                </div>
+            )}
+        </div>
+    )
     
 }
