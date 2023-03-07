@@ -20,10 +20,10 @@ export default function Settings() {
                 setUser(true);
                 const docRef = doc(db, "users", user.uid);
                 getDoc(docRef).then((doc) => {
-                    setDisplayName(doc.data().displayName);
-                    setBio(doc.data().bio);
-                    setProfPic(doc.data().profPic)
-                    setProfPicPreview(doc.data().profPic);
+                    setDisplayName(doc?.data()?.displayName);
+                    setBio(doc?.data()?.bio);
+                    setProfPic(doc?.data()?.profPic)
+                    setProfPicPreview(doc?.data()?.profPic);
                 })
             }
         })
@@ -139,7 +139,7 @@ export default function Settings() {
                             required
                             />
                             <button onClick={saveProfPic}> Save profPic </button>
-                            <img src={preview} alt="" width={100} height={100}></img>
+                            <Image src={preview} alt="" width={100} height={100}/>
 
                         </form>
                     </div>  

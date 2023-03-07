@@ -3,12 +3,11 @@ import React, {useEffect, useState, useRef} from "react";
 import Card from "./card";
 import { useRouter } from "next/router";
 import { auth, db } from "../firebaseConfig";
-import { collection, query, getDocs, orderBy, limit, startAfter } from "firebase/firestore";
+import { collection, query, getDocs, orderBy, limit, startAfter, doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
 
 export default function Homepage() {
-
     // Static Data holders
     var Username="Username"
     var Caption="Best Image" 
@@ -72,11 +71,15 @@ export default function Homepage() {
             limit(3))
 
         getDocs(q).then((snap) => {
-
-            snap.forEach((doc) => {
-                setPostIDs((postIDs) => [...postIDs, doc.id])
-                setPosts((posts) => [...posts, doc.data()])
-                setLastDoc(doc)
+            snap.forEach((postDoc) => {
+                const userRef = doc(db, "users", postDoc.data().creatorID);
+                getDoc(userRef).then((userDoc) => {
+                    setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                    setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                })
+                //setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                //setPosts((posts) => [...posts, postDoc.data()])
+                setLastDoc(postDoc)
             })
             setLoading(false)
             setShowMore(true)
@@ -89,8 +92,12 @@ export default function Homepage() {
     useEffect(() => {
         fetchPosts()
         auth.onAuthStateChanged((user) => {
-            if(user)
-                setCurrUser(user)
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                getDoc(userRef).then((doc) => {
+                    setCurrUser({uid: user.uid, data: doc.data()});
+                })
+            }
         })
     }, [])
 
@@ -102,17 +109,18 @@ export default function Homepage() {
                                  hover:bg-nav_bg_dark flex justify-center items-center"
                     onClick={() => handlePost()}
                 >
-                    <img src="/images/add_image_icon_w.png" className="w-[60px] h-[51px]" />
+                    <Image src="/images/add_image_icon_w.png" alt="" width={60} height={51} />
                     <span className="text-[20px] text-white w-fit h-fit">Create New Post</span>
                 </div>
             </div>
             {
                 posts.map((post, index) => {
-                    console.log(post.creatorID);
                     return (
-                        <Card key={index} owner={post.creatorID}
-                            caption={post.caption} imageSrc={post.imageSrc} profpic={Profpic} postID={postIDs[index]}
-                            currUser={currUser} likes={post.likes} dislikes={post.dislikes} commentsID={post.commentsID}
+                        <Card key={index} 
+                        post={post.data} 
+                        profpic={post.userData.profPic} 
+                        postID={postIDs[index]}
+                        currUser={currUser}   
                         />
                     )
                 })

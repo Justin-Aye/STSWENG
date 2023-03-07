@@ -2,60 +2,209 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
+import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
+export default function Card( { currUser, post, profpic, postID } ) {
 
     var hasVoted = false;
     
-    const [ commentsid, setCommentsid ] = useState(commentsID)
+    const [ commentsid, setCommentsid ] = useState(post.commentsID || "")
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
-
     const [ addComment, setAddComment ] = useState('')
-    const [ comments, setComments ] = useState([])
-    const [ postOwner, setPostOwner ] = useState("")
-    const [ commentOwner, setCommentOwner ] = useState("")
+    const [ comments, setComments ] = useState([]);
+    const [ postOwner, setPostOwner ] = useState("");
+    const [ postLikeCount, setPostLikeCount ] = useState(post.likes || 0);
+    const [ postDislikeCount, setPostDislikeCount ] = useState(post.dislikes || 0);
     // const [ lastComment, setLastComment ] = useState()
 
+    const [disable, setDisabled] = useState(false);
+
     useEffect(() => {
-        const postOwnerRef = doc(db, "users", owner);
+        const postOwnerRef = doc(db, "users", post.creatorID);
         getDoc(postOwnerRef).then((doc) => {
             setPostOwner(doc.data().email); // TODO: change to displayName later
         });
-    }, [currUser.uid, owner])
+    }, [post.creatorID]);
 
+    useEffect(() => {
+        const docRef = doc(db, "posts", postID);
+        onSnapshot(docRef, (doc) => {
+            setPostLikeCount(doc.data().likes);
+            setPostDislikeCount(doc.data().dislikes);
+        })
+    }, [postID]);
+
+    
+    useEffect(() => {
+        return () => {
+            clearTimeout();
+        }
+    }, []);
+    
+    async function handleLikePost() {
+        try {
+            if (currUser) {
+                const userRef = doc(db, "users", currUser.uid);
+                const postRef = doc(db, "posts", postID);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    if ( (userSnap.data().liked.indexOf(postID) == -1) && (userSnap.data().disliked.indexOf(postID) == -1)) {
+                        await updateDoc(postRef, {
+                            likes: increment(1)
+                        });
+                        await updateDoc(userRef, {
+                            liked: arrayUnion(postID)
+                        });
+                    }
+                    else if ( (userSnap.data().liked.includes(postID)) && (userSnap.data().disliked.indexOf(postID) == -1)) {
+                        await updateDoc(postRef, {
+                            likes: increment(-1)
+                        });
+                        await updateDoc(userRef, {
+                            liked: userSnap.data().liked.filter((val, i, arr) => {return val != postID})
+                        })
+                    }
+                }
+                setDisabled(true);
+                setTimeout(() => setDisabled(false), 500);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async function handleDislikePost() {
+        try {
+            if (currUser) {
+                const userRef = doc(db, "users", currUser.uid);
+                const postRef = doc(db, "posts", postID);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    if ( (userSnap.data().disliked.indexOf(postID) == -1) && (userSnap.data().liked.indexOf(postID) == -1)) {
+                        await updateDoc(postRef, {
+                            dislikes: increment(-1)
+                        });
+                        await updateDoc(userRef, {
+                            disliked: arrayUnion(postID)
+                        });
+                    }
+                    else if ((userSnap.data().disliked.includes(postID)) && (userSnap.data().liked.indexOf(postID) == -1)) {
+                        await updateDoc(postRef, {
+                            dislikes: increment(1)
+                        });
+                        await updateDoc(userRef, {
+                            disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != postID})
+                        })
+                    }
+                }
+                setDisabled(true);
+                setTimeout(() => setDisabled(false), 500);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    // TODO: works but doesnt update frontend until refreshed
+    async function handleLikeComment(item) {
+        try {
+            if (currUser) {
+                const userRef = doc(db, "users", currUser.uid);
+                const commentRef = doc(db, "comments", item.commentID);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    if ((userSnap.data().liked.indexOf(item.commentID) == -1) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
+                        await updateDoc(commentRef, {
+                            likes: increment(1)
+                        });
+                        await updateDoc(userRef, {
+                            liked: arrayUnion(item.commentID)
+                        });
+                    }
+                    else if ((userSnap.data().liked.includes(item.commentID)) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
+                        await updateDoc(commentRef, {
+                            likes: increment(-1)
+                        });
+                        await updateDoc(userRef, {
+                            liked: userSnap.data().liked.filter((val, i, arr) => {return val != item.commentID})
+                        })
+                    }
+                }
+                //setDisabled(true);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async function handleDislikeComment(item) {
+        try {
+            if (currUser) {
+                const userRef = doc(db, "users", currUser.uid);
+                const commentRef = doc(db, "comments", item.commentID);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    if ((userSnap.data().disliked.indexOf(item.commentID) == -1) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
+                        await updateDoc(commentRef, {
+                            dislikes: increment(1)
+                        });
+                        await updateDoc(userRef, {
+                            disliked: arrayUnion(item.commentID)
+                        });
+                    }
+                    else if ((userSnap.data().disliked.includes(item.commentID)) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
+                        await updateDoc(commentRef, {
+                            dislikes: increment(-1)
+                        });
+                        await updateDoc(userRef, {
+                            disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != item.commentID})
+                        })
+                    }
+                }
+                //setDisabled(true);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     function handleInsertComment(){
         if(addComment.length > 0)
             try {
-                addDoc(collection(db, "comments"), {
-                    comment: addComment,
-                    likes: 0,
-                    dislikes: 0,
-                    creator: currUser.uid
-                }).then((com) => {
-                    setCommentsid((commentsid) => [...commentsid, com.id])
+                if (currUser) {
+                    addDoc(collection(db, "comments"), {
+                        comment: addComment,
+                        likes: 0,
+                        dislikes: 0,
+                        creator: currUser.uid
+                    }).then((com) => {
+                        setCommentsid((commentsid) => [...commentsid, com.id])
 
-                    setLoading(true)
-                    setAddComment('')
-                    getDoc(com).then((snap) => {
-                        const userRef = doc(db, "users", snap.data().creator);
-                        getDoc(userRef).then((userDoc) => {
-                            setComments((comments) => [...comments, {commentData: snap.data(), userData: userDoc.data().email}]);
+                        setLoading(true)
+                        setAddComment('')
+                        getDoc(com).then((snap) => {
+                            const userRef = doc(db, "users", snap.data().creator);
+                            getDoc(userRef).then((userDoc) => {
+                                setComments((comments) => [...comments, {commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}]);
+                            })
+                            //setComments((comments) => [...comments, snap.data()])
+                            setLoading(false)
                         })
-                        //setComments((comments) => [...comments, snap.data()])
-                        setLoading(false)
-                    })
 
-                    // Insert comment into post via postid
-                    updateDoc(doc(db, "posts", postID), {
-                        commentsID: arrayUnion(com.id)
-                    }).catch((error) => {
-                        console.log(error)
+                        // Insert comment into post via postid
+                        updateDoc(doc(db, "posts", postID), {
+                            commentsID: arrayUnion(com.id)
+                        }).catch((error) => {
+                            console.log(error)
+                        })
                     })
-                })
+                }
             } 
             catch (error) {
                 console.log(error)
@@ -71,8 +220,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     //console.log(commentDoc.data().creator)
                     const userRef = doc(db, "users", commentDoc.data().creator);
                     getDoc(userRef).then((userDoc) => {
-                        setComments((comments) => [...comments, {commentData: commentDoc.data(), userData: userDoc.data().email}])
-                        console.log(userDoc.data().email);
+                        setComments((comments) => [...comments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
                     })
                     ;
                     // setLastComment(commentDoc)
@@ -81,7 +229,6 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
             })
         }
     }
-
 
     return (
         <div className="mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
@@ -96,25 +243,29 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
             
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
-                imageSrc.length != 0 &&
+                post.imageSrc.length != 0 &&
                 <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
-                    <Image className="rounded-lg" src={imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
+                    <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
                 </div>
             }   
 
             {/* CAPTION OF POST */}
-            <p className="mb-5 text-left" data-testid="caption">{caption}</p>
+            <p className="mb-5 text-left" data-testid="caption">{post.caption}</p>
 
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{likes ? likes.toLocaleString('en-US') : 0}</p>
+                    <button onClick={handleLikePost} disabled={disable}>
+                        <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    </button>
+                    <p className="my-auto">{postLikeCount}</p>
                 </div>
                 
                 <div className="flex gap-1">
-                    <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{dislikes ? dislikes.toLocaleString('en-US') : 0}</p>
+                    <button onClick={handleDislikePost} disabled={disable}>
+                        <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    </button>
+                    <p className="my-auto">{postDislikeCount}</p>
                 </div>
             </div>
 
@@ -139,7 +290,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                 }
 
                 
-                {/* SHOW ALL COMMENTS FIXME: */}
+                {/* SHOW ALL COMMENTS */}
                 {
                     showComments &&
                     comments.map((item, index) => {
@@ -147,13 +298,36 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                             <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">
                                 <div className="flex w-full mb-2">
                                     <div className="flex relative w-[30px] h-[30px]">
-                                        <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
+                                        <Image className="rounded-[50%]" src={item.userData.profPic} alt="" fill sizes="(max-width: 30px)"/>
                                     </div>
-                                    <p className="ml-5 w-full text-left my-auto">{item.userData}</p>
+                                    <p className="ml-5 w-full text-left my-auto">{item.userData.email}</p>
                                 </div>
                                 
                                 <p className="text-left w-full">{item.commentData.comment}</p>
+                            
+                                
+                                {/* TEMPORARY COMMENT LIKE & DISLIKE BUTTONS TODO: change if needed */}
+                                <div className="flex gap-5 mb-5" data-testid="buttons_container">
+                                    <div className="flex gap-1">
+                                        <button onClick={() => {handleLikeComment(item)}}>
+                                            <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                                        </button>
+                                        <p className="my-auto">{item.commentData.likes}</p>
+                                    </div>
+                                    
+                                    <div className="flex gap-1">
+                                        <button onClick={() => {handleDislikeComment(item)}}>
+                                            <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                                        </button>
+                                        <p className="my-auto">{item.commentData.dislikes}</p>
+                                    </div>
+                                </div>
+                            
                             </div>
+                        
+                        
+                        
+                        
                         )
                     })
                 }
