@@ -5,13 +5,24 @@ import Image from "next/image";
 import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-export default function Card( { currUser, username, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
+
+export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
 
     var hasVoted = false;
     
     const [ commentsid, setCommentsid ] = useState(commentsID)
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
+    const [ showOptions, setShowOptions ] = useState(false)
+    const [ commentOptions, setCommentOptions] = useState(false)
+    const [ showEditComment, setShowEditComment ] = useState(false)
+    const [ askDeletePost, setaskDeletePost ] = useState(false)
+    const [ askDeleteComment, setAskDeleteComment ] = useState(false)
+
+    const [ currComment, setCurrComment ] = useState('')
+    const [ selectedComment, setSelected ] = useState()
+    const [ selectedCommentVal, setSelectedCommentVal] = useState('')
+    const [ selectedCommID, setSelectedID ] = useState()
 
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([])
@@ -54,12 +65,65 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
             setLoading(true)
             const q = query(collection(db, "comments"), where(documentId(), "in", commentsid))
             getDocs(q).then((docs) => {
-                docs.forEach((doc) => {
-                    setComments((comments) => [...comments, doc.data()])
-                    // setLastComment(doc)
+                docs.forEach((commentDoc) => {
+                    //console.log(commentDoc.data().creator)
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setComments((comments) => [...comments, {commentData: commentDoc.data(), userData: userDoc.data().email, id:commentDoc.id}])
+                        console.log(userDoc.data().email);
+                    })
+                    ;
+                    // setLastComment(commentDoc)
                 })
                 setLoading(false)
             })
+        }
+    }
+
+    async function deletePost(){
+        const post = await getDoc(doc(db, "posts", postID))
+        const data = post.data()
+
+        var commentIDs = data.commentsID
+        
+        // Delete Every Comment in the post
+        if(commentIDs.length > 0){
+            const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
+            querySnapshot.forEach((doc) => {
+                deleteDoc(doc.ref)
+            })
+        }
+        
+        // Delete Image
+        if(data.imageSrc.length > 0){
+            deleteObject(ref(storage, imageSrc))
+        }
+
+        // Delete Post
+        deleteDoc(doc(db, "posts", postID)).then(() => {
+            console.log("Successfully deleted")
+            window.location.reload()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
+    function saveCommentEdit(){
+        if(selectedCommentVal != currComment){
+            updateDoc(doc(db, "comments", selectedCommID), {
+                comment: selectedCommentVal
+            }).then(() => {
+                setShowEditComment(false)
+                setSelectedCommentVal("")
+                setCurrComment("")
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+        else{
+            setShowEditComment(false)
+            setSelectedCommentVal("")
+            setCurrComment("")
         }
     }
 
@@ -75,9 +139,103 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                 <div className="flex relative w-[50px] h-[50px]">
                     <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
-                <p className="my-auto text-left font-bold text-[20px]">{username}</p>
+
+                <p className="my-auto text-left">{postOwner}</p>
+
+                {/* Triple Dot Button */}
+                {
+                    (currUser && currUser.uid == owner) &&
+                    <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
+                        onClick={() => setShowOptions(true)}
+                    >
+                        <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
+                    </div>
+                }
+
+                {/* EDIT / DELETE OPTION */}
+                {   
+                    showOptions &&
+                    <div className="absolute top-0 right-0 w-1/4 h-fit drop-shadow-xl shadow-xl flex flex-col z-10">
+                        <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
+                            onClick={() => {router.push({
+                                pathname: '/editpost',
+                                query: {
+                                    caption: caption,
+                                    postID: postID,
+                                    profpic: profpic,
+                                    imageSrc: imageSrc,
+                                    username: postOwner
+                                },
+                            }, 'edit_post')}}
+                        >
+                            Edit
+                        </p>
+                        <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
+                            onClick={() => {setaskDeletePost(true); setShowOptions(false)}}
+                        >
+                            Delete
+                        </p>
+
+                        <p className="hover:brightness-95 bg-red-200 border-separate border-black cursor-pointer"
+                            onClick={() => setShowOptions(false)}
+                        >
+                            Cancel
+                        </p>
+                    </div>
+                }
             </div>
             
+            {/* Warns User before deleting the post */}
+            {
+                askDeletePost &&
+                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
+                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5">
+                        <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
+                        <p>You are about to delete a post.</p>
+                        <div className="flex mt-10 justify-center gap-5">
+                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => deletePost()}
+                            >
+                                Delete Post
+                            </button>
+                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => setaskDeletePost(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            {/* Warns User before deleting the comment */}
+
+            {/* Edit Comment Interface */}
+            {
+                showEditComment &&
+                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
+                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
+                        <p className="text-center text-[20px] font-bold">EDIT COMMENT</p>
+                        
+                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                            value={selectedCommentVal} onChange={(e) => {setSelectedCommentVal(e.target.value)}} 
+                        />
+                        <div className="flex mt-10 justify-center gap-5">
+                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => saveCommentEdit()}
+                            >
+                                Save Edits
+                            </button>
+                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => setShowEditComment(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
                 imageSrc.length != 0 &&
@@ -133,10 +291,10 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                                     <div className="flex relative w-[30px] h-[30px]">
                                         <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
                                     </div>
-                                    <p className="ml-5 w-full text-left my-auto">{username}</p>
+                                    <p className="ml-5 w-full text-left my-auto">{item.userData}</p>
                                 </div>
                                 
-                                <p className="text-left w-full">{item.comment}</p>
+                                <p className="text-left w-full">{item.commentData.comment}</p>
                             </div>
                         )
                     })
@@ -161,6 +319,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     }}
                 >
                     {showComments ? "Hide Comments" : "View Comments"}
+
                 </p> */}
                 
                 <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
