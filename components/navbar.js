@@ -83,7 +83,7 @@ export default function Navbar() {
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                <Link href={`/profile/${currName}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
+                <Link href={`/profile/${currUser}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>

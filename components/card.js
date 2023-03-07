@@ -41,7 +41,11 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     setLoading(true)
                     setAddComment('')
                     getDoc(com).then((snap) => {
-                        setComments((comments) => [...comments, snap.data()])
+                        const userRef = doc(db, "users", snap.data().creator);
+                        getDoc(userRef).then((userDoc) => {
+                            setComments((comments) => [...comments, {commentData: snap.data(), userData: userDoc.data().email}]);
+                        })
+                        //setComments((comments) => [...comments, snap.data()])
                         setLoading(false)
                     })
 
@@ -135,7 +139,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                 }
 
                 
-                {/* SHOW ALL COMMENTS */}
+                {/* SHOW ALL COMMENTS FIXME: */}
                 {
                     showComments &&
                     comments.map((item, index) => {
@@ -186,7 +190,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                 >
                     <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
                 </p>
-            </div> 
+            </div>
         </div>
     )
 }
