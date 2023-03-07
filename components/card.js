@@ -93,12 +93,12 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
                     <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{likes.toLocaleString('en-US')}</p>
+                    <p className="my-auto">{likes ? likes.toLocaleString('en-US') : 0}</p>
                 </div>
                 
                 <div className="flex gap-1">
                     <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{dislikes.toLocaleString('en-US')}</p>
+                    <p className="my-auto">{dislikes ? dislikes.toLocaleString('en-US') : 0}</p>
                 </div>
             </div>
 
