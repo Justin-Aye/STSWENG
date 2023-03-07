@@ -66,7 +66,7 @@ export default function Navbar() {
                     <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
                         onClick={() => handlePost()}>
                         <i className="fa fa-plus-circle text-[24px] pr-2" />
-                        <span>New Post</span>
+                        <Link href="/addpost">New Post</Link>
                     </div>
                     
                 </div>

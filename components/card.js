@@ -116,7 +116,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
         }
     }
 
-    // TODO: works but doesnt update frontend until refreshed
+    // FIXME: works but doesnt update frontend until page refreshed
     async function handleLikeComment(item) {
         try {
             if (currUser) {
@@ -279,7 +279,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
                 {/* Triple Dot Button */}
                 {
-                    (currUser && currUser.uid == owner) &&
+                    (currUser && currUser.uid == post.creatorID) &&
                     <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
                         onClick={() => setShowOptions(true)}
                     >
