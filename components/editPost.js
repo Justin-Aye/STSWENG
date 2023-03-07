@@ -11,12 +11,13 @@ import { uuidv4 } from "@firebase/util";
 export default function EditPost(){
 
     const [ loading, setLoading ] = useState(true)
-    const [ mustFill, setMustFill ] = useState(false)
+    const [ needEdit, setNeedEdit ] = useState(false)
  
     const [ caption, setCaption] = useState('')
     const [ postID, setPostID ] = useState()
     const [ image, setImage ] = useState()
     const [ imgUrl, setUrl ] = useState('')
+    const [ oldImgUrl, setOldImgUrl ] = useState('')
     const [ profpic, setProfPic ] = useState('')
     const [ userID, setUserId ] = useState()
 
@@ -29,12 +30,13 @@ export default function EditPost(){
         setLoading(false)
     }
 
-    async function uploadPost(){
-        
-        if(image == null && caption.length == 0)
-            setMustFill(true)
+    async function saveEdits(){
 
-        else if(image == null && caption.length > 0){
+        if(image == null && caption == router.query.caption)
+            setNeedEdit(true)
+
+        // User does not upload a new image, and caption is new
+        else if(image == null && caption.length > 0 && caption != router.query.caption){
             try {
                 updateDoc(doc(db, "posts", postID), {
                     caption: caption,
@@ -50,7 +52,9 @@ export default function EditPost(){
             }
         }
 
-        else if(image != null && caption.length > 0){
+        // User uploads a new image, while post already has an image
+        else if( image != null && caption.length > 0 && oldImgUrl.length > 0){
+
             // Sets up unique file name
             const uid = uuidv4()
             const filename = "images/" + image.name + "_" + uid
@@ -58,33 +62,35 @@ export default function EditPost(){
             // Reference to firebase storage, and intended filename
             const storageRef = ref( storage, filename)
             
-            deleteObject(ref(storage, editImgUrl)).then(() => {
+            // Delete Previously stored image
+            deleteObject(ref(storage, oldImgUrl)).then(() => {
 
-            })
-                
-            // Uploads an Image to Firebase
-            uploadBytesResumable( storageRef,  image).then((uploadResult) => {
+                // Uploads new Image to Firebase
+                uploadBytesResumable( storageRef,  image).then((uploadResult) => {
 
-                // Get Firebase Image Url for post
-                getDownloadURL(uploadResult.ref).then((res) => {
-                    try {
-                        updateDoc(doc(db, "posts", postID), {
-                            caption: caption,
-                            imageSrc: imgUrl
-                        }).then(() => {
-                            router.push("/")
-                        }).catch((error) => {
+                    // Get Firebase Image Url
+                    getDownloadURL(uploadResult.ref).then((res) => {
+
+                        // Update Post data
+                        try {
+                            updateDoc(doc(db, "posts", postID), {
+                                caption: caption,
+                                imageSrc: imgUrl
+                            }).then(() => {
+                                router.push("/")
+                            }).catch((error) => {
+                                console.log(error)
+                            })
+                        } 
+                        catch (error) {
                             console.log(error)
-                        })
-                    } 
-                    catch (error) {
+                        }
+                    }).catch((error) => {
                         console.log(error)
-                    }
+                    })
                 }).catch((error) => {
                     console.log(error)
                 })
-            }).catch((error) => {
-                console.log(error)
             })
         }
     }
@@ -113,6 +119,7 @@ export default function EditPost(){
                 setPostID(router.query.postID)
                 setProfPic(router.query.profpic) 
                 setUrl(router.query.imageSrc)
+                setOldImgUrl(router.query.imageSrc)
                 
                 // router.query.username
 
@@ -175,8 +182,8 @@ export default function EditPost(){
                 </div>
 
                 {   
-                    mustFill &&
-                    <p className=" text-center text-red-500 mt-5 underline">Post must have atleast an Image or Caption</p>
+                    needEdit &&
+                    <p className=" text-center text-red-500 mt-5 underline">No new edits have been made</p>
                 }
 
                 <div className="flex w-full gap-5">
@@ -187,7 +194,7 @@ export default function EditPost(){
                     </button>
 
                     <button className="border mt-10 mb-5 border-black w-1/4 bg-nav_bg px-5 py-1 text-white rounded-xl hover:brightness-95" 
-                        onClick={() => uploadPost()}
+                        onClick={() => saveEdits()}
                     >
                         Save Edits
                     </button>
