@@ -5,7 +5,7 @@ import Image from "next/image";
 import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, startAfter, getDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-export default function Card( { currUser, username, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
+export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
 
     var hasVoted = false;
     
@@ -15,8 +15,17 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
 
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([])
-
+    const [ postOwner, setPostOwner ] = useState("")
+    const [ commentOwner, setCommentOwner ] = useState("")
     // const [ lastComment, setLastComment ] = useState()
+
+    useEffect(() => {
+        const postOwnerRef = doc(db, "users", owner);
+        getDoc(postOwnerRef).then((doc) => {
+            setPostOwner(doc.data().email); // TODO: change to displayName later
+        });
+    }, [currUser.uid, owner])
+
 
     function handleInsertComment(){
         if(addComment.length > 0)
@@ -54,18 +63,21 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
             setLoading(true)
             const q = query(collection(db, "comments"), where(documentId(), "in", commentsid))
             getDocs(q).then((docs) => {
-                docs.forEach((doc) => {
-                    setComments((comments) => [...comments, doc.data()])
-                    // setLastComment(doc)
+                docs.forEach((commentDoc) => {
+                    //console.log(commentDoc.data().creator)
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setComments((comments) => [...comments, {commentData: commentDoc.data(), userData: userDoc.data().email}])
+                        console.log(userDoc.data().email);
+                    })
+                    ;
+                    // setLastComment(commentDoc)
                 })
                 setLoading(false)
             })
         }
     }
 
-    useEffect(() => {
-
-    }, [])
 
     return (
         <div className="mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
@@ -75,7 +87,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                 <div className="flex relative w-[50px] h-[50px]">
                     <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
-                <p className="my-auto text-left">{username}</p>
+                <p className="my-auto text-left">{postOwner}</p>
             </div>
             
             {/* IMAGE OF POST, IF AVAILABLE */}
@@ -123,8 +135,8 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     </div>
                 }
 
-
-                {/* SHOW ALL COMMENTS */}
+                
+                {/* SHOW ALL COMMENTS FIXME: */}
                 {
                     showComments &&
                     comments.map((item, index) => {
@@ -134,10 +146,10 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                                     <div className="flex relative w-[30px] h-[30px]">
                                         <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
                                     </div>
-                                    <p className="ml-5 w-full text-left my-auto">{username}</p>
+                                    <p className="ml-5 w-full text-left my-auto">{item.userData}</p>
                                 </div>
                                 
-                                <p className="text-left w-full">{item.comment}</p>
+                                <p className="text-left w-full">{item.commentData.comment}</p>
                             </div>
                         )
                     })
@@ -163,9 +175,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                 >
                     {showComments ? "Hide Comments" : "View Comments"}
                 </p>
-
-
-            </div>
+            </div> 
         </div>
     )
 }

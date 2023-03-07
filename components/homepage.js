@@ -103,8 +103,9 @@ export default function Homepage() {
 
             {
                 posts.map((post, index) => {
+                    console.log(post.creatorID);
                     return (
-                        <Card key={index} username={"Display Name"} 
+                        <Card key={index} owner={post.creatorID}
                             caption={post.caption} imageSrc={post.imageSrc} profpic={Profpic} postID={postIDs[index]}
                             currUser={currUser} likes={post.likes} dislikes={post.dislikes} commentsID={post.commentsID}
                         />
