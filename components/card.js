@@ -105,18 +105,17 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
                     <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{likes.toLocaleString('en-US')}</p>
+                    <p className="my-auto">{likes ? likes.toLocaleString('en-US') : 0}</p>
                 </div>
                 
                 <div className="flex gap-1">
                     <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                    <p className="my-auto">{dislikes.toLocaleString('en-US')}</p>
+                    <p className="my-auto">{dislikes ? dislikes.toLocaleString('en-US') : 0}</p>
                 </div>
             </div>
 
             {/* COMMENTS CONTAINER */}
             <div className="flex flex-col w-full rounded-lg">
-
                 {/* ADD COMMENT INPUT */}
                 {
                     showComments &&
@@ -136,12 +135,12 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                 }
 
                 
-                {/* SHOW ALL COMMENTS FIXME: */}
+                {/* SHOW ALL COMMENTS */}
                 {
                     showComments &&
                     comments.map((item, index) => {
                         return (
-                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 shadow-xl rounded-lg border border-gray-300">
+                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">
                                 <div className="flex w-full mb-2">
                                     <div className="flex relative w-[30px] h-[30px]">
                                         <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
@@ -163,8 +162,8 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     </div>
                 }
 
-                {/* SHOW COMEMTNS BUTTON */}
-                <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
+                {/* SHOW COMMENTS BUTTON */}
+                {/* <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
                     onClick={() => {
                         setShowComments(!showComments)
 
@@ -174,6 +173,18 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     }}
                 >
                     {showComments ? "Hide Comments" : "View Comments"}
+                </p> */}
+                
+                <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                    onClick={() => {
+                        setShowComments(!showComments)
+
+                        if(commentsid.length > 0){
+                            fetchComments()
+                        }
+                    }}
+                >
+                    <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
                 </p>
             </div> 
         </div>
