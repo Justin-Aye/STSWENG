@@ -58,21 +58,26 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
-                    if ( (userSnap.data().liked.indexOf(postID) == -1) && (userSnap.data().disliked.indexOf(postID) == -1)) {
-                        await updateDoc(postRef, {
-                            likes: increment(1)
-                        });
-                        await updateDoc(userRef, {
-                            liked: arrayUnion(postID)
-                        });
+                    if (userSnap.id != post.creatorID) {
+                        if ( (userSnap.data().liked.indexOf(postID) == -1) && (userSnap.data().disliked.indexOf(postID) == -1)) {
+                            await updateDoc(postRef, {
+                                likes: increment(1)
+                            });
+                            await updateDoc(userRef, {
+                                liked: arrayUnion(postID)
+                            });
+                        }
+                        else if ( (userSnap.data().liked.includes(postID)) && (userSnap.data().disliked.indexOf(postID) == -1)) {
+                            await updateDoc(postRef, {
+                                likes: increment(-1)
+                            });
+                            await updateDoc(userRef, {
+                                liked: userSnap.data().liked.filter((val, i, arr) => {return val != postID})
+                            })
+                        }
                     }
-                    else if ( (userSnap.data().liked.includes(postID)) && (userSnap.data().disliked.indexOf(postID) == -1)) {
-                        await updateDoc(postRef, {
-                            likes: increment(-1)
-                        });
-                        await updateDoc(userRef, {
-                            liked: userSnap.data().liked.filter((val, i, arr) => {return val != postID})
-                        })
+                    else {
+                        alert("liking own post prohibited");    // TODO: should do something
                     }
                 }
                 setDisabled(true);
@@ -91,21 +96,26 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
-                    if ( (userSnap.data().disliked.indexOf(postID) == -1) && (userSnap.data().liked.indexOf(postID) == -1)) {
-                        await updateDoc(postRef, {
-                            dislikes: increment(-1)
-                        });
-                        await updateDoc(userRef, {
-                            disliked: arrayUnion(postID)
-                        });
+                    if (userSnap.id != post.creatorID) {
+                        if ( (userSnap.data().disliked.indexOf(postID) == -1) && (userSnap.data().liked.indexOf(postID) == -1)) {
+                            await updateDoc(postRef, {
+                                dislikes: increment(-1)
+                            });
+                            await updateDoc(userRef, {
+                                disliked: arrayUnion(postID)
+                            });
+                        }
+                        else if ((userSnap.data().disliked.includes(postID)) && (userSnap.data().liked.indexOf(postID) == -1)) {
+                            await updateDoc(postRef, {
+                                dislikes: increment(1)
+                            });
+                            await updateDoc(userRef, {
+                                disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != postID})
+                            })
+                        }
                     }
-                    else if ((userSnap.data().disliked.includes(postID)) && (userSnap.data().liked.indexOf(postID) == -1)) {
-                        await updateDoc(postRef, {
-                            dislikes: increment(1)
-                        });
-                        await updateDoc(userRef, {
-                            disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != postID})
-                        })
+                    else {
+                        alert("disliking own post prohibited");    // TODO:
                     }
                 }
                 setDisabled(true);
@@ -123,23 +133,27 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 const userRef = doc(db, "users", currUser.uid);
                 const commentRef = doc(db, "comments", item.commentID);
                 const userSnap = await getDoc(userRef);
-
                 if (userSnap.exists()) {
-                    if ((userSnap.data().liked.indexOf(item.commentID) == -1) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
-                        await updateDoc(commentRef, {
-                            likes: increment(1)
-                        });
-                        await updateDoc(userRef, {
-                            liked: arrayUnion(item.commentID)
-                        });
+                    if (userSnap.id != item.commentData.creator) {
+                        if ((userSnap.data().liked.indexOf(item.commentID) == -1) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
+                            await updateDoc(commentRef, {
+                                likes: increment(1)
+                            });
+                            await updateDoc(userRef, {
+                                liked: arrayUnion(item.commentID)
+                            });
+                        }
+                        else if ((userSnap.data().liked.includes(item.commentID)) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
+                            await updateDoc(commentRef, {
+                                likes: increment(-1)
+                            });
+                            await updateDoc(userRef, {
+                                liked: userSnap.data().liked.filter((val, i, arr) => {return val != item.commentID})
+                            })
+                        }
                     }
-                    else if ((userSnap.data().liked.includes(item.commentID)) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
-                        await updateDoc(commentRef, {
-                            likes: increment(-1)
-                        });
-                        await updateDoc(userRef, {
-                            liked: userSnap.data().liked.filter((val, i, arr) => {return val != item.commentID})
-                        })
+                    else {
+                        alert("liking own comment prohibited");     // TODO:
                     }
                 }
                 //setDisabled(true);
@@ -157,21 +171,26 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
-                    if ((userSnap.data().disliked.indexOf(item.commentID) == -1) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
-                        await updateDoc(commentRef, {
-                            dislikes: increment(1)
-                        });
-                        await updateDoc(userRef, {
-                            disliked: arrayUnion(item.commentID)
-                        });
+                    if (userSnap.id != item.commentData.creator) {
+                        if ((userSnap.data().disliked.indexOf(item.commentID) == -1) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
+                            await updateDoc(commentRef, {
+                                dislikes: increment(1)
+                            });
+                            await updateDoc(userRef, {
+                                disliked: arrayUnion(item.commentID)
+                            });
+                        }
+                        else if ((userSnap.data().disliked.includes(item.commentID)) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
+                            await updateDoc(commentRef, {
+                                dislikes: increment(-1)
+                            });
+                            await updateDoc(userRef, {
+                                disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != item.commentID})
+                            })
+                        }
                     }
-                    else if ((userSnap.data().disliked.includes(item.commentID)) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
-                        await updateDoc(commentRef, {
-                            dislikes: increment(-1)
-                        });
-                        await updateDoc(userRef, {
-                            disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != item.commentID})
-                        })
+                    else {
+                        alert("disliking own comment prohibited"); // TODO:
                     }
                 }
                 //setDisabled(true);
