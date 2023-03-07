@@ -128,7 +128,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     showComments &&
                     comments.map((item, index) => {
                         return (
-                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 shadow-xl rounded-lg border border-gray-300">
+                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">
                                 <div className="flex w-full mb-2">
                                     <div className="flex relative w-[30px] h-[30px]">
                                         <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
@@ -151,7 +151,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                 }
 
                 {/* SHOW COMMENTS BUTTON */}
-                <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
+                {/* <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
                     onClick={() => {
                         setShowComments(!showComments)
 
@@ -161,10 +161,18 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                     }}
                 >
                     {showComments ? "Hide Comments" : "View Comments"}
-                </p>
+                </p> */}
                 
-                <p className="px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none">
-                    <i className="fa fa-comment pr-2" />Comments ...
+                <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                    onClick={() => {
+                        setShowComments(!showComments)
+
+                        if(commentsid.length > 0){
+                            fetchComments()
+                        }
+                    }}
+                >
+                    <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
                 </p>
             </div>
         </div>
