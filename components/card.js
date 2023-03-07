@@ -32,7 +32,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
         getDoc(postOwnerRef).then((doc) => {
             setPostOwner(doc.data().email); // TODO: change to displayName later
         });
-    }, [currUser.uid, owner])
+    }, [])
 
 
     function handleInsertComment(){
@@ -117,10 +117,6 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
             console.log(error)
         })
     }
-
-    useEffect(() => {
-
-    }, [])
 
     return (
         <>
@@ -234,7 +230,12 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                         />
                         <div className="flex">
                             <button className="w-1/3 ml-auto border border-black rounded-xl bg-nav_bg text-white hover:brightness-110"
-                                onClick={() => {handleInsertComment()}}
+                                onClick={() => {
+                                    if(currUser)
+                                        handleInsertComment()
+                                    else
+                                        router.push("/login")
+                                }}
                             >
                                 Add Comment
                             </button>
@@ -271,20 +272,6 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     </div>
                 }
 
-                {/* SHOW COMMENTS BUTTON */}
-                {/* <p className="mt-5 px-5 py-2 text-white w-full text-left hover:brightness-110 cursor-pointer bg-nav_bg rounded-lg select-none"
-                    onClick={() => {
-                        setShowComments(!showComments)
-
-                        if(commentsid.length > 0){
-                            fetchComments()
-                        }
-                    }}
-                >
-                    {showComments ? "Hide Comments" : "View Comments"}
-
-                </p> */}
-                
                 <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
                     onClick={() => {
                         setShowComments(!showComments)
