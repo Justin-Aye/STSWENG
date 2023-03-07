@@ -13,7 +13,6 @@ export default function Document() {
 
 
         <link rel="shortcut icon" href="/images/logo.png" />
-        <title>FaceGram</title>
         
       </Head>
       <body className='bg-doc_bg text-gray-800'>
