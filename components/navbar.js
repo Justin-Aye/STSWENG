@@ -68,7 +68,7 @@ export default function Navbar() {
                         console.log(e.key)
                     }} type="text" size="75" placeholder="Search..."/>
             </div>
-            
+
             <div className="ml-auto pl-3 flex gap-5 w-fit justify-end">
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
                     <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
