@@ -80,7 +80,7 @@ export default function Card( { currUser, username, imageSrc, caption, profpic, 
                 <p className="my-auto text-left">{username}</p>
 
                 {
-                    (currUser.uid == creator) &&
+                    (currUser && currUser.uid == creator) &&
                     <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
                         onClick={() => {router.push({
                             pathname: '/editpost',
