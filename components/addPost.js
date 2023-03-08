@@ -33,6 +33,7 @@ export default function AddPost(){
         if(image == null && caption.length == 0)
             setMustFill(true)
 
+        // If user did not upload an image, but caption is changed 
         else if(image == null && caption.length > 0){
             try {
                 addDoc(collection(db, "posts"), {
@@ -53,7 +54,8 @@ export default function AddPost(){
             }
         }
 
-        else if(image != null && caption.length > 0){
+        // If user uploaded an image
+        else if(image != null){
             // Sets up unique file name
             const uid = uuidv4()
             const filename = "images/" + image.name + "_" + uid

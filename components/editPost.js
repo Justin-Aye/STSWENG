@@ -113,7 +113,6 @@ export default function EditPost(){
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if(user){
-                console.log(router.query)
 
                 setCaption(router.query.caption)
                 setPostID(router.query.postID)

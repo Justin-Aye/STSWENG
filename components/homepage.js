@@ -111,7 +111,6 @@ export default function Homepage() {
             </div>
             {
                 posts.map((post, index) => {
-                    console.log(post.creatorID);
                     return (
                         <Card key={index} 
                             username={"Display Name"} 
