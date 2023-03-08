@@ -253,7 +253,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     return (
         <>
-        <div className="relative mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <div className="relative mx-auto mb-28 w-4/5 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
             <div className="flex mb-5 gap-5 relative" data-testid="user_container">
@@ -332,7 +332,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
                 post.imageSrc != 0 &&
-                <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
+                <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] mb-5 relative" data-testid="image">
                     <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
                 </div>
             }   
