@@ -17,7 +17,7 @@ describe('Card Component', () => {
 
     await act( async () => render(
       <Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
-        likes={0} dislikes={0} commentsID={[]} 
+        likes={0} dislikes={0} commentsID={[]} owner={"IopbmgLpylVYmdPaJd17IE2vmXo2"}
       />
     ))
     expect(screen.getByTestId("user_container")).toBeInTheDocument();

@@ -42,7 +42,7 @@ export default function Navbar() {
     }
 
     return (
-        <div className="w-full h-20 bg-nav_bg flex px-10 drop-shadow-lg shadow-sm text-white sticky top-0 z-50
+        <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-lg shadow-sm text-white sticky top-0 z-50
                         grid grid-flow-col auto-col-max"
                 data-testid="nav_container">
 
@@ -83,7 +83,7 @@ export default function Navbar() {
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                <Link href={`/profile/${currUser}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
+                    <Link href={`/profile/${currUser}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
