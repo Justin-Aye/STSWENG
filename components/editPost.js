@@ -21,13 +21,15 @@ export default function EditPost(){
     const [ oldImgUrl, setOldImgUrl ] = useState('')
     const [ profpic, setProfPic ] = useState('')
     const [ userID, setUserId ] = useState()
+    const [ displayName, setDisplayName ] = useState("")
 
     const router = useRouter()
 
     async function fetchUserData(uid){
         const u = await getDoc(doc(db, "users", uid))
         setUserId(uid)
-        setProfPic(u.data().profPic)
+        setProfPic(u?.data()?.profPic)
+        setDisplayName(u?.data()?.displayName);
         setLoading(false)
     }
 
@@ -188,7 +190,7 @@ export default function EditPost(){
                     <div className="flex relative w-[50px] h-[50px]">
                         <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>
                     </div>
-                    <p className="my-auto text-left">{"Display Name"}</p>
+                    <p className="my-auto text-left">{displayName}</p>
                 </div>
 
                 {

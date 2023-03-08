@@ -23,15 +23,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ postDislikeCount, setPostDislikeCount ] = useState(post.dislikes || 0);
     const [ showOptions, setShowOptions ] = useState(false)
 
-    const [ commentOptions, setCommentOptions] = useState(false)
-    const [ showEditComment, setShowEditComment ] = useState(false)
     const [ askDeletePost, setaskDeletePost ] = useState(false)
-    const [ askDeleteComment, setAskDeleteComment ] = useState(false)
-
-    const [ currComment, setCurrComment ] = useState('')
-    const [ selectedComment, setSelected ] = useState()
-    const [ selectedCommentVal, setSelectedCommentVal] = useState('')
-    const [ selectedCommID, setSelectedID ] = useState()
 
 
     const router = useRouter()
@@ -49,8 +41,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
     useEffect(() => {
         const docRef = doc(db, "posts", postID);
         onSnapshot(docRef, (doc) => {
-            setPostLikeCount(doc.data().likes);
-            setPostDislikeCount(doc.data().dislikes);
+            try {
+                setPostLikeCount(doc.data().likes);
+                setPostDislikeCount(doc.data().dislikes);
+            } catch (e) {
+                console.log("post no longer exists.");
+            }
         })
     }, [postID]);
 
@@ -83,7 +79,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 likes: increment(-1)
                             });
                             await updateDoc(userRef, {
-                                liked: userSnap.data().liked.filter((val, i, arr) => {return val != postID})
+                                liked: userSnap.data().liked.filter((val) => {return val != postID})
                             })
                         }
                     }
@@ -121,7 +117,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 dislikes: increment(1)
                             });
                             await updateDoc(userRef, {
-                                disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != postID})
+                                disliked: userSnap.data().disliked.filter((val) => {return val != postID})
                             })
                         }
                     }
@@ -143,65 +139,49 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
         var commentIDs = data.commentsID
         
-        // Delete Every Comment in the post
+        
         if(commentIDs.length > 0){
+            // Delete Every Comment in the post
             const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
             querySnapshot.forEach((doc) => {
                 deleteDoc(doc.ref)
+            })
+
+            // Remove deleted comments from user's commentIDs
+            const qUsers = await getDocs(query(collection(db, "users"), where("commentIDs", "array-contains-any", commentIDs)))
+            qUsers.forEach(async (userDoc) => {
+                const userRef = doc(db, "users", userDoc.id)
+                const userSnap = await getDoc(userRef)
+
+                if (userSnap.exists()) {
+                    const newComments = userSnap.data().commentIDs.filter((val) => !commentIDs.includes(val));
+                    updateDoc(userRef, {
+                        commentIDs: newComments
+                    })
+                }
+                console.log(userDoc.id);
             })
         }
         
         // Delete Image
         if(data.imageSrc.length > 0){
-            deleteObject(ref(storage, imageSrc))
+            deleteObject(ref(storage, data.imageSrc))
         }
 
         // Delete Post
-        deleteDoc(doc(db, "posts", postID)).then(() => {
+        deleteDoc(doc(db, "posts", postID)).then(async () => {
+            // Update postsID array of user afterr deleting the post
+            const userRef = doc(db, "users", currUser.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                updateDoc(userRef, {
+                    postsID: userSnap.data().postsID.filter((val) => {return val != postID})
+                })
+            }
+
             console.log("Successfully deleted")
             window.location.reload()
-        }).catch((error) => {
-            console.log(error)
-        })
-    }
-    
-    function saveCommentEdit(){
-
-        // If Changes have been made
-        if(selectedCommentVal != currComment){
-            updateDoc(doc(db, "comments", selectedCommID), {
-                comment: selectedCommentVal
-            }).then(() => {
-                setShowEditComment(false)
-                setSelectedCommentVal("")
-                setCurrComment("")
-                window.location.reload()
-            }).catch((error) => {
-                console.log(error)
-            })
-        }
-        else{
-            setShowEditComment(false)
-            setSelectedCommentVal("")
-            setCurrComment("")
-        }
-    }
-
-    async function deleteComment(){
-        deleteDoc(doc(db, "comments", selectedCommID)).then(() => {
-            updateDoc(doc(db, "posts", postID), {
-                commentsID: arrayRemove(selectedCommID)
-            }).then(() => {
-                console.log("Comment Deleted")
-                
-                setComments(comments => {
-                    return comments.filter(x => x.id !== selectedCommID)
-                })
-
-                setAskDeleteComment(false)
-            }).catch((error) => {
-                console.log(error)
-            })
         }).catch((error) => {
             console.log(error)
         })
@@ -233,6 +213,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         // Insert comment into post via postid
                         updateDoc(doc(db, "posts", postID), {
                             commentsID: arrayUnion(com.id)
+                        }).then(() => {
+                            updateDoc(doc(db, "users", currUser.uid), {
+                                commentIDs: arrayUnion(com.id)
+                            });
                         }).catch((error) => {
                             console.log(error)
                         })
@@ -279,8 +263,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 {
                     (currUser && currUser.uid == post.creatorID) &&
                     <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
-                        onClick={() => setShowOptions(true)}
-                    >
+                        onClick={() => setShowOptions(true)}>
                         <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
                     </div>
                 }
@@ -293,10 +276,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             onClick={() => {router.push({
                                 pathname: '/editpost',
                                 query: {
-                                    caption: caption,
+                                    caption: post.caption,
                                     postID: postID,
                                     profpic: profpic,
-                                    imageSrc: imageSrc,
+                                    imageSrc: post.imageSrc,
                                     username: postOwner
                                 },
                             }, 'edit_post')}}
@@ -334,55 +317,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             </button>
                             <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
                                 onClick={() => setaskDeletePost(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            }
-
-            {/* Warns User before deleting the comment */}
-            {
-                askDeleteComment &&
-                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
-                        <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
-                        <p>You are about to delete a comment.</p>
-                        <div className="flex mt-10 justify-center gap-5">
-                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => deleteComment()}
-                            >
-                                Delete Comment
-                            </button>
-                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => setAskDeleteComment(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            }
-
-            {/* Edit Comment Interface */}
-            {
-                showEditComment &&
-                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
-                        <p className="text-center text-[20px] font-bold">EDIT COMMENT</p>
-                        
-                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
-                            value={selectedCommentVal} onChange={(e) => {setSelectedCommentVal(e.target.value)}} 
-                        />
-                        <div className="flex mt-10 justify-center gap-5">
-                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => saveCommentEdit()}
-                            >
-                                Save Edits
-                            </button>
-                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => setShowEditComment(false)}
                             >
                                 Cancel
                             </button>
@@ -453,7 +387,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             <Comment 
                             key={index}
                             currUser={currUser}
-                            item={item} 
+                            item={item}
+                            postID={postID}
                             />
                         )
                     })

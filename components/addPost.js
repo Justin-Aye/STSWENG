@@ -18,13 +18,15 @@ export default function AddPost(){
     const [ imgUrl, setUrl ] = useState()
     const [ profpic, setProfPic ] = useState('')
     const [ userID, setUserId ] = useState()
+    const [ displayName, setDisplayName ] = useState("")
 
     const router = useRouter()
 
     async function fetchUserData(uid){
         const u = await getDoc(doc(db, "users", uid))
         setUserId(uid)
-        setProfPic(u.data().profPic)
+        setProfPic(u.data()?.profPic)
+        setDisplayName(u.data()?.displayName) 
         setLoading(false)
     }
 
@@ -44,7 +46,10 @@ export default function AddPost(){
                     creatorID: userID,
                     userPic: profpic,
                     commentsID: []
-                }).then(() => {
+                }).then((docRef) => {
+                    updateDoc(doc(db, "users", userID), {
+                        postsID: arrayUnion(docRef.id)
+                    })
                     console.log("Post has been added")
                     router.push('/')
                 })
@@ -77,7 +82,10 @@ export default function AddPost(){
                             creatorID: userID,
                             userPic: profpic,
                             commentsID: []
-                        }).then(() => {
+                        }).then((docRef) => {
+                            updateDoc(doc(db, "users", userID), {
+                                postsID: arrayUnion(docRef.id)
+                            });
                             console.log("Post has been added")
                             window.location.reload()
                         })
@@ -135,7 +143,7 @@ export default function AddPost(){
                 <div className="flex relative w-[50px] h-[50px]">
                     <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
-                <p className="my-auto text-left">{"Display Name"}</p>
+                <p className="my-auto text-left">{displayName}</p>
             </div>
 
             {
