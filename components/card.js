@@ -2,7 +2,7 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
+import { arrayRemove, onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
@@ -22,8 +22,18 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ postLikeCount, setPostLikeCount ] = useState(post.likes || 0);
     const [ postDislikeCount, setPostDislikeCount ] = useState(post.dislikes || 0);
     const [ showOptions, setShowOptions ] = useState(false)
-    const [ areYouSure, setAreYouSure ] = useState(false)
-    
+
+    const [ commentOptions, setCommentOptions] = useState(false)
+    const [ showEditComment, setShowEditComment ] = useState(false)
+    const [ askDeletePost, setaskDeletePost ] = useState(false)
+    const [ askDeleteComment, setAskDeleteComment ] = useState(false)
+
+    const [ currComment, setCurrComment ] = useState('')
+    const [ selectedComment, setSelected ] = useState()
+    const [ selectedCommentVal, setSelectedCommentVal] = useState('')
+    const [ selectedCommID, setSelectedID ] = useState()
+
+
     const router = useRouter()
     // const [ lastComment, setLastComment ] = useState()
 
@@ -154,6 +164,48 @@ export default function Card( { currUser, post, profpic, postID } ) {
             console.log(error)
         })
     }
+    
+    function saveCommentEdit(){
+
+        // If Changes have been made
+        if(selectedCommentVal != currComment){
+            updateDoc(doc(db, "comments", selectedCommID), {
+                comment: selectedCommentVal
+            }).then(() => {
+                setShowEditComment(false)
+                setSelectedCommentVal("")
+                setCurrComment("")
+                window.location.reload()
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+        else{
+            setShowEditComment(false)
+            setSelectedCommentVal("")
+            setCurrComment("")
+        }
+    }
+
+    async function deleteComment(){
+        deleteDoc(doc(db, "comments", selectedCommID)).then(() => {
+            updateDoc(doc(db, "posts", postID), {
+                commentsID: arrayRemove(selectedCommID)
+            }).then(() => {
+                console.log("Comment Deleted")
+                
+                setComments(comments => {
+                    return comments.filter(x => x.id !== selectedCommID)
+                })
+
+                setAskDeleteComment(false)
+            }).catch((error) => {
+                console.log(error)
+            })
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
 
     function handleInsertComment(){
         if(addComment.length > 0)
@@ -252,7 +304,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             Edit
                         </p>
                         <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
-                            onClick={() => {setAreYouSure(true); setShowOptions(false)}}
+                            onClick={() => {setaskDeletePost(true); setShowOptions(false)}}
                         >
                             Delete
                         </p>
@@ -266,8 +318,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 }
             </div>
             
+
+            {/* Warns User before deleting the post */}
             {
-                areYouSure &&
+                askDeletePost &&
                 <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
                     <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5">
                         <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
@@ -279,7 +333,56 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 Delete Post
                             </button>
                             <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => setAreYouSure(false)}
+                                onClick={() => setaskDeletePost(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            {/* Warns User before deleting the comment */}
+            {
+                askDeleteComment &&
+                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
+                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
+                        <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
+                        <p>You are about to delete a comment.</p>
+                        <div className="flex mt-10 justify-center gap-5">
+                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => deleteComment()}
+                            >
+                                Delete Comment
+                            </button>
+                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => setAskDeleteComment(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            {/* Edit Comment Interface */}
+            {
+                showEditComment &&
+                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
+                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
+                        <p className="text-center text-[20px] font-bold">EDIT COMMENT</p>
+                        
+                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                            value={selectedCommentVal} onChange={(e) => {setSelectedCommentVal(e.target.value)}} 
+                        />
+                        <div className="flex mt-10 justify-center gap-5">
+                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => saveCommentEdit()}
+                            >
+                                Save Edits
+                            </button>
+                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                onClick={() => setShowEditComment(false)}
                             >
                                 Cancel
                             </button>
@@ -364,6 +467,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     </div>
                 }
 
+                {/* SHOW COMMENTS BUTTON */}                
                 <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
                     onClick={() => {
                         setShowComments(!showComments)
