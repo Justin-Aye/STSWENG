@@ -23,7 +23,7 @@ export default function Profile({ props }) {
                     <br></br>
 
                     <h2> profpic: </h2>               
-                    <img src={props.data.profPic} alt="" width={100} height={100}/>
+                    <Image src={props.data.profPic} alt="" width={100} height={100}/>
                     
                     <br></br>
                     

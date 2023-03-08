@@ -3,18 +3,11 @@ import React, {useEffect, useState, useRef} from "react";
 import Card from "./card";
 import { useRouter } from "next/router";
 import { auth, db } from "../firebaseConfig";
-import { collection, query, getDocs, orderBy, limit, startAfter } from "firebase/firestore";
+import { collection, query, getDocs, orderBy, limit, startAfter, doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
 
 export default function Homepage() {
-
-    // Static Data holders
-    // var Username="Username"
-    // var Caption="Best Image" 
-    // var ImageSrc="/images/mountain.jpg" 
-    var Profpic="/images/user_icon.png"
-
     // Fetched data
     const [ posts, setPosts ] = useState([])
     const [ postIDs, setPostIDs] = useState([])
@@ -50,10 +43,13 @@ export default function Homepage() {
         )
 
         getDocs(q).then((docs) => {
-            docs.forEach((doc) => {
-                setPostIDs((postIDs) => [...postIDs, doc.id])
-                setPosts((posts) => [...posts, doc.data()])
-                setLastDoc(doc)
+            docs.forEach((postDoc) => {
+                const userRef = doc(db, "users", postDoc.data().creatorID);
+                getDoc(userRef).then((userDoc) => {
+                    setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                    setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                })
+                setLastDoc(postDoc)
             })
             setLoading(false)
 
@@ -75,15 +71,17 @@ export default function Homepage() {
             limit(3))
 
         getDocs(q).then((snap) => {
-
-            snap.forEach((doc) => {
-                setPostIDs((postIDs) => [...postIDs, doc.id])
-                setPosts((posts) => [...posts, doc.data()])
-                setLastDoc(doc)
+            snap.forEach((postDoc) => {
+                const userRef = doc(db, "users", postDoc.data().creatorID);
+                getDoc(userRef).then((userDoc) => {
+                    setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                    setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                })
+                setLastDoc(postDoc)
             })
+            console.log(posts)
             setLoading(false)
             setShowMore(true)
-
         }).catch((error) => {
             console.log(error)
         })
@@ -92,8 +90,12 @@ export default function Homepage() {
     useEffect(() => {
         fetchPosts()
         auth.onAuthStateChanged((user) => {
-            if(user)
-                setCurrUser(user)
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                getDoc(userRef).then((doc) => {
+                    setCurrUser({uid: user.uid, data: doc.data()});
+                })
+            }
         })
     }, [])
 
@@ -105,7 +107,7 @@ export default function Homepage() {
                                  hover:bg-nav_bg_dark flex justify-center items-center"
                     onClick={() => handlePost()}
                 >
-                    <img src="/images/add_image_icon_w.png" className="w-[60px] h-[51px]" />
+                    <Image src="/images/add_image_icon_w.png" alt="" width={60} height={51} />
                     <span className="text-[20px] text-white w-fit h-fit">Create New Post</span>
                 </div>
             </div>
@@ -113,16 +115,10 @@ export default function Homepage() {
                 posts.map((post, index) => {
                     return (
                         <Card key={index} 
-                            username={"Display Name"} 
-                            caption={post.caption} 
-                            imageSrc={post.imageSrc} 
-                            profpic={Profpic} 
-                            postID={postIDs[index]}
-                            currUser={currUser} 
-                            likes={post.likes} 
-                            dislikes={post.dislikes} 
-                            commentsID={post.commentsID}
-                            owner={post.creatorID}
+                        post={post.data} 
+                        profpic={post.userData.profPic} 
+                        postID={postIDs[index]}
+                        currUser={currUser}   
                         />
                     )
                 })
