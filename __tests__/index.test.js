@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import Card from '../components/card'
 import Navbar from '../components/navbar'
 import Login from '../components/login'
@@ -13,12 +13,13 @@ jest.mock('next/router', () => ({
 }))
 
 describe('Card Component', () => {
-  it('renders a heading', () => {
-    render(
+  it('renders a heading', async () => {
+
+    await act( async () => render(
       <Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
         likes={0} dislikes={0} commentsID={[]} owner={"IopbmgLpylVYmdPaJd17IE2vmXo2"}
       />
-    )
+    ))
     expect(screen.getByTestId("user_container")).toBeInTheDocument();
     expect(screen.getByTestId("image")).toBeInTheDocument();
     expect(screen.getByTestId("buttons_container")).toBeInTheDocument();
@@ -37,9 +38,9 @@ describe('Navbar Component', () => {
 })
 
 describe('Signup Component', () => {
-  it('renders title, form, and submit button', () => {
+  it('renders title, form, and submit button', async () => {
     useRouter.mockReturnValue({ query: {}})
-    render(<Signup />)
+    await act( async () => render(<Signup />));
     expect(screen.getByTestId("page_title")).toBeInTheDocument();
     expect(screen.getByTestId("email_input")).toBeInTheDocument();
     expect(screen.getByTestId("pass_input")).toBeInTheDocument();
@@ -49,9 +50,9 @@ describe('Signup Component', () => {
 })
 
 describe('Login Component', () => {
-  it('renders title, form, and submit button', () => {
+  it('renders title, form, and submit button', async () => {
     useRouter.mockReturnValue({ query: {}})
-    render(<Login />)
+    await act( async () => render(<Login />));
     expect(screen.getByTestId("page_title")).toBeInTheDocument();
     expect(screen.getByTestId("email_input")).toBeInTheDocument();
     expect(screen.getByTestId("pass_input")).toBeInTheDocument();

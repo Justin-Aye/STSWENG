@@ -2,18 +2,20 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, arrayRemove, deleteDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig";
 
+import { collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, arrayRemove, deleteDoc } from "firebase/firestore";
+import { deleteObject, ref } from "firebase/storage";
+import { db, storage } from "../firebaseConfig";
+import { useRouter } from "next/router";
 
 export default function Card( { currUser, owner, imageSrc, caption, profpic, likes, dislikes, commentsID, postID } ) {
 
     var hasVoted = false;
     
-    const [ commentsid, setCommentsid ] = useState(commentsID)
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
     const [ showOptions, setShowOptions ] = useState(false)
+
     const [ commentOptions, setCommentOptions] = useState(false)
     const [ showEditComment, setShowEditComment ] = useState(false)
     const [ askDeletePost, setaskDeletePost ] = useState(false)
@@ -24,8 +26,12 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
     const [ selectedCommentVal, setSelectedCommentVal] = useState('')
     const [ selectedCommID, setSelectedID ] = useState()
 
+
+    const [ commentsid, setCommentsid ] = useState(commentsID)
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([])
+    
+    const router = useRouter()
 
     const [ postOwner, setPostOwner ] = useState("")
     const [ commentOwner, setCommentOwner ] = useState("")
@@ -53,7 +59,6 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     setAddComment('')
 
                     getDoc(com).then((snap) => {
-
                         getDoc(doc(db, "users", currUser.uid)).then((doc) => {
                             setComments((comments) => [...comments, {commentData: snap.data(), userData: doc.data().email, id:snap.id}])
                             setLoading(false)
@@ -121,7 +126,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
             console.log(error)
         })
     }
-
+    
     function saveCommentEdit(){
 
         // If Changes have been made
@@ -165,10 +170,11 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
     }
 
     return (
-        <div className="mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <>
+        <div className="relative mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
-            <div className="flex mb-5 gap-5" data-testid="user_container">
+            <div className="flex mb-5 gap-5 relative" data-testid="user_container">
                 <div className="flex relative w-[50px] h-[50px]">
                     <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
@@ -218,6 +224,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                 }
             </div>
             
+
             {/* Warns User before deleting the post */}
             {
                 askDeletePost &&
@@ -325,7 +332,12 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                         />
                         <div className="flex">
                             <button className="w-1/3 ml-auto border border-black rounded-xl bg-nav_bg text-white hover:brightness-110"
-                                onClick={() => {handleInsertComment()}}
+                                onClick={() => {
+                                    if(currUser)
+                                        handleInsertComment()
+                                    else
+                                        router.push("/login")
+                                }}
                             >
                                 Add Comment
                             </button>
@@ -334,8 +346,8 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                     </div>
                 }
 
-
-                {/* SHOW ALL COMMENTS */}
+                
+                {/* SHOW ALL COMMENTS FIXME: */}
                 {
                     showComments &&
                     comments.map((item, index) => {
@@ -346,7 +358,6 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                                         <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 30px)"/>
                                     </div>
                                     <p className="ml-5 w-full text-left my-auto">{item.userData}</p>
-
                                     {/* Triple Dot Button */}
                                     {
                                         (currUser && currUser.uid == item.commentData.creator) &&
@@ -421,5 +432,7 @@ export default function Card( { currUser, owner, imageSrc, caption, profpic, lik
                 </p>
             </div>
         </div>
+        </>
+        
     )
 }

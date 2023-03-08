@@ -3,12 +3,14 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 export default function Login(){
 
     const router = useRouter();
+    const [ loading, setLoading ] = useState(true)
 
     const [email, setEmail] = useState("");
     const [password, setPass] = useState("");
@@ -32,8 +34,18 @@ export default function Login(){
         auth.onAuthStateChanged((user) => {
             if(user)
                 router.push("/")
+            else
+                setLoading(false)
         })
     })
+
+    if(loading){
+        return (
+            <div className="w-[100px] h-[100px] mx-auto mb-5 relative justify-center">
+                <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+            </div>
+        )
+    }
 
     return (
         <div className='bg-login_page bg-no-repeat bg-cover bg-fixed w-full h-screen'>

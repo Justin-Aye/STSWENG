@@ -1,13 +1,14 @@
 
 
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { addDoc, collection, setDoc, doc, query, where, getDocs } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import Link from "next/link";
+
 
 export default function Signup(){
 
@@ -19,6 +20,7 @@ export default function Signup(){
     const [samePass, setSamePass] = useState(true)
 
     const router = useRouter()
+    const [ loading, setLoading ] = useState(true)
 
     function handleSubmit(){
         if(password != repeatPassword)
@@ -58,8 +60,18 @@ export default function Signup(){
         auth.onAuthStateChanged((user) => {
             if(user)
                 router.push("/")
+            else
+                setLoading(false)
         })
     })
+
+    if(loading){
+        return (
+            <div className="w-[100px] h-[100px] mx-auto mb-5 relative justify-center">
+                <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+            </div>
+        )
+    }
 
     return (
         <div className='bg-signup_page bg-no-repeat bg-cover bg-fixed w-full h-screen'>
