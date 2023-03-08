@@ -12,6 +12,7 @@ export default function EditPost(){
 
     const [ loading, setLoading ] = useState(true)
     const [ needEdit, setNeedEdit ] = useState(false)
+    const [ emptyPost, setEmptyPost ] = useState(false)
  
     const [ caption, setCaption] = useState('')
     const [ postID, setPostID ] = useState()
@@ -32,10 +33,14 @@ export default function EditPost(){
 
     async function saveEdits(){
 
-        if(image == null && caption == router.query.caption)
+        // No new image uploaded, and caption remained the same
+        if((image == null && caption == router.query.caption))
             setNeedEdit(true)
 
-        // User does not upload a new image, and caption is new
+        else if(oldImgUrl.length == 0 && image == null && caption.length == 0)
+            setEmptyPost(true)
+
+        // No new image, and caption is new
         else if(image == null && caption.length > 0 && caption != router.query.caption){
             try {
                 updateDoc(doc(db, "posts", postID), {
@@ -52,8 +57,8 @@ export default function EditPost(){
             }
         }
 
-        // User uploads a new image, while post already has an image
-        else if( image != null && caption.length > 0 && oldImgUrl.length > 0){
+        // New image, while post already has a previous image
+        else if( image != null && oldImgUrl.length > 0){
 
             // Sets up unique file name
             const uid = uuidv4()
@@ -91,6 +96,44 @@ export default function EditPost(){
                 }).catch((error) => {
                     console.log(error)
                 })
+            })
+        }
+
+        // New image, while post has no previous image
+        else if( image != null){
+
+            // Sets up unique file name
+            const uid = uuidv4()
+            const filename = "images/" + image.name + "_" + uid
+
+            // Reference to firebase storage, and intended filename
+            const storageRef = ref( storage, filename)
+            
+            // Uploads new Image to Firebase
+            uploadBytesResumable( storageRef,  image).then((uploadResult) => {
+
+                // Get Firebase Image Url
+                getDownloadURL(uploadResult.ref).then((res) => {
+
+                    // Update Post data
+                    try {
+                        updateDoc(doc(db, "posts", postID), {
+                            caption: caption,
+                            imageSrc: res
+                        }).then(() => {
+                            router.push("/")
+                        }).catch((error) => {
+                            console.log(error)
+                        })
+                    } 
+                    catch (error) {
+                        console.log(error)
+                    }
+                }).catch((error) => {
+                    console.log(error)
+                })
+            }).catch((error) => {
+                console.log(error)
             })
         }
     }
@@ -183,6 +226,11 @@ export default function EditPost(){
                 {   
                     needEdit &&
                     <p className=" text-center text-red-500 mt-5 underline">No new edits have been made</p>
+                }
+
+                {
+                    emptyPost &&
+                    <p className=" text-center text-red-500 mt-5 underline">Empty Posts are not Allowed</p>
                 }
 
                 <div className="flex w-full gap-5">

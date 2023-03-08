@@ -46,7 +46,7 @@ export default function AddPost(){
                     commentsID: []
                 }).then(() => {
                     console.log("Post has been added")
-                    window.location.reload()
+                    router.push('/')
                 })
             } 
             catch (error) {
