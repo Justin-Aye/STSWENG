@@ -75,7 +75,7 @@ export default function EditPost(){
                         try {
                             updateDoc(doc(db, "posts", postID), {
                                 caption: caption,
-                                imageSrc: imgUrl
+                                imageSrc: res
                             }).then(() => {
                                 router.push("/")
                             }).catch((error) => {
