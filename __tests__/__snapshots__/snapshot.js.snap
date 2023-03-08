@@ -12,8 +12,15 @@ exports[`renders homepage unchanged 1`] = `
         class="mb-5 w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300 hover:bg-nav_bg_dark flex justify-center items-center"
       >
         <img
-          class="w-[60px] h-[51px]"
-          src="/images/add_image_icon_w.png"
+          alt=""
+          data-nimg="1"
+          decoding="async"
+          height="51"
+          loading="lazy"
+          src="/_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=128&q=75"
+          srcset="/_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=64&q=75 1x, /_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=128&q=75 2x"
+          style="color: transparent;"
+          width="60"
         />
         <span
           class="text-[20px] text-white w-fit h-fit"

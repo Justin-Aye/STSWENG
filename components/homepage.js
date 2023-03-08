@@ -79,9 +79,9 @@ export default function Homepage() {
                 })
                 setLastDoc(postDoc)
             })
+            console.log(posts)
             setLoading(false)
             setShowMore(true)
-
         }).catch((error) => {
             console.log(error)
         })

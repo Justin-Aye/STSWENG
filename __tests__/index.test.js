@@ -1,4 +1,5 @@
 import { render, screen, act } from '@testing-library/react'
+import React from 'react'
 import Card from '../components/card'
 import Navbar from '../components/navbar'
 import Login from '../components/login'
@@ -8,17 +9,23 @@ import '@testing-library/jest-dom'
 // Unit Test Per Component
 import { useRouter } from 'next/router'
 
+
 jest.mock('next/router', () => ({
   useRouter: jest.fn()
 }))
 
 describe('Card Component', () => {
   it('renders a heading', async () => {
+    let currUser = {uid: "IopbmgLpylVYmdPaJd17IE2vmXo2", data: {}}
+    let post = {data: {imageSrc: "/images/mountain.jpg"}, userData: {}}
+    let profpic = "/images/user_icon.png"
+    let postID = "sOrvV7JMNx13vPydnrXj"
 
     await act( async () => render(
-      <Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
+        <Card currUser={currUser} post={post} profpic={profpic} postID={postID}/>
+      /*<Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
         likes={0} dislikes={0} commentsID={[]} owner={"IopbmgLpylVYmdPaJd17IE2vmXo2"}
-      />
+      />*/
     ))
     expect(screen.getByTestId("user_container")).toBeInTheDocument();
     expect(screen.getByTestId("image")).toBeInTheDocument();

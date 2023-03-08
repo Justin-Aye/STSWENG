@@ -22,7 +22,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ postLikeCount, setPostLikeCount ] = useState(post.likes || 0);
     const [ postDislikeCount, setPostDislikeCount ] = useState(post.dislikes || 0);
     const [ showOptions, setShowOptions ] = useState(false)
-
+    const [ postImg, setPostImg ] = useState(post.imageSrc);
     const [ askDeletePost, setaskDeletePost ] = useState(false)
 
 
@@ -32,10 +32,14 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [disable, setDisabled] = useState(false);
 
     useEffect(() => {
-        const postOwnerRef = doc(db, "users", post.creatorID);
-        getDoc(postOwnerRef).then((doc) => {
-            setPostOwner(doc.data().email); // TODO: change to displayName later
-        });
+        try {
+            const postOwnerRef = doc(db, "users", post.creatorID);
+            getDoc(postOwnerRef).then((doc) => {
+                setPostOwner(doc.data().email); // TODO: change to displayName later
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }, [post.creatorID]);
 
     useEffect(() => {
@@ -49,6 +53,13 @@ export default function Card( { currUser, post, profpic, postID } ) {
             }
         })
     }, [postID]);
+
+    useEffect(() => {
+        if (post.imageSrc)
+            setPostImg(post.imageSrc)
+        else
+            setPostImg(null);
+    }, [post.imageSrc])
 
     
     useEffect(() => {
@@ -327,7 +338,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
-                post.imageSrc.length != 0 &&
+                postImg != 0 &&
                 <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
                     <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
                 </div>
