@@ -17,7 +17,7 @@ jest.mock('next/router', () => ({
 describe('Card Component', () => {
   it('renders a heading', async () => {
     let currUser = {uid: "IopbmgLpylVYmdPaJd17IE2vmXo2", data: {}}
-    let post = {data: {imageSrc: "/images/mountain.jpg"}, userData: {}}
+    let post = {imageSrc: "/images/mountain.jpg", creatorID: "x3azMKvcdiOH44T1NgnyacOsc792"}
     let profpic = "/images/user_icon.png"
     let postID = "sOrvV7JMNx13vPydnrXj"
 

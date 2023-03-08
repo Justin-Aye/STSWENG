@@ -33,10 +33,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     useEffect(() => {
         try {
-            const postOwnerRef = doc(db, "users", post.creatorID);
-            getDoc(postOwnerRef).then((doc) => {
-                setPostOwner(doc.data().email); // TODO: change to displayName later
-            });
+            if (post.creatorID) {
+                const postOwnerRef = doc(db, "users", post.creatorID);
+                getDoc(postOwnerRef).then((doc) => {
+                    setPostOwner(doc.data().email); // TODO: change to displayName later
+                });
+            }
         } catch (e) {
             console.log(e);
         }
@@ -340,7 +342,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {
                 postImg != 0 &&
                 <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
-                    <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
+                    <Image className="rounded-lg" src={postImg} alt={""} fill sizes="(max-width: 900px)"/>    
                 </div>
             }   
 
