@@ -6,6 +6,7 @@ import { onSnapshot, increment, collection, documentId, getDocs, query, where, a
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
+import Comment from "./comment";
 
 
 export default function Card( { currUser, post, profpic, postID } ) {
@@ -126,78 +127,32 @@ export default function Card( { currUser, post, profpic, postID } ) {
         }
     }
 
-    // FIXME: works but doesnt update frontend until page refreshed
-    async function handleLikeComment(item) {
-        try {
-            if (currUser) {
-                const userRef = doc(db, "users", currUser.uid);
-                const commentRef = doc(db, "comments", item.commentID);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    if (userSnap.id != item.commentData.creator) {
-                        if ((userSnap.data().liked.indexOf(item.commentID) == -1) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
-                            await updateDoc(commentRef, {
-                                likes: increment(1)
-                            });
-                            await updateDoc(userRef, {
-                                liked: arrayUnion(item.commentID)
-                            });
-                        }
-                        else if ((userSnap.data().liked.includes(item.commentID)) && (userSnap.data().disliked.indexOf(item.commentID) == -1)) {
-                            await updateDoc(commentRef, {
-                                likes: increment(-1)
-                            });
-                            await updateDoc(userRef, {
-                                liked: userSnap.data().liked.filter((val, i, arr) => {return val != item.commentID})
-                            })
-                        }
-                    }
-                    else {
-                        alert("liking own comment prohibited");     // TODO:
-                    }
-                }
-                //setDisabled(true);
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
+    async function deletePost(){
+        const post = await getDoc(doc(db, "posts", postID))
+        const data = post.data()
 
-    async function handleDislikeComment(item) {
-        try {
-            if (currUser) {
-                const userRef = doc(db, "users", currUser.uid);
-                const commentRef = doc(db, "comments", item.commentID);
-                const userSnap = await getDoc(userRef);
-
-                if (userSnap.exists()) {
-                    if (userSnap.id != item.commentData.creator) {
-                        if ((userSnap.data().disliked.indexOf(item.commentID) == -1) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
-                            await updateDoc(commentRef, {
-                                dislikes: increment(1)
-                            });
-                            await updateDoc(userRef, {
-                                disliked: arrayUnion(item.commentID)
-                            });
-                        }
-                        else if ((userSnap.data().disliked.includes(item.commentID)) && (userSnap.data().liked.indexOf(item.commentID) == -1)) {
-                            await updateDoc(commentRef, {
-                                dislikes: increment(-1)
-                            });
-                            await updateDoc(userRef, {
-                                disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != item.commentID})
-                            })
-                        }
-                    }
-                    else {
-                        alert("disliking own comment prohibited"); // TODO:
-                    }
-                }
-                //setDisabled(true);
-            }
-        } catch (e) {
-            console.log(e);
+        var commentIDs = data.commentsID
+        
+        // Delete Every Comment in the post
+        if(commentIDs.length > 0){
+            const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
+            querySnapshot.forEach((doc) => {
+                deleteDoc(doc.ref)
+            })
         }
+        
+        // Delete Image
+        if(data.imageSrc.length > 0){
+            deleteObject(ref(storage, imageSrc))
+        }
+
+        // Delete Post
+        deleteDoc(doc(db, "posts", postID)).then(() => {
+            console.log("Successfully deleted")
+            window.location.reload()
+        }).catch((error) => {
+            console.log(error)
+        })
     }
 
     function handleInsertComment(){
@@ -237,6 +192,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             }
     }
 
+
     function fetchComments(){
         if(commentsid.length > 0 && comments.length == 0){
             setLoading(true)
@@ -247,41 +203,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     const userRef = doc(db, "users", commentDoc.data().creator);
                     getDoc(userRef).then((userDoc) => {
                         setComments((comments) => [...comments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
-                    })
-                    ;
+                    });
                     // setLastComment(commentDoc)
                 })
                 setLoading(false)
             })
         }
-    }
-
-    async function deletePost(){
-        const post = await getDoc(doc(db, "posts", postID))
-        const data = post.data()
-
-        var commentIDs = data.commentsID
-        
-        // Delete Every Comment in the post
-        if(commentIDs.length > 0){
-            const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
-            querySnapshot.forEach((doc) => {
-                deleteDoc(doc.ref)
-            })
-        }
-        
-        // Delete Image
-        if(data.imageSrc.length > 0){
-            deleteObject(ref(storage, imageSrc))
-        }
-
-        // Delete Post
-        deleteDoc(doc(db, "posts", postID)).then(() => {
-            console.log("Successfully deleted")
-            window.location.reload()
-        }).catch((error) => {
-            console.log(error)
-        })
     }
 
     return (
@@ -420,39 +347,11 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     showComments &&
                     comments.map((item, index) => {
                         return (
-                            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">
-                                <div className="flex w-full mb-2">
-                                    <div className="flex relative w-[30px] h-[30px]">
-                                        <Image className="rounded-[50%]" src={item.userData.profPic} alt="" fill sizes="(max-width: 30px)"/>
-                                    </div>
-                                    <p className="ml-5 w-full text-left my-auto">{item.userData.email}</p>
-                                </div>
-                                
-                                <p className="text-left w-full">{item.commentData.comment}</p>
-                            
-                                
-                                {/* TEMPORARY COMMENT LIKE & DISLIKE BUTTONS TODO: change if needed */}
-                                <div className="flex gap-5 mb-5" data-testid="buttons_container">
-                                    <div className="flex gap-1">
-                                        <button onClick={() => {handleLikeComment(item)}}>
-                                            <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                                        </button>
-                                        <p className="my-auto">{item.commentData.likes}</p>
-                                    </div>
-                                    
-                                    <div className="flex gap-1">
-                                        <button onClick={() => {handleDislikeComment(item)}}>
-                                            <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                                        </button>
-                                        <p className="my-auto">{item.commentData.dislikes}</p>
-                                    </div>
-                                </div>
-                            
-                            </div>
-                        
-                        
-                        
-                        
+                            <Comment 
+                            key={index}
+                            currUser={currUser}
+                            item={item} 
+                            />
                         )
                     })
                 }

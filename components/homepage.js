@@ -8,12 +8,6 @@ import Image from "next/image";
 
 
 export default function Homepage() {
-    // Static Data holders
-    // var Username="Username"
-    // var Caption="Best Image" 
-    // var ImageSrc="/images/mountain.jpg" 
-    var Profpic="/images/user_icon.png"
-
     // Fetched data
     const [ posts, setPosts ] = useState([])
     const [ postIDs, setPostIDs] = useState([])
@@ -49,10 +43,13 @@ export default function Homepage() {
         )
 
         getDocs(q).then((docs) => {
-            docs.forEach((doc) => {
-                setPostIDs((postIDs) => [...postIDs, doc.id])
-                setPosts((posts) => [...posts, doc.data()])
-                setLastDoc(doc)
+            docs.forEach((postDoc) => {
+                const userRef = doc(db, "users", postDoc.data().creatorID);
+                getDoc(userRef).then((userDoc) => {
+                    setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                    setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                })
+                setLastDoc(postDoc)
             })
             setLoading(false)
 
@@ -80,8 +77,6 @@ export default function Homepage() {
                     setPostIDs((postIDs) => [...postIDs, postDoc.id])
                     setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
                 })
-                //setPostIDs((postIDs) => [...postIDs, postDoc.id])
-                //setPosts((posts) => [...posts, postDoc.data()])
                 setLastDoc(postDoc)
             })
             setLoading(false)
