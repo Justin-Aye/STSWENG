@@ -22,7 +22,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ postLikeCount, setPostLikeCount ] = useState(post.likes || 0);
     const [ postDislikeCount, setPostDislikeCount ] = useState(post.dislikes || 0);
     const [ showOptions, setShowOptions ] = useState(false)
-    const [ postImg, setPostImg ] = useState(post.imageSrc);
     const [ askDeletePost, setaskDeletePost ] = useState(false)
 
 
@@ -55,14 +54,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
             }
         })
     }, [postID]);
-
-    useEffect(() => {
-        if (post.imageSrc)
-            setPostImg(post.imageSrc)
-        else
-            setPostImg(null);
-    }, [post.imageSrc])
-
     
     useEffect(() => {
         return () => {
@@ -340,9 +331,9 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
-                postImg != 0 &&
+                post.imageSrc != 0 &&
                 <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
-                    <Image className="rounded-lg" src={postImg} alt={""} fill sizes="(max-width: 900px)"/>    
+                    <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
                 </div>
             }   
 
