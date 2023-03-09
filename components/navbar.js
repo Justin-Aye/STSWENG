@@ -54,7 +54,7 @@ export default function Navbar() {
             </div>
             
 
-            <div className="mx-auto my-auto w-full flex justify-end col-span-3">
+            <div className="hidden md:flex mx-auto my-auto w-full justify-end col-span-3">
                 <input className="my-auto h-12 w-1/2 px-5 rounded-full text-black focus:outline-blue-100" 
                     onKeyDown={(e) => {
                         console.log(e.key)
