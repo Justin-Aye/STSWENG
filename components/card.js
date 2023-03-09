@@ -163,7 +163,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         commentIDs: newComments
                     })
                 }
-                console.log(userDoc.id);
             })
         }
         
@@ -389,10 +388,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     comments.map((item, index) => {
                         return (
                             <Comment 
-                            key={index}
-                            currUser={currUser}
-                            item={item}
-                            postID={postID}
+                                key={index}
+                                currUser={currUser}
+                                item={item}
+                                postID={postID}
                             />
                         )
                     })
