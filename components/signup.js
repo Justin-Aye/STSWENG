@@ -42,6 +42,8 @@ export default function Signup(){
                         bio: ""
                     }).then(() => {
                         console.log("User has been added")
+                    }).catch((error) => {
+                        console.log(error)
                     })
                 } catch (error) {
                     console.log(error)

@@ -102,7 +102,7 @@ export default function Homepage() {
         <div className="text-center mt-0 flex flex-col">
             {/* <div className="bg-feed_bg w-4/5 self-center pt-8"> //use this if we add extra stuff on the right of feed */}
             <div className="bg-doc_bg w-full self-center pt-8"> 
-                <div className="mb-5 w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
+                <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
                                  hover:bg-nav_bg_dark flex justify-center items-center"
                     onClick={() => handlePost()}
                 >
