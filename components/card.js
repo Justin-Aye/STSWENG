@@ -2,7 +2,7 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { arrayRemove, onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
+import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
@@ -16,6 +16,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ commentsid, setCommentsid ] = useState(post.commentsID || "")
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
+    const [ commentsCount, setCommentsCount ] = useState(post.commentsID.length || 0)  
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([]);
     const [ postOwner, setPostOwner ] = useState("");
@@ -35,7 +36,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             if (post.creatorID) {
                 const postOwnerRef = doc(db, "users", post.creatorID);
                 getDoc(postOwnerRef).then((doc) => {
-                    setPostOwner(doc.data().email); // TODO: change to displayName later
+                    setPostOwner(doc.data().displayName);
                 });
             }
         } catch (e) {
@@ -49,6 +50,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             try {
                 setPostLikeCount(doc.data().likes);
                 setPostDislikeCount(doc.data().dislikes);
+                setCommentsCount(doc.data().commentsID.length);
             } catch (e) {
                 console.log("post no longer exists.");
             }
@@ -231,7 +233,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
             }
     }
 
-
     function fetchComments(){
         if(commentsid.length > 0 && comments.length == 0){
             setLoading(true)
@@ -248,7 +249,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 setLoading(false)
             })
         }
-    }
+    }    
 
     return (
         <>
@@ -304,7 +305,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 }
             </div>
             
-
             {/* Warns User before deleting the post */}
             {
                 askDeletePost &&
@@ -377,7 +377,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 Add Comment
                             </button>
                         </div>
-                        <p className="text-left">Number of Comments: {commentsid.length}</p>
+                        <p className="text-left">Number of Comments: {commentsCount}</p>
                     </div>
                 }
 

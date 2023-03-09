@@ -23,10 +23,9 @@ export default function Navbar() {
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if (user) {
-                setUser(true);
+                setUser(auth.currentUser.uid);
                 const docRef = doc(db, "users", auth.currentUser.uid);
                 onSnapshot(docRef, (doc) => {
-                    setUser(auth.currentUser.uid);
                     setName(doc.data().displayName);
                 })
                 

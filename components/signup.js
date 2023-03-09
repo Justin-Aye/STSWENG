@@ -16,7 +16,8 @@ export default function Signup(){
     const [password, setPass] = useState("")
     const [repeatPassword, setRepPass] = useState("")
 
-    const [emailExists, setEmailExists] = useState(false)
+    const [errorExists, setErrorExists] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
     const [samePass, setSamePass] = useState(true)
 
     const router = useRouter()
@@ -25,8 +26,8 @@ export default function Signup(){
     function handleSubmit(){
         if(password != repeatPassword)
             setSamePass(false)
-
-        if(samePass)
+        else {
+            setSamePass(true)
             createUserWithEmailAndPassword(auth, email, password)
             .then( (userCredential) => {
                 const user = userCredential.user;
@@ -51,12 +52,13 @@ export default function Signup(){
             })
             .catch((error) => {
                 const errorCode = error.code
-                const errorMessage = error.message
-
-                setEmailExists(true)
+                setErrorExists(true)
+                setErrorMessage(error.message);
                 
-                console.log(error)
             });
+        }
+
+        
     }
 
     useEffect(() => {
@@ -87,7 +89,7 @@ export default function Signup(){
                         
                         <div className='grid grid-flow-col auto-col-max w-2/3 mx-auto mt-4'>
                             <label className="w-fit font-bold text-left ml-1" htmlFor="email">Email:</label>
-                            <span className={`${emailExists ? "" : "hidden"} text-red-500 text-right mr-1`} id='email-error'>Error: Invalid Email / Email already taken</span>
+                            <span className={`${errorExists ? "" : "hidden"} text-red-500 text-right mr-1`} id='email-error'>{errorMessage}</span>
                         </div>
                         <input className="w-2/3 h-10 mx-auto mb-8 border border-black rounded-md px-2" placeholder="Email..." type="text" name="email" id="email" 
                             onChange={(e) => setEmail(e.target.value) } data-testid="email_input" required
