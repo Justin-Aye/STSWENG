@@ -333,7 +333,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {
                 post.imageSrc != 0 &&
                 <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] mb-5 relative" data-testid="image">
-                    <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
+                    <Image className="rounded-lg object-contain" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
                 </div>
             }   
 
