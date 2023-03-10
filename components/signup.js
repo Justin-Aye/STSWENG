@@ -57,8 +57,6 @@ export default function Signup(){
                 
             });
         }
-
-        
     }
 
     useEffect(() => {
@@ -85,35 +83,44 @@ export default function Signup(){
                 
                 <div className="flex flex-col mx-auto w-2/5 h-auto py-5 rounded-xl bg-white shadow-lg opacity-90">
 
-                    <form className="flex flex-col mx-auto w-full py-5 rounded-xl" data-testid="form">
-                        
+                    <form className="flex flex-col mx-auto w-full py-5 rounded-xl" data-testid="form" 
+                        onSubmit={(e) => {
+                            e.preventDefault()
+                            handleSubmit()
+                        }}
+                    >
+
+                        <span className={`${errorExists ? "" : "hidden"} text-red-500 text-center mr-1`} id='email-error'>{errorMessage}</span>
                         <div className='grid grid-flow-col auto-col-max w-2/3 mx-auto mt-4'>
                             <label className="w-fit font-bold text-left ml-1" htmlFor="email">Email:</label>
-                            <span className={`${errorExists ? "" : "hidden"} text-red-500 text-right mr-1`} id='email-error'>{errorMessage}</span>
                         </div>
-                        <input className="w-2/3 h-10 mx-auto mb-8 border border-black rounded-md px-2" placeholder="Email..." type="text" name="email" id="email" 
+                        <input className="w-2/3 h-10 mx-auto mb-8 border border-black rounded-md px-2" placeholder="Email..." type="email" name="email" id="email" 
                             onChange={(e) => setEmail(e.target.value) } data-testid="email_input" required
                         />
 
                         <label className="w-2/3 mx-auto font-bold" htmlFor="email">Password:</label>
                         <input className="w-2/3 h-10 mx-auto mb-8 border border-black rounded-md px-2" placeholder="Password..." type="password" name="password" id="password" 
-                            onChange={(e) => setPass(e.target.value) } data-testid="pass_input" required
+                            onChange={(e) => setPass(e.target.value) } data-testid="pass_input" required minLength={6} maxLength={16}
                         />
                         
+                        <span className={`${samePass ? "hidden" : ""} text-red-500 text-center mr-1`} id='password-error'>Error: Passwords do not match</span>
                         <div className='grid grid-flow-col auto-col-max w-2/3 mx-auto'>
                             <label className="w-fit font-bold text-left ml-1" htmlFor="email">Re-enter Password:</label>
-                            <span className={`${samePass ? "hidden" : ""} text-red-500 text-right mr-1`} id='password-error'>Error: Passwords do not match</span>
                         </div>
                         <input className="w-2/3 h-10 mx-auto mb-8 border border-black rounded-md px-2" placeholder="Re-enter Password..." type="password" name="rep_pass" id="rep_pass" 
-                            onChange={(e) => setRepPass(e.target.value) } data-testid="rep_pass_input" required
+                            onChange={(e) => setRepPass(e.target.value) } data-testid="rep_pass_input" required minLength={6} maxLength={16}
                         />
+
+                        <button className="w-1/3 mx-auto mb-8 py-2 rounded-[20px] bg-nav_bg font-bold text-white hover:transition duration-300 hover:bg-nav_bg_dark" 
+                            type="submit" 
+                            data-testid="submit_btn"
+                        >
+                            SIGN UP
+                        </button>
+
                     </form>
                 
-                    <button className="w-1/3 mx-auto mb-8 py-2 rounded-[20px] bg-nav_bg font-bold text-white
-                                        hover:transition duration-300 hover:bg-nav_bg_dark" type="submit" onClick={() => handleSubmit()} data-testid="submit_btn">
-                        SIGN UP
-                    </button>
-
+                    
                     <div className='flex justify-center py-2'>
                         <span className='pr-1'>Already have an account?</span>
                         <Link href="/login" className="hover:transition duration-300 hover:text-violet-800 hover:underline">Login</Link>
