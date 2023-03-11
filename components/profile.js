@@ -15,7 +15,7 @@ export default function Profile({ props }) {
             : (
                 <div>
                     <h2>
-                        Bio: {props.data.bio.trim() ? props.data.bio : `User ${props.data.displayName} has no bio!`}
+                        Bio: {props.data.bio?.trim() ? props.data.bio : `User ${props.data.displayName} has no bio!`}
                     </h2>
                     <h2> Display Name: {props.data.displayName}</h2>
                     <h2> Email: {props.data.email}</h2>
