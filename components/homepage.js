@@ -111,7 +111,6 @@ export default function Homepage() {
 
     return (
         <div id="homepage" className="text-center mt-0 flex flex-col h-screen overflow-y-auto" onScroll={handleScroll}>
-            {/* <div className="bg-feed_bg w-4/5 self-center pt-8"> //use this if we add extra stuff on the right of feed */}
             <div className="bg-doc_bg w-full self-center pt-8"> 
                 <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
                                  hover:bg-nav_bg_dark flex justify-center items-center"
@@ -140,17 +139,6 @@ export default function Homepage() {
                     <div className="w-[75px] h-[75px] mx-auto mb-5 relative justify-center">
                         <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
                     </div>
-                }
-
-                
-                {
-                /* {
-                    showMore &&
-                    <p className="text-center text-[20px] text-blue-500 mb-20 cursor-pointer hover:underline"
-                        onClick={() => nextPostsQuery()}>
-                        View More...
-                    </p>
-                } */
                 }
 
                 {
