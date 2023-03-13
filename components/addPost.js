@@ -135,69 +135,69 @@ export default function AddPost(){
         )
 
     return (
-        <>
-        <p className="my-10 text-center text-[40px]">Create a Post</p>
-        <div className="flex flex-col mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <div className="h-screen overflow-y-scroll">
+            <p className="my-10 text-center text-[40px]">Create a Post</p>
+            <div className="flex flex-col mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
-            <div className="flex mb-5 gap-5" data-testid="user_container">
-                <div className="flex relative w-[50px] h-[50px]">
-                    <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>
+                <div className="flex mb-5 gap-5" data-testid="user_container">
+                    <div className="flex relative w-[50px] h-[50px]">
+                        <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>
+                    </div>
+                    <p className="my-auto text-left">{displayName}</p>
                 </div>
-                <p className="my-auto text-left">{displayName}</p>
-            </div>
 
-            {
-                !imgUrl &&
-                <p className="mb-2 text-red-500 text-center text-[14px]">Reminder: The image below is only a default image, and this will not be uploaded.</p>
-            }
+                {
+                    !imgUrl &&
+                    <p className="mb-2 text-red-500 text-center text-[14px]">Reminder: The image below is only a default image, and this will not be uploaded.</p>
+                }
 
-            <div className="w-full h-[500px] bg-gray-300 mx-auto mb-5 relative justify-center">
-                <Image src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)"/>
-            </div>
+                <div className="w-full h-[500px] bg-gray-300 mx-auto mb-5 relative justify-center">
+                    <Image src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)"/>
+                </div>
 
-            <textarea className="w-full h-[100px] p-5 mx-auto border border-black mb-5" placeholder="Image Caption" 
-                onChange={(e) => {setCaption(e.target.value)}}
-            />
-
-            <div className="mx-auto py-2 relative w-1/2 justify-center bg-gray-100 rounded-md border-2 border-black border-dotted cursor-pointer hover:brightness-90">
-                <input
-                    id="image_files"
-                    type="file"
-                    onChange={(e) => {handleImageUpload(e)}}
-                    className="absolute h-full w-full bg-transparent opacity-0 z-10 cursor-pointer"
+                <textarea className="w-full h-[100px] p-5 mx-auto border border-black mb-5" placeholder="Image Caption" 
+                    onChange={(e) => {setCaption(e.target.value)}}
                 />
 
-                <img
-                    src="/images/add_image_icon.png"
-                    alt=""
-                    className="max-h-[40px] m-auto cursor-pointer"
-                />
+                <div className="mx-auto py-2 relative w-1/2 justify-center bg-gray-100 rounded-md border-2 border-black border-dotted cursor-pointer hover:brightness-90">
+                    <input
+                        id="image_files"
+                        type="file"
+                        onChange={(e) => {handleImageUpload(e)}}
+                        className="absolute h-full w-full bg-transparent opacity-0 z-10 cursor-pointer"
+                    />
 
-                <p className="w-full text-center font-bold text-[12px] cursor-pointer">
-                    Upload an Image
-                </p>
+                    <img
+                        src="/images/add_image_icon.png"
+                        alt=""
+                        className="max-h-[40px] m-auto cursor-pointer"
+                    />
+
+                    <p className="w-full text-center font-bold text-[12px] cursor-pointer">
+                        Upload an Image
+                    </p>
+                </div>
+
+                {   
+                    mustFill &&
+                    <p className=" text-center text-red-500 mt-5 underline">Post must have atleast an Image or Caption</p>
+                }
+
+                <div className="flex w-full gap-5">
+                    <button className="ml-auto border mt-10 mb-5 border-black w-1/4 bg-red-300 px-5 py-1 text-white rounded-xl hover:brightness-95" 
+                        onClick={() => {router.push("/")}}
+                    >
+                        Cancel
+                    </button>
+
+                    <button className="border mt-10 mb-5 border-black w-1/4 bg-nav_bg px-5 py-1 text-white rounded-xl hover:brightness-95" 
+                        onClick={() => uploadPost()}
+                    >
+                        Upload Post
+                    </button>
+                </div>
+                
             </div>
-
-            {   
-                mustFill &&
-                <p className=" text-center text-red-500 mt-5 underline">Post must have atleast an Image or Caption</p>
-            }
-
-            <div className="flex w-full gap-5">
-                <button className="ml-auto border mt-10 mb-5 border-black w-1/4 bg-red-300 px-5 py-1 text-white rounded-xl hover:brightness-95" 
-                    onClick={() => {router.push("/")}}
-                >
-                    Cancel
-                </button>
-
-                <button className="border mt-10 mb-5 border-black w-1/4 bg-nav_bg px-5 py-1 text-white rounded-xl hover:brightness-95" 
-                    onClick={() => uploadPost()}
-                >
-                    Upload Post
-                </button>
-            </div>
-            
         </div>
-        </>
     )
 }

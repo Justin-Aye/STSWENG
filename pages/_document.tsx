@@ -15,7 +15,7 @@ export default function Document() {
         <link rel="shortcut icon" href="/images/logo.png" />
         
       </Head>
-      <body className='bg-doc_bg text-gray-800'>
+      <body className='bg-doc_bg text-gray-800 overflow-hidden'>
         <Main />
         <NextScript />
       </body>
