@@ -27,7 +27,7 @@ export default function Profile({ props }) {
                         </div>
                     </div>
                     <div className="col-span-2 grid">
-                        <span className="font-bold text-3xl my-4"> {props.data.displayName}</span>
+                        <span className="font-bold text-3xl text-icon_color my-4"> {props.data.displayName}</span>
 
                         <span className="text-xl font-bold">
                             Email:
