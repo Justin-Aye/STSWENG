@@ -414,11 +414,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 {
                     showComments &&
                     <div className="flex flex-col gap-5">
-                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                        <textarea className="border border-gray-400 h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
                             value={addComment} onChange={(e) => {setAddComment(e.target.value)}} 
                         />
                         <div className="flex">
-                            <button className="w-1/3 ml-auto border border-black rounded-xl bg-nav_bg text-white hover:brightness-110"
+                            <button className="w-1/4 ml-auto p-1 rounded-full bg-nav_bg text-white hover:transition duration-300
+                                 hover:bg-nav_bg_dark"
                                 onClick={() => {
                                     if(currUser)
                                         handleInsertComment()
