@@ -8,28 +8,33 @@ import { useRouter } from "next/router";
 
 
 export default function Settings() {
-    const [user, setUser] = useState(false);
+    const [currUser, setCurrUser] = useState("");
     const [displayName, setDisplayName] = useState("");
     const [bio, setBio] = useState("");
     const [email, setEmail] = useState("");
-    const [profPic, setProfPic] = useState("");
+    const [profPic, setProfPic] = useState(null);
     const [preview, setProfPicPreview] = useState("")
     const router = useRouter()
     
     // get logged in user's data
-    // FIXME: doc.data(), reader.result, auth.currentUser error warnings
+    // FIXME: doc.data(), reader.result
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
-            if (user) {
-                setUser(true);
-                const docRef = doc(db, "users", user.uid);
-                getDoc(docRef).then((doc) => {
-                    setDisplayName(doc?.data()?.displayName);
-                    setBio(doc?.data()?.bio);
-                    setProfPic(doc?.data()?.profPic)
-                    setProfPicPreview(doc?.data()?.profPic);
-                    setEmail(doc?.data()?.email);
-                })
+            try {
+                if (user) {
+                    setCurrUser(user.uid);
+                    const docRef = doc(db, "users", user.uid);
+                    getDoc(docRef).then((doc) => {
+                        setDisplayName(doc?.data()?.displayName);
+                        setBio(doc?.data()?.bio);
+                        setProfPicPreview(doc?.data()?.profPic);
+                        setEmail(doc?.data()?.email);
+                    })
+                }
+                else
+                    router.push("/login");
+            } catch (err) {
+                console.log(err);
             }
         })
     }, []);
@@ -62,6 +67,7 @@ export default function Settings() {
             const qDisplayName = query(usersRef, where("displayName", "==", displayName))
             const matchingUsers = await getDocs(qDisplayName);
 
+
             if (matchingUsers.size > 0) {
                 // TODO: dont use alert
                 console.log("entered displayname already exists");
@@ -69,20 +75,21 @@ export default function Settings() {
                 return
             }
             else {
-                const docRef = doc(db, "users", auth.currentUser.uid);
+                const docRef = doc(db, "users", currUser);
                 updateDoc(docRef, {
                     displayName: displayName,
                     lowerCaseDisplayName: displayName.toLowerCase()
                 });
             }
+
         } catch {
             console.log("error saving displayname");
         }
     }
 
     const saveBio = function () {
-        const docRef = doc(db, "users", auth.currentUser.uid);
         try {
+        const docRef = doc(db, "users", currUser);
             updateDoc(docRef, {
                 bio: bio
             });
@@ -93,28 +100,31 @@ export default function Settings() {
 
     const saveProfPic = async function () {
         // TODO:
-        const storageRef = ref(storage, `images/${profPic.name}`)
-        await uploadBytes(storageRef, profPic);
+        if (profPic) {
+            const storageRef = ref(storage, `images/${profPic.name}`)
+            await uploadBytes(storageRef, profPic);
+        
 
-        const profPicUrl = await getDownloadURL(storageRef);
-        const docRef = doc(db, "users", auth.currentUser.uid);
-        try {
-            updateDoc(docRef, {
-                profPic: profPicUrl
-            });
-        } catch {
-            console.log("error uploading profPic");
+            const profPicUrl = await getDownloadURL(storageRef);
+            const docRef = doc(db, "users", currUser);
+            try {
+                updateDoc(docRef, {
+                    profPic: profPicUrl
+                });
+            } catch {
+                console.log("error uploading profPic");
+            }
         }
     }
 
     return (
         <div className="m-auto flex flex-col h-full">
-            { user ? (
+            { currUser ? (
                 <div className="m-5 w-full mx-auto">
 
                     <div className="my-4 mx-10 px-10 flex justify-between h-fit border-b border-black">
                             <span className="w-fit font-bold text-3xl"><i className="fa fa-pencil mr-2 mb-2" />EDIT PROFILE</span>
-                            <Link href={`/profile/${auth.currentUser.uid}`} className="w-fit my-auto hover:underline">
+                            <Link href={`/profile/${currUser}`} className="w-fit my-auto hover:underline">
                                 Back to Profile Page</Link>
                     </div>
 

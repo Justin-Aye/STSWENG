@@ -8,13 +8,12 @@ export async function getServerSideProps(context) {
     const searchInput = context.query.result.toLowerCase();
     const usersRef = collection(db, "users");
     const qSnapshot = await getDocs(usersRef);
-    const results = []
-
+    
+    let results = []
     qSnapshot.forEach(async (userDoc) => {
-        results.push({uid: userDoc.id, data: userDoc.data()});
+        if (userDoc.data().lowerCaseDisplayName.includes(searchInput))
+            results.push({uid: userDoc.id, data: userDoc.data()});
     })
-    console.log(results.length)
-
     return {
         props: {results, searchInput}
     }
@@ -27,14 +26,13 @@ export default function search(props) {
             {props.results.length < 1 ? <h2> No results found! </h2> :
                 (
                     props.results.map((user, index) => {
-                        if (user.data.lowerCaseDisplayName.includes(props.searchInput))
-                            return (
-                                <SearchResult
-                                key={index}
-                                uid={user.uid}
-                                data={user.data}
-                                />
-                            );
+                        return (
+                            <SearchResult
+                            key={index}
+                            uid={user.uid}
+                            data={user.data}
+                            />
+                        );
                     })
                 )
             }

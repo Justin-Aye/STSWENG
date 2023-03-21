@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { auth, db } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 
 export default function Profile({ props }) {
-    const router = useRouter();
-    const profileUID = router.query.uid;
+    const [currUser, setCurrUser] = useState("");
+
+    useEffect(() => {
+        try {
+            auth.onAuthStateChanged((user) => {
+                if (user)
+                    setCurrUser(user.uid);
+            })
+                
+        } catch (err) {
+            console.log(err);
+        }
+    })
 
     return (
         <div className="m-auto flex flex-col h-full">
@@ -21,7 +31,7 @@ export default function Profile({ props }) {
                         </div>
                         
                         <div className="mt-5 flex justify-center">
-                        { props.UID == profileUID ? <Link href="/settings" className="self-center hover:underline">
+                        { props.profileUID == currUser ? <Link href="/settings" className="self-center hover:underline">
                             <i className="fa fa-pencil mr-2" />Edit Profile
                             </Link> : ""}
                         </div>
