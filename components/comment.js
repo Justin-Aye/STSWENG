@@ -38,7 +38,7 @@ export default function Comment( { index, currUser, item, postID } ) {
     async function handleLikeComment(item) {
         try {
             if (currUser) {
-                console.log(item);
+                //console.log(item);
                 const userRef = doc(db, "users", currUser.uid);
                 const commentRef = doc(db, "comments", item.commentID);
                 const userSnap = await getDoc(userRef);

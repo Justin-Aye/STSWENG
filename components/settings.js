@@ -66,7 +66,8 @@ export default function Settings() {
             else {
                 const docRef = doc(db, "users", auth.currentUser.uid);
                 updateDoc(docRef, {
-                    displayName: displayName
+                    displayName: displayName,
+                    lowerCaseDisplayName: displayName.toLowerCase()
                 });
             }
         } catch {
