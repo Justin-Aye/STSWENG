@@ -15,6 +15,9 @@ export default function Document() {
         <link rel="shortcut icon" href="/images/logo.png" />
         
       </Head>
+
+      {/* Overflow is now made to default hidden in order to track child component's scroll */}
+      {/* Make sure to enable overflow on child component */}
       <body className='bg-doc_bg text-gray-800 overflow-hidden'>
         <Main />
         <NextScript />
