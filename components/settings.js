@@ -140,7 +140,7 @@ export default function Settings() {
                                 <form className="w-fit grid justify-items-center" onSubmit={(e) => e.preventDefault()}>
                                     <input
                                     type="file"
-                                    accept="/image/*"
+                                    accept="image/*"
                                     className="w-56"
                                     onChange={handleProfPicChange}
                                     required
