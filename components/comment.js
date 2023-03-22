@@ -38,7 +38,7 @@ export default function Comment( { index, currUser, item, postID } ) {
     async function handleLikeComment(item) {
         try {
             if (currUser) {
-                console.log(item);
+                //console.log(item);
                 const userRef = doc(db, "users", currUser.uid);
                 const commentRef = doc(db, "comments", item.commentID);
                 const userSnap = await getDoc(userRef);
@@ -243,7 +243,7 @@ export default function Comment( { index, currUser, item, postID } ) {
                     
                     <div className="flex w-full mb-2">
                         <div className="flex relative w-[30px] h-[30px]">
-                            <Image className="rounded-[50%]" src={item.userData.profPic} alt="" fill sizes="(max-width: 30px)"/>
+                            <Image className="rounded-full" src={item.userData.profPic} alt="" fill sizes="(max-width: 30px)"/>
                         </div>
 
                         <p className="ml-5 w-full text-left my-auto">{item.userData.displayName}</p>
@@ -273,7 +273,7 @@ export default function Comment( { index, currUser, item, postID } ) {
                                     Delete
                                 </p>
 
-                                <p className="hover:brightness-95 bg-red-200 border-separate border-black cursor-pointer"
+                                <p className="hover:brightness-95 bg-white text-red-400 border-separate border-black cursor-pointer"
                                     onClick={() => setShowOptions(false)}
                                 >
                                     Cancel
@@ -287,19 +287,19 @@ export default function Comment( { index, currUser, item, postID } ) {
                     
 
                     {/* TEMPORARY COMMENT LIKE & DISLIKE BUTTONS TODO: change if needed */}
-                    <div className="flex gap-5 mb-5" data-testid="buttons_container">
+                    <div className="flex gap-5 mt-3" data-testid="buttons_container">
                         <div className="flex gap-1">
                             <button onClick={() => {handleLikeComment(item)}} disabled={disable}>
                                 <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
                             </button>
-                            <p className="my-auto">{commentLikeCount}</p>
+                            <span className="my-auto">{commentLikeCount}</span>
                         </div>
                         
                         <div className="flex gap-1">
                             <button onClick={() => {handleDislikeComment(item)}} disabled={disable}>
                                 <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
                             </button>
-                            <p className="my-auto">{commentDislikeCount}</p>
+                            <span className="my-auto">{commentDislikeCount}</span>
                         </div>
                     </div>
                 </div>
