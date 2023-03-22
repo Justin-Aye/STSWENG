@@ -41,10 +41,9 @@ export default function Navbar() {
         })
     }
 
-    // FIXME: if file directory is used as input, it should not navigate to that directory
     function handleSearch(e) {
         if (currUser) {
-            if (searchInput.trim() != "") {
+            if (searchInput.trim() != "" && !searchInput.startsWith(".") && !searchInput.includes("/")) {
                 console.log(searchInput)
                 e.preventDefault();
                 router.push(`/search/${searchInput}`);

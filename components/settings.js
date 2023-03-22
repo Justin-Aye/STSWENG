@@ -17,7 +17,7 @@ export default function Settings() {
     const router = useRouter()
     
     // get logged in user's data
-    // FIXME: doc.data(), reader.result
+    // FIXME: reader.result, profPic.name
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             try {
@@ -75,11 +75,16 @@ export default function Settings() {
                 return
             }
             else {
-                const docRef = doc(db, "users", currUser);
-                updateDoc(docRef, {
-                    displayName: displayName,
-                    lowerCaseDisplayName: displayName.toLowerCase()
-                });
+                if (!displayName.includes("/") && !displayName.startsWith(".") && displayName.match(/(.*[a-z]){3}/i)) {
+                    const docRef = doc(db, "users", currUser);
+                    updateDoc(docRef, {
+                        displayName: displayName,
+                        lowerCaseDisplayName: displayName.toLowerCase()
+                    });
+                 }
+                 else {
+                    alert("display name should have at least 3 letters and cannot have a / or start with a .")
+                 }
             }
 
         } catch {
