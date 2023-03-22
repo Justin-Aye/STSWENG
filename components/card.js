@@ -2,7 +2,7 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
+import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc, limit, startAfter } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
@@ -13,7 +13,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     var hasVoted = false;
     
-    const [ commentsid, setCommentsid ] = useState(post.commentsID || "")
+    const [ commentsid, setCommentsid ] = useState(post.commentsID || [])
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
     const [ commentsCount, setCommentsCount ] = useState(post.commentsID.length || 0)  
@@ -27,7 +27,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
 
     const router = useRouter()
-    // const [ lastComment, setLastComment ] = useState()
+    const [ lastComment, setLastComment ] = useState()
 
     const [disable, setDisabled] = useState(false);
 
@@ -263,9 +263,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         getDoc(com).then((snap) => {
                             const userRef = doc(db, "users", snap.data().creator);
                             getDoc(userRef).then((userDoc) => {
-                                setComments((comments) => [...comments, {commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}]);
+                                setComments((comments) => [{commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}, ...comments]);
                             })
-                            //setComments((comments) => [...comments, snap.data()])
                             setLoading(false)
                         })
 
@@ -290,20 +289,37 @@ export default function Card( { currUser, post, profpic, postID } ) {
     function fetchComments(){
         if(commentsid.length > 0 && comments.length == 0){
             setLoading(true)
-            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid))
+
+            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid), limit(3))
             getDocs(q).then((docs) => {
                 docs.forEach((commentDoc) => {
-                    //console.log(commentDoc.data().creator)
                     const userRef = doc(db, "users", commentDoc.data().creator);
                     getDoc(userRef).then((userDoc) => {
                         setComments((comments) => [...comments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
                     });
-                    // setLastComment(commentDoc)
+                    setLastComment(commentDoc)
                 })
                 setLoading(false)
             })
         }
-    }    
+    }
+    
+    function fetchNextComments(){
+        if(commentsid.length > 0 && comments.length < commentsid.length){
+            setLoading(true)
+            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid), startAfter(lastComment), limit(3))
+            getDocs(q).then((docs) => {
+                docs.forEach((commentDoc) => {
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setComments((comments) => [...comments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
+                    });
+                    setLastComment(commentDoc)
+                })
+                setLoading(false)
+            })
+        }
+    }
 
     return (
         <>
@@ -436,6 +452,13 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     </div>
                 }
 
+                {/* LOADING SYMBOL */}
+                {
+                    loading && 
+                    <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
+                        <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+                    </div>
+                }
                 
                 {/* SHOW ALL COMMENTS */}
                 {
@@ -452,12 +475,20 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     })
                 }
 
-                {/* LOADING SYMBOL */}
                 {
-                    loading && 
-                    <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
-                        <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
-                    </div>
+                    comments.length < commentsid.length && showComments &&
+                    <p className="my-5 text-purple-800 cursor-pointer"
+                        onClick={() => fetchNextComments()}
+                    >
+                        View More
+                    </p>
+                }
+
+                {
+                    comments.length == commentsid.length && showComments &&
+                    <p className="my-5">
+                        There are no more comments.
+                    </p>
                 }
 
                 {/* SHOW COMMENTS BUTTON */}                

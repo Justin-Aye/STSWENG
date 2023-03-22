@@ -182,7 +182,7 @@ export default function EditPost(){
         )
 
     return (
-        <>
+        <div className="h-screen overflow-y-scroll">
             <p className="my-10 text-center text-[40px]">Edit a Post</p>
             <div className="flex flex-col mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
@@ -250,6 +250,6 @@ export default function EditPost(){
                 </div>
                 
             </div>
-        </>
+        </div>
     )
 }
