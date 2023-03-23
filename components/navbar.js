@@ -41,7 +41,7 @@ export default function Navbar() {
     }
 
     return (
-        <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-lg shadow-sm text-white sticky top-0 z-50
+        <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-md shadow-sm text-white sticky top-0 z-50
                         grid grid-flow-col auto-col-max"
                 data-testid="nav_container">
 

@@ -9,6 +9,18 @@ export default function Profile({ props }) {
     const router = useRouter();
     const profileUID = router.query.uid;
 
+    const [ isAdmin, setAdmin ] = useState(false)
+
+    useEffect(() => {
+        getDoc(doc(db, "administrators", "Admin_List")).then((doc) => {
+            var data = doc.data()
+            setAdmin(data.admins.includes(profileUID))
+        }).catch((error) => {
+            console.log(error)
+            setAdmin(false)
+        })
+    })
+
     return (
         <div>
             {!props.data ? <h2> User does not exist!</h2>
@@ -27,7 +39,10 @@ export default function Profile({ props }) {
                     
                     <br></br>
                     
-                    { props.UID == profileUID ? <Link href="/settings"> settings </Link> : ""}
+                    { props.UID == profileUID ? <Link href={`/profile/${profileUID}/settings`}> settings </Link> : ""}
+
+                    <br></br>
+                    { props.UID == profileUID && isAdmin > 0 ? <Link href={`/profile/${profileUID}/admin`}> admin page </Link> : ""}
                 </div>
             )}
         </div>
