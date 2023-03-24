@@ -10,6 +10,8 @@ export default function Navbar() {
     const router = useRouter();
     const [currUser, setUser] = useState(null);
     const [currName, setName] = useState("");
+    
+    const [ isAdmin, setAdmin ] = useState(false)
 
     function logout(){
         auth.signOut().then(() => {
@@ -28,7 +30,14 @@ export default function Navbar() {
                 onSnapshot(docRef, (doc) => {
                     setName(doc.data().displayName);
                 })
-                
+
+                getDoc(doc(db, "administrators", "Admin_List")).then((doc) => {
+                    var data = doc.data()
+                    setAdmin(data.admins.includes(user.uid))
+                }).catch((error) => {
+                    console.log(error)
+                    setAdmin(false)
+                })
             }
         })
     }, [])
@@ -84,10 +93,22 @@ export default function Navbar() {
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
                     <Link href={`/profile/${currUser}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
                 </div>
-
+                
+                {
+                    isAdmin &&
+                    <>
+                        <span className={`mx-3 text-[24px] m-auto`}>|</span>
+                        <div className={`my-auto`}>
+                            <Link href={`/profile/${currUser}/admin`} className="hover:transition duration-300 hover:text-violet-800"> Admin Dashboard </Link>
+                        </div>
+                        <span className={`mx-3 text-[24px] m-auto`}>|</span>    
+                    </>
+                }
+                
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
                     <p className="hover:transition duration-300 hover:text-violet-800 cursor-pointer" onClick={() => logout()}>Logout</p>
                 </div>
+                
             </div>
         </div>
     )

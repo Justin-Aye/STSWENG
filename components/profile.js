@@ -9,18 +9,6 @@ export default function Profile({ props }) {
     const router = useRouter();
     const profileUID = router.query.uid;
 
-    const [ isAdmin, setAdmin ] = useState(false)
-
-    useEffect(() => {
-        getDoc(doc(db, "administrators", "Admin_List")).then((doc) => {
-            var data = doc.data()
-            setAdmin(data.admins.includes(profileUID))
-        }).catch((error) => {
-            console.log(error)
-            setAdmin(false)
-        })
-    })
-
     return (
         <div>
             {!props.data ? <h2> User does not exist!</h2>

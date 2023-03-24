@@ -1,7 +1,8 @@
 
-import { collection, documentId, getDocs, query, where, getDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, documentId, getDocs, query, where, getDoc, deleteDoc, updateDoc, doc, limit, startAfter } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import Image from "next/image";
+import Comments from "./comments";
 import React, { useEffect, useState } from "react";
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import { db, auth, storage } from "../../firebaseConfig";
@@ -12,15 +13,50 @@ export default function Admin_homepage(){
     const [ current, setCurrent ] = useState(1)
     const [ currUserIndex, setCurrUserIndex] = useState()
     const [ allUsers, setAllUsers] = useState([])
+    const [ postBuffer, setPostBuffer ] = useState()
+    const [ currComments, setCurrComments ] = useState([])
+    const [ lastComment, setLastComment ] = useState()
 
     const [ viewUsers, setViewUsers ] = useState(false)
     const [ showPosts, setShowPosts ] = useState(false)
-
-    const [ postBuffer, setPostBuffer ] = useState()
-
+    const [ noPosts, setNoPosts ] = useState(false)
+    const [ commentsLoading, setCommentsLoading ] = useState(false)
+    const [ showComments, setShowComments ] = useState(false)
     const [ showOptions, setShowOptions ] = useState(false)
     const [ askDeletePost, setaskDeletePost ] = useState(false)
-    const [ noPosts, setNoPosts ] = useState(false)
+
+    function fetchComments(commentsid){
+        if(commentsid.length > 0 && currComments.length == 0){
+            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid), limit(3))
+            getDocs(q).then((docs) => {
+                docs.forEach((commentDoc) => {
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setCurrComments((currComments) => [...currComments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
+                    });
+                    setLastComment(commentDoc)
+                })
+                setCommentsLoading(false)
+            })
+        }
+    }
+
+    function fetchNextComments(commentsid){
+        if(commentsid.length > 0 && currComments.length < commentsid.length){
+            setCommentsLoading(true)
+            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid), startAfter(lastComment), limit(3))
+            getDocs(q).then((docs) => {
+                docs.forEach((commentDoc) => {
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setCurrComments((currComments) => [...currComments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
+                    });
+                    setLastComment(commentDoc)
+                })
+                setCommentsLoading(false)
+            })
+        }
+    }
 
     async function fetchUserPosts(index){
         var postIDs = allUsers[index].data.postsID ? allUsers[index].data.postsID : []
@@ -188,6 +224,11 @@ export default function Admin_homepage(){
                             setShowPosts(false)
                             setShowOptions(false)
                             setNoPosts(false)
+                            setShowComments(false)
+
+                            setCurrComments([])
+                            setLastComment(null)
+
                             if(allUsers.length == 0)
                                 fetchUserData()
                         }}
@@ -323,13 +364,73 @@ export default function Admin_homepage(){
                                         <p className="my-auto" data-testid="postDislikeCount">{val.data.dislikes}</p>
                                     </div>
                                 </div>
+
+                                {/* COMMENTS CONTAINER */}
+                                <div className="flex flex-col w-full rounded-lg">
+                                    {/* LOADING SYMBOL */}
+                                    {
+                                        commentsLoading && current === index &&
+                                        <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
+                                            <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+                                        </div>
+                                    }
+                                    
+                                    {/* SHOW ALL COMMENTS */}
+                                    {
+                                        showComments && current === index &&
+                                        currComments.map((item, index) => {
+                                            return (
+                                                <Comments
+                                                    key={index}
+                                                    currUser={{...allUsers[currUserIndex].data, uid: allUsers[currUserIndex].userID}}
+                                                    item={item}
+                                                    postID={val.postID}
+                                                    currComments={currComments}
+                                                    setCurrComments={setCurrComments}
+                                                />
+                                            )
+                                        })
+                                    }
+
+                                    {
+                                        currComments.length < val.data.commentsID.length && showComments && current === index &&
+                                        <p className="my-5 text-purple-800 cursor-pointer"
+                                            onClick={() => fetchNextComments(val.data.commentsID)}
+                                        >
+                                            View More
+                                        </p>
+                                    }
+
+                                    {
+                                        currComments.length == val.data.commentsID.length && showComments && current === index &&
+                                        <p className="my-5">
+                                            There are no more comments.
+                                        </p>
+                                    }
+
+                                    {/* SHOW COMMENTS BUTTON */}                
+                                    <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                                        onClick={() => {
+                                            setShowComments(!showComments)
+                                            setCurrent(index)
+
+                                            if(val.data.commentsID.length > 0){
+                                                fetchComments(val.data.commentsID)
+                                            }else{
+                                                setShowComments(false)
+                                            }
+                                        }}
+                                    >
+                                        <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
+                                    </p>
+                                </div>
+
                             </div>
                         )
                     })
                 }
+
             </div>
-
-
         </div>
     )
 }
