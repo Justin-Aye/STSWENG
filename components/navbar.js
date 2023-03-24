@@ -95,7 +95,7 @@ export default function Navbar() {
                 </div>
                 
                 {
-                    isAdmin &&
+                    currUser && isAdmin &&
                     <>
                         <span className={`mx-3 text-[24px] m-auto`}>|</span>
                         <div className={`my-auto`}>

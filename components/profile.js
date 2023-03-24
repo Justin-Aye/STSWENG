@@ -28,9 +28,6 @@ export default function Profile({ props }) {
                     <br></br>
                     
                     { props.UID == profileUID ? <Link href={`/profile/${profileUID}/settings`}> settings </Link> : ""}
-
-                    <br></br>
-                    { props.UID == profileUID && isAdmin > 0 ? <Link href={`/profile/${profileUID}/admin`}> admin page </Link> : ""}
                 </div>
             )}
         </div>
