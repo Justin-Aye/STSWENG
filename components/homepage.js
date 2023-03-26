@@ -16,6 +16,7 @@ export default function Homepage() {
     const [ loading, setLoading ] = useState()
     const [ showMore, setShowMore ] = useState(false)
     const [ lastPost, setLastPost ] = useState(false)
+    const [ hasFired, setHasFired ] = useState(false)
     const router = useRouter()
 
     const [ currUser, setCurrUser] = useState(null)
@@ -30,9 +31,8 @@ export default function Homepage() {
         })
     }
 
-    function nextPostsQuery( ){
+    async function nextPostsQuery( ){
         if(!lastPost){
-            setLoading(true)
             setShowMore(false)
             if (nextPosts.length > 0)
                 setNextPosts([])
@@ -44,32 +44,56 @@ export default function Homepage() {
             )
 
             getDocs(q).then((docs) => {
-                docs.forEach((postDoc) => {
-                    const userRef = doc(db, "users", postDoc.data().creatorID);
-                    getDoc(userRef).then((userDoc) => {
-                        setPostIDs((postIDs) => [...postIDs, postDoc.id])
-                        setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
-                    })
-                    setLastDoc(postDoc)
-                })
-                setLoading(false)
 
-                if(docs.size > 0)
-                    setShowMore(true)
-                else
+                if(docs.size > 0){
+                    const p = new Promise((resolve, reject) => {
+                        var counter = 0
+                        docs.forEach((postDoc) => {
+                            const userRef = doc(db, "users", postDoc.data().creatorID);
+                            getDoc(userRef).then((userDoc) => {
+                                setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                                setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                            })
+                            setLastDoc(postDoc)
+                            
+                            counter += 1
+    
+                            if(counter == docs.size - 1){
+                                resolve()
+                            }
+                        })
+                    })
+        
+                    p.then(() => {
+                        if(docs.size > 0)
+                            setShowMore(true)
+                        else
+                            setLastPost(true)
+    
+                        setLoading(false)
+                        setHasFired(false)
+                    })
+                } else{
+                    setShowMore(false)
                     setLastPost(true)
+                    setLoading(false)
+                    setHasFired(true)
+                }
+
             }).catch((error) => {
                 console.log(error)
             })
-        }
+        } 
+        else
+            setLoading(false)
     }
 
     function fetchPosts(){
         setPosts([])
         setLoading(true)
 
-        const q = query(collection(db, "posts"), 
-            orderBy("likes"), 
+        const q = query(collection(db, "posts"),
+            orderBy("likes"),
             limit(3))
 
         getDocs(q).then((snap) => {
@@ -101,16 +125,33 @@ export default function Homepage() {
     }, [])
 
     function handleScroll(event){
-        const target = event.target
-
-        if(target.scrollHeight - target.scrollTop < target.clientHeight){
-            nextPostsQuery()
+        if(!lastPost){
+            const target = event.target
+            // console.log(Math.round(target.scrollHeight - target.scrollTop))
+            // console.log(target.clientHeight)
+            if(Math.round(target.scrollHeight - target.scrollTop) == target.clientHeight){
+                
+                if(!lastPost && !hasFired){
+                    target.scrollTop = (target.scrollTop - 300) <= 0 ? 0 : (target.scrollTop-300)
+                    setTimeout(() => {
+                        setLoading(true)
+                        setHasFired(true)
+                        nextPostsQuery()
+                    }, 250)
+                }
+                
+                if(hasFired){
+                    setLoading(false)
+                    setLastPost(true)
+                }
+            }
         }
-        
     }
 
     return (
-        <div id="homepage" className="text-center mt-0 flex flex-col h-screen overflow-y-auto" onScroll={handleScroll}>
+        <div id="homepage" className="text-center mt-0 flex flex-col h-[calc(100vh_-_80px)] overflow-y-auto " 
+            onScroll={(e) => { handleScroll(e) }}
+        >
             <div className="bg-doc_bg w-full self-center pt-8"> 
                 <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
                                  hover:bg-nav_bg_dark flex justify-center items-center"
