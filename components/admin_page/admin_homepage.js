@@ -1,10 +1,10 @@
 
-import { collection, documentId, getDocs, query, where, getDoc, deleteDoc, updateDoc, doc, limit, startAfter } from "firebase/firestore";
+import { collection, documentId, getDocs, query, where, getDoc, deleteDoc, updateDoc, doc, limit, startAfter, orderBy } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import Image from "next/image";
 import Comments from "./comments";
 import React, { useEffect, useState } from "react";
-import { HiThumbUp, HiThumbDown } from "react-icons/hi";
+import { HiThumbUp, HiThumbDown, HiChevronRight } from "react-icons/hi";
 import { db, auth, storage } from "../../firebaseConfig";
 
 
@@ -80,7 +80,7 @@ export default function Admin_homepage(){
                     })   
                 }
                 setShowPosts(true)
-                setViewUsers(false)
+                // setViewUsers(false)
             })
         }
         else{
@@ -200,7 +200,7 @@ export default function Admin_homepage(){
     }
 
     function fetchUserData(){
-        const q = query(collection(db, "users"))
+        const q = query(collection(db, "users"), orderBy("displayName"))
         getDocs(q).then((docs) => {
             if(docs.size > 0){
                 docs.forEach((doc) => {
@@ -236,12 +236,12 @@ export default function Admin_homepage(){
                 </div>
             </div>
 
-            <div className="flex flex-col gap-5 w-full h-auto bg-white overflow-y-auto px-10 pt-10 pb-[200px]">
+            <div className="flex flex-col gap-5 w-full h-auto bg-gray-300 overflow-y-auto px-10 pt-10 pb-[200px] lg:relative">
                 {
                     viewUsers &&
                     allUsers.map((val, index) => {
                         return (
-                            <div key={index} className="flex gap-5 w-full h-36 px-10 py-5 cursor-pointer hover:brightness-95 rounded-lg bg-nav_bg_dark"
+                            <div key={index} className="flex gap-5 w-1/3 h-36 px-5 py-5 cursor-pointer hover:brightness-95 rounded-lg bg-white"
                                 onClick={() => {
                                     setNoPosts(false)
                                     setCurrUserIndex(index)
@@ -251,183 +251,191 @@ export default function Admin_homepage(){
                                 <div className="relative w-[50px] h-[50px] my-auto">
                                     <Image className="rounded-[50%]" src={val.data.profPic ? val.data.profPic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 500px)" />
                                 </div>
-                                <p className="my-auto text-white text-[20px]">{val.data.email}</p>
-                                
-                                {   noPosts && currUserIndex === index &&
-                                    <p className="my-auto text-yellow-200 text-[20px] ml-auto">USER HAS NO POSTS</p>
-                                }
+                                <div className="flex flex-col">
+                                    <p className="my-auto text-[15px]">{val.data.displayName}</p>
+                                    
+                                    {   noPosts && currUserIndex === index &&
+                                        <p className="my-auto text-red-400 text-[12px]">USER HAS NO POSTS</p>
+                                    }
+                                </div>
+                                <HiChevronRight className="my-auto ml-auto text-[25px]"/>
                             </div>
                         )
                     })
                 }
 
+                
                 {
                     showPosts &&
-                    postBuffer?.posts.map((val, index) => {
-                        return(
-                            <div key={index} className="relative mx-auto mb-28 w-4/5 sm:w-3/5 md:w-3/5 lg:w-3/5 xl:w-1/2 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
-
-                                {/* USER PROFILE PIC */}
-                                <div className="flex mb-5 gap-5 relative" data-testid="user_container">
-                                    <div className="flex relative w-[50px] h-[50px]">
-                                        <Image className="rounded-[50%]" src={ allUsers[postBuffer.userIndex].data.profPic } alt="" fill sizes="(max-width: 50px)"/>
-                                    </div>
-                    
-                                    <p className="my-auto text-left">{ allUsers[postBuffer.userIndex].data.displayName }</p>
-                    
-                                    {/* Triple Dot Button */}
-                                    {
-                                        <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
-                                            onClick={() => {
-                                                setShowOptions(true)
-                                                setaskDeletePost(false)
-                                                setCurrent(index)
-                                            }}
-                                        >
-                                            <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
-                                        </div>
-                                    }
-                
-                                    {/* EDIT / DELETE OPTION */}
-                                    {   
-                                        showOptions && current === index &&
-                                        <div className="absolute top-0 right-0 w-1/4 h-fit shadow-[0px_5px_7px_2.5px_rgb(0,0,0,0.1)] flex flex-col z-10">
-                                            <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer px-2"
-                                                onClick={() => {
-                                                    setShowOptions(false)
-                                                    setaskDeletePost(true) 
-                                                }}
-                                            >
-                                                Delete
-                                            </p>
-                    
-                                            <p className="hover:brightness-95 bg-red-200 border-separate border-black cursor-pointer px-2"
-                                                onClick={() => 
-                                                    setShowOptions(false)}
-                                            >
-                                                Cancel
-                                            </p>
-                                        </div>
-                                    }
-                                </div>
+                    <div className="absolute top-10 right-10 w-7/12 h-auto rounded-lg bg-gray-200 overflow-auto py-10">
+                        {
+                            postBuffer?.posts.map((val, index) => {
+                                return(
+                                    <div key={index} className="relative mx-auto mb-28 w-4/5 sm:w-4/5 md:w-3/5 lg:w-3/5 xl:w-4/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        
+                                        {/* USER PROFILE PIC */}
+                                        <div className="flex mb-5 gap-5 relative" data-testid="user_container">
+                                            <div className="flex relative w-[50px] h-[50px]">
+                                                <Image className="rounded-[50%]" src={ allUsers[postBuffer.userIndex].data.profPic } alt="" fill sizes="(max-width: 50px)"/>
+                                            </div>
                             
-                                {/* Warns User before deleting the post */}
-                                {
-                                    askDeletePost && current === index &&
-                                    <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-2">
-                                        <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5">
-                                            <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
-                                            <p className="text-center">You are about to delete a post.</p>
-                                            <div className="flex justify-center gap-5">
-                                                <button className="w-full bg-green-200 py-2 font-bold rounded-lg hover:brightness-90"
+                                            <p className="my-auto text-left">{ allUsers[postBuffer.userIndex].data.displayName }</p>
+                            
+                                            {/* Triple Dot Button */}
+                                            {
+                                                <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
                                                     onClick={() => {
-                                                        // console.log(allUsers[currUserIndex])
-                                                        deletePost(val.postID, allUsers[currUserIndex].userID)
+                                                        setShowOptions(true)
+                                                        setaskDeletePost(false)
+                                                        setCurrent(index)
                                                     }}
                                                 >
-                                                    Delete Post
+                                                    <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
+                                                </div>
+                                            }
+                        
+                                            {/* EDIT / DELETE OPTION */}
+                                            {   
+                                                showOptions && current === index &&
+                                                <div className="absolute top-0 right-0 w-1/4 h-fit shadow-[0px_5px_7px_2.5px_rgb(0,0,0,0.1)] flex flex-col z-10">
+                                                    <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer px-2"
+                                                        onClick={() => {
+                                                            setShowOptions(false)
+                                                            setaskDeletePost(true) 
+                                                        }}
+                                                    >
+                                                        Delete
+                                                    </p>
+                            
+                                                    <p className="hover:brightness-95 bg-red-200 border-separate border-black cursor-pointer px-2"
+                                                        onClick={() => 
+                                                            setShowOptions(false)}
+                                                    >
+                                                        Cancel
+                                                    </p>
+                                                </div>
+                                            }
+                                        </div>
+                                    
+                                        {/* Warns User before deleting the post */}
+                                        {
+                                            askDeletePost && current === index &&
+                                            <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-2">
+                                                <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5">
+                                                    <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
+                                                    <p className="text-center">You are about to delete a post.</p>
+                                                    <div className="flex justify-center gap-5">
+                                                        <button className="w-full bg-green-200 py-2 font-bold rounded-lg hover:brightness-90"
+                                                            onClick={() => {
+                                                                // console.log(allUsers[currUserIndex])
+                                                                deletePost(val.postID, allUsers[currUserIndex].userID)
+                                                            }}
+                                                        >
+                                                            Delete Post
+                                                        </button>
+                                                        <button className="w-full bg-red-200 py-2 font-bold rounded-lg hover:brightness-90"
+                                                            onClick={() => setaskDeletePost(false)}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                            
+                                        {/* IMAGE OF POST, IF AVAILABLE */}
+                                        {
+                                            val.data.imageSrc.length > 0 &&
+                                            <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] mb-5 relative" data-testid="image">
+                                                <Image className="rounded-lg object-contain" src={val.data.imageSrc} alt={""} fill sizes="(max-width: 900px)" priority/>    
+                                            </div>
+                                        }   
+                            
+                                        {/* CAPTION OF POST */}
+                                        <p className="mb-5 text-left" data-testid="caption">{val.data.caption}</p>
+                            
+                                        {/* LIKE AND DISLIKE BUTTON CONTAINER */}
+                                        <div className="flex gap-5 mb-5" data-testid="buttons_container">
+                                            <div className="flex gap-1">
+                                                <button disabled={true} data-testid="postLikeBtn">
+                                                    <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle text-gray-800 hover:opacity-75`}/>
                                                 </button>
-                                                <button className="w-full bg-red-200 py-2 font-bold rounded-lg hover:brightness-90"
-                                                    onClick={() => setaskDeletePost(false)}
-                                                >
-                                                    Cancel
+                                                <p className="my-auto" data-testid="postLikeCount">{val.data.likes}</p>
+                                            </div>
+                                            
+                                            <div className="flex gap-1">
+                                                <button disabled={true} data-testid="postDislikeBtn">
+                                                    <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle text-gray-800 hover:opacity-75`}/>
                                                 </button>
+                                                <p className="my-auto" data-testid="postDislikeCount">{val.data.dislikes}</p>
                                             </div>
                                         </div>
-                                    </div>
-                                }
-                    
-                                {/* IMAGE OF POST, IF AVAILABLE */}
-                                {
-                                    val.data.imageSrc.length > 0 &&
-                                    <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] mb-5 relative" data-testid="image">
-                                        <Image className="rounded-lg object-contain" src={val.data.imageSrc} alt={""} fill sizes="(max-width: 900px)" priority/>    
-                                    </div>
-                                }   
-                    
-                                {/* CAPTION OF POST */}
-                                <p className="mb-5 text-left" data-testid="caption">{val.data.caption}</p>
-                    
-                                {/* LIKE AND DISLIKE BUTTON CONTAINER */}
-                                <div className="flex gap-5 mb-5" data-testid="buttons_container">
-                                    <div className="flex gap-1">
-                                        <button disabled={true} data-testid="postLikeBtn">
-                                            <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle text-gray-800 hover:opacity-75`}/>
-                                        </button>
-                                        <p className="my-auto" data-testid="postLikeCount">{val.data.likes}</p>
-                                    </div>
-                                    
-                                    <div className="flex gap-1">
-                                        <button disabled={true} data-testid="postDislikeBtn">
-                                            <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle text-gray-800 hover:opacity-75`}/>
-                                        </button>
-                                        <p className="my-auto" data-testid="postDislikeCount">{val.data.dislikes}</p>
-                                    </div>
-                                </div>
-
-                                {/* COMMENTS CONTAINER */}
-                                <div className="flex flex-col w-full rounded-lg">
-                                    {/* LOADING SYMBOL */}
-                                    {
-                                        commentsLoading && current === index &&
-                                        <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
-                                            <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
-                                        </div>
-                                    }
-                                    
-                                    {/* SHOW ALL COMMENTS */}
-                                    {
-                                        showComments && current === index &&
-                                        currComments.map((item, index) => {
-                                            return (
-                                                <Comments
-                                                    key={index}
-                                                    currUser={{...allUsers[currUserIndex].data, uid: allUsers[currUserIndex].userID}}
-                                                    item={item}
-                                                    postID={val.postID}
-                                                    currComments={currComments}
-                                                    setCurrComments={setCurrComments}
-                                                />
-                                            )
-                                        })
-                                    }
-
-                                    {
-                                        currComments.length < val.data.commentsID.length && showComments && current === index &&
-                                        <p className="my-5 text-purple-800 cursor-pointer"
-                                            onClick={() => fetchNextComments(val.data.commentsID)}
-                                        >
-                                            View More
-                                        </p>
-                                    }
-
-                                    {
-                                        currComments.length == val.data.commentsID.length && showComments && current === index &&
-                                        <p className="my-5">
-                                            There are no more comments.
-                                        </p>
-                                    }
-
-                                    {/* SHOW COMMENTS BUTTON */}                
-                                    <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
-                                        onClick={() => {
-                                            setShowComments(!showComments)
-                                            setCurrent(index)
-
-                                            if(val.data.commentsID.length > 0){
-                                                fetchComments(val.data.commentsID)
-                                            }else{
-                                                setShowComments(false)
+        
+                                        {/* COMMENTS CONTAINER */}
+                                        <div className="flex flex-col w-full rounded-lg">
+                                            {/* LOADING SYMBOL */}
+                                            {
+                                                commentsLoading && current === index &&
+                                                <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
+                                                    <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+                                                </div>
                                             }
-                                        }}
-                                    >
-                                        <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
-                                    </p>
-                                </div>
-
-                            </div>
-                        )
-                    })
+                                            
+                                            {/* SHOW ALL COMMENTS */}
+                                            {
+                                                showComments && current === index &&
+                                                currComments.map((item, index) => {
+                                                    return (
+                                                        <Comments
+                                                            key={index}
+                                                            currUser={{...allUsers[currUserIndex].data, uid: allUsers[currUserIndex].userID}}
+                                                            item={item}
+                                                            postID={val.postID}
+                                                            currComments={currComments}
+                                                            setCurrComments={setCurrComments}
+                                                        />
+                                                    )
+                                                })
+                                            }
+        
+                                            {
+                                                currComments.length < val.data.commentsID.length && showComments && current === index &&
+                                                <p className="my-5 text-purple-800 cursor-pointer"
+                                                    onClick={() => fetchNextComments(val.data.commentsID)}
+                                                >
+                                                    View More
+                                                </p>
+                                            }
+        
+                                            {
+                                                currComments.length == val.data.commentsID.length && showComments && current === index &&
+                                                <p className="my-5">
+                                                    There are no more comments.
+                                                </p>
+                                            }
+        
+                                            {/* SHOW COMMENTS BUTTON */}                
+                                            <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                                                onClick={() => {
+                                                    setShowComments(!showComments)
+                                                    setCurrent(index)
+        
+                                                    if(val.data.commentsID.length > 0){
+                                                        fetchComments(val.data.commentsID)
+                                                    }else{
+                                                        setShowComments(false)
+                                                    }
+                                                }}
+                                            >
+                                                <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
+                                            </p>
+                                        </div>
+        
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 }
 
             </div>
