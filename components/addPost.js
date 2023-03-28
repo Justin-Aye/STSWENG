@@ -184,13 +184,13 @@ export default function AddPost(){
                 }
 
                 <div className="flex w-full gap-5">
-                    <button className="ml-auto border mt-10 mb-5 border-black w-1/4 bg-red-300 px-5 py-1 text-white rounded-xl hover:brightness-95" 
+                    <button className="ml-auto mt-10 mb-5 w-1/4 bg-red-300 px-5 py-1 text-white rounded-xl hover:brightness-90" 
                         onClick={() => {router.push("/")}}
                     >
                         Cancel
                     </button>
 
-                    <button className="border mt-10 mb-5 border-black w-1/4 bg-nav_bg px-5 py-1 text-white rounded-xl hover:brightness-95" 
+                    <button className="mt-10 mb-5 w-1/4 bg-nav_bg px-5 py-1 text-white rounded-xl hover:brightness-90" 
                         onClick={() => uploadPost()}
                     >
                         Upload Post

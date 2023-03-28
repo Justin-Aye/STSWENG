@@ -10,6 +10,8 @@ export default function Navbar() {
     const router = useRouter();
     const [currUser, setUser] = useState(null);
     const [currName, setName] = useState("");
+    
+    const [ isAdmin, setAdmin ] = useState(false)
     const [searchInput, setSearch] = useState("");
 
     function logout(){
@@ -29,7 +31,14 @@ export default function Navbar() {
                 onSnapshot(docRef, (doc) => {
                     setName(doc.data().displayName);
                 })
-                
+
+                getDoc(doc(db, "administrators", "Admin_List")).then((doc) => {
+                    var data = doc.data()
+                    setAdmin(data.admins.includes(user.uid))
+                }).catch((error) => {
+                    console.log(error)
+                    setAdmin(false)
+                })
             }
         })
     }, [])
@@ -52,7 +61,7 @@ export default function Navbar() {
     }
 
     return (
-        <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-lg shadow-sm text-white sticky top-0 z-50
+        <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-md shadow-sm text-white sticky top-0 z-50
                         grid grid-flow-col auto-col-max"
                 data-testid="nav_container">
 
@@ -95,10 +104,22 @@ export default function Navbar() {
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
                     <Link href={`/profile/${currUser}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
                 </div>
-
+                
+                {
+                    currUser && isAdmin &&
+                    <>
+                        <span className={`mx-3 text-[24px] m-auto`}>|</span>
+                        <div className={`my-auto`}>
+                            <Link href={`/profile/${currUser}/admin`} className="hover:transition duration-300 hover:text-violet-800"> Admin Dashboard </Link>
+                        </div>
+                        <span className={`mx-3 text-[24px] m-auto`}>|</span>    
+                    </>
+                }
+                
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
                     <p className="hover:transition duration-300 hover:text-violet-800 cursor-pointer" onClick={() => logout()}>Logout</p>
                 </div>
+                
             </div>
         </div>
     )
