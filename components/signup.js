@@ -40,6 +40,7 @@ export default function Signup(){
                         liked: [],
                         disliked: [],
                         displayName: email,
+                        lowerCaseDisplayName: email.toLowerCase(),
                         bio: ""
                     }).then(() => {
                         console.log("User has been added")

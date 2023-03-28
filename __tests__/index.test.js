@@ -1,4 +1,4 @@
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, queryByTestId } from '@testing-library/react'
 import React from 'react'
 import Card from '../components/card'
 import Navbar from '../components/navbar'
@@ -66,12 +66,9 @@ describe('Card Component', () => {
   it('renders a post with no image', async () => {
     await act( async () => render(
         <Card currUser={testUser} post={testPostNoImg} profpic={testUser.data.profPic} postID={testPostID}/>
-      /*<Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
-        likes={0} dislikes={0} commentsID={[]} owner={"IopbmgLpylVYmdPaJd17IE2vmXo2"}
-      />*/
     ))
     expect(screen.getByTestId("user_container")).toBeInTheDocument();
-    //expect(screen.getByTestId("image")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("image")).not.toBeInTheDocument();
     expect(screen.getByTestId("buttons_container")).toBeInTheDocument();
     expect(screen.getByTestId("caption")).toBeInTheDocument();
   })
@@ -81,9 +78,6 @@ describe('Card Component', () => {
     it('renders a post with an image', async () => {
       await act( async () => render(
           <Card currUser={testUser} post={testPostImg} profpic={testUser.data.profPic} postID={testPostID}/>
-        /*<Card username={"Username"} caption={"Best Image"} imageSrc={"/images/mountain.jpg"} profpic={"/images/user_icon.png"}
-          likes={0} dislikes={0} commentsID={[]} owner={"IopbmgLpylVYmdPaJd17IE2vmXo2"}
-        />*/
       ))
       expect(screen.getByTestId("user_container")).toBeInTheDocument();
       expect(screen.getByTestId("image")).toBeInTheDocument();

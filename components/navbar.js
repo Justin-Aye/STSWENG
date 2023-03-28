@@ -12,6 +12,7 @@ export default function Navbar() {
     const [currName, setName] = useState("");
     
     const [ isAdmin, setAdmin ] = useState(false)
+    const [searchInput, setSearch] = useState("");
 
     function logout(){
         auth.signOut().then(() => {
@@ -49,6 +50,16 @@ export default function Navbar() {
         })
     }
 
+    function handleSearch(e) {
+        if (currUser) {
+            if (searchInput.trim() != "" && !searchInput.startsWith(".") && !searchInput.includes("/")) {
+                console.log(searchInput)
+                e.preventDefault();
+                router.push(`/search/${searchInput}`);
+            }
+        }
+    }
+
     return (
         <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-md shadow-sm text-white sticky top-0 z-50
                         grid grid-flow-col auto-col-max"
@@ -64,9 +75,9 @@ export default function Navbar() {
 
             <div className="hidden md:flex mx-auto my-auto w-full justify-end col-span-3">
                 <input className="my-auto h-12 w-1/2 px-5 rounded-full text-black focus:outline-blue-100" 
-                    onKeyDown={(e) => {
-                        console.log(e.key)
-                    }} type="text" size="75" placeholder="Search..."/>
+                    onChange={(e) => setSearch(e.target.value)} 
+                    onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
+                    type="text" size="75" placeholder="Search..."/>
             </div>
 
             <div className="ml-auto pl-3 flex gap-5 w-fit justify-end">

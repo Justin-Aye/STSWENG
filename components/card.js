@@ -142,105 +142,107 @@ export default function Card( { currUser, post, profpic, postID } ) {
     async function deletePost(){
         const post = await getDoc(doc(db, "posts", postID))
         if (post.exists()) {
-            const data = post.data()
-            var commentIDs = data.commentsID
+            try {
+                const data = post.data()
+                var commentIDs = data.commentsID
 
-            if(commentIDs.length > 0){
-                // Delete Every Comment in the post
-                const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
-                querySnapshot.forEach((doc) => {
-                    deleteDoc(doc.ref)
-                })
+                if(commentIDs.length > 0){
+                    // Delete Every Comment in the post
+                    const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
+                    querySnapshot.forEach((doc) => {
+                        deleteDoc(doc.ref)
+                    })
 
-                // Remove deleted comments from user's commentIDs
-                const qUsers = await getDocs(query(collection(db, "users"), where("commentIDs", "array-contains-any", commentIDs)))
-                qUsers.forEach(async (userDoc) => {
-                    const userRef = doc(db, "users", userDoc.id)
-                    const userSnap = await getDoc(userRef)
+                    // Remove deleted comments from user's commentIDs
+                    const qUsers = await getDocs(query(collection(db, "users"), where("commentIDs", "array-contains-any", commentIDs)))
+                    qUsers.forEach(async (userDoc) => {
+                        const userRef = doc(db, "users", userDoc.id)
+                        const userSnap = await getDoc(userRef)
+                        if (userSnap.exists()) {
+                            const newComments = userSnap.data().commentIDs.filter((val) => !commentIDs.includes(val));
+                            updateDoc(userRef, {
+                                commentIDs: newComments
+                            })
+                        }
+                    })
+
+                    // Remove deleted comments from user's liked & disliked
+                    const qLikedComments = await getDocs(query(collection(db, "users"), where("liked", "array-contains-any", commentIDs)));
+                    const qDislikedComments = await getDocs(query(collection(db, "users"), where("disliked", "array-contains-any", commentIDs)));
+
+                    if (qLikedComments.size > 0) {
+                        qLikedComments.forEach(async (userDoc) => {
+                            const userRef = doc(db, "users", userDoc.id);
+                            const userSnap = await getDoc(userRef);
+                            if (userSnap.exists()) {
+                                updateDoc(userRef, {
+                                    liked: userSnap.data().liked.filter((val) => !commentIDs.includes(val))
+                                })
+                            }
+                        })
+                    }
+
+                    if (qDislikedComments.size > 0) {
+                        qDislikedComments.forEach(async (userDoc) => {
+                            const userRef = doc(db, "users", userDoc.id);
+                            const userSnap = await getDoc(userRef);
+                            if (userSnap.exists()) {
+                                updateDoc(userRef, {
+                                    liked: userSnap.data().disliked.filter((val) => !commentIDs.includes(val))
+                                })
+                            }
+                        })
+                    }
+                }
+
+                // Remove post from users liked & disliked fields
+                const qLikedPosts = await getDocs(query(collection(db, "users"), where("liked", "array-contains", postID)));
+                const qDislikedPosts = await getDocs(query(collection(db, "users"), where("disliked", "array-contains", postID)));
+
+                if (qLikedPosts.size > 0) {
+                    qLikedPosts.forEach(async (userDoc) => {
+                        const userSnap = await getDoc(doc(db, "users", userDoc.id));
+                        if (userSnap.exists()) {
+                            updateDoc(doc(db, "users", userDoc.id), {
+                                liked: userSnap.data().liked.filter((val) => val != postID)
+                            })
+                        }
+                    })
+                }
+
+                if (qDislikedPosts.size > 0) {
+                    qDislikedPosts.forEach(async (userDoc) => {
+                        const userSnap = await getDoc(doc(db, "users", userDoc.id));
+                        if (userSnap.exists()) {
+                            updateDoc(doc(db, "users", userDoc.id), {
+                                disliked: userSnap.data().disliked.filter((val) => val != postID)
+                            })
+                        }
+                    })
+                }
+
+                // Delete Image
+                if(data.imageSrc.length > 0){
+                    deleteObject(ref(storage, data.imageSrc))
+                }
+
+                // Delete Post
+                deleteDoc(doc(db, "posts", postID)).then(async () => {
+                    // Update postsID array of user afterr deleting the post
+                    const userRef = doc(db, "users", currUser.uid);
+                    const userSnap = await getDoc(userRef);
+
                     if (userSnap.exists()) {
-                        const newComments = userSnap.data().commentIDs.filter((val) => !commentIDs.includes(val));
                         updateDoc(userRef, {
-                            commentIDs: newComments
+                            postsID: userSnap.data().postsID.filter((val) => {return val != postID})
                         })
                     }
+                    console.log("Successfully deleted")
+                    window.location.reload()
                 })
-
-                // Remove deleted comments from user's liked & disliked
-                const qLikedComments = await getDocs(query(collection(db, "users"), where("liked", "array-contains-any", commentIDs)));
-                const qDislikedComments = await getDocs(query(collection(db, "users"), where("disliked", "array-contains-any", commentIDs)));
-
-                if (qLikedComments.size > 0) {
-                    qLikedComments.forEach(async (userDoc) => {
-                        const userRef = doc(db, "users", userDoc.id);
-                        const userSnap = await getDoc(userRef);
-                        if (userSnap.exists()) {
-                            updateDoc(userRef, {
-                                liked: userSnap.data().liked.filter((val) => !commentIDs.includes(val))
-                            })
-                        }
-                    })
-                }
-
-                if (qDislikedComments.size > 0) {
-                    qDislikedComments.forEach(async (userDoc) => {
-                        const userRef = doc(db, "users", userDoc.id);
-                        const userSnap = await getDoc(userRef);
-                        if (userSnap.exists()) {
-                            updateDoc(userRef, {
-                                liked: userSnap.data().disliked.filter((val) => !commentIDs.includes(val))
-                            })
-                        }
-                    })
-                }
+            } catch (e) {
+                console.log(e);
             }
-
-            // Remove post from users liked & disliked fields
-            const qLikedPosts = await getDocs(query(collection(db, "users"), where("liked", "array-contains", postID)));
-            const qDislikedPosts = await getDocs(query(collection(db, "users"), where("disliked", "array-contains", postID)));
-
-            if (qLikedPosts.size > 0) {
-                qLikedPosts.forEach(async (userDoc) => {
-                    const userSnap = await getDoc(doc(db, "users", userDoc.id));
-                    if (userSnap.exists()) {
-                        updateDoc(doc(db, "users", userDoc.id), {
-                            liked: userSnap.data().liked.filter((val) => val != postID)
-                        })
-                    }
-                })
-            }
-
-            if (qDislikedPosts.size > 0) {
-                qDislikedPosts.forEach(async (userDoc) => {
-                    const userSnap = await getDoc(doc(db, "users", userDoc.id));
-                    if (userSnap.exists()) {
-                        updateDoc(doc(db, "users", userDoc.id), {
-                            disliked: userSnap.data().disliked.filter((val) => val != postID)
-                        })
-                    }
-                })
-            }
-
-            // Delete Image
-            if(data.imageSrc.length > 0){
-                deleteObject(ref(storage, data.imageSrc))
-            }
-
-            // Delete Post
-            deleteDoc(doc(db, "posts", postID)).then(async () => {
-                // Update postsID array of user afterr deleting the post
-                const userRef = doc(db, "users", currUser.uid);
-                const userSnap = await getDoc(userRef);
-
-                if (userSnap.exists()) {
-                    updateDoc(userRef, {
-                        postsID: userSnap.data().postsID.filter((val) => {return val != postID})
-                    })
-                }
-                console.log("Successfully deleted")
-                window.location.reload()
-            }).catch((error) => {
-                console.log(error)
-            })
         }
     }
 
@@ -430,11 +432,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 {
                     showComments &&
                     <div className="flex flex-col gap-5">
-                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                        <textarea className="border border-gray-400 h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
                             value={addComment} onChange={(e) => {setAddComment(e.target.value)}} 
                         />
                         <div className="flex">
-                            <button className="w-1/3 ml-auto border border-black rounded-xl bg-nav_bg text-white hover:brightness-110"
+                            <button className="w-1/4 ml-auto p-1 rounded-full bg-nav_bg text-white hover:transition duration-300
+                                 hover:bg-nav_bg_dark"
                                 onClick={() => {
                                     if(currUser)
                                         handleInsertComment()
