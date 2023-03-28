@@ -241,18 +241,24 @@ export default function Admin_homepage(){
                     viewUsers &&
                     allUsers.map((val, index) => {
                         return (
-                            <div key={index} className="flex gap-5 w-1/3 h-36 px-5 py-5 cursor-pointer hover:brightness-95 rounded-lg bg-white"
+                            <div key={index} className="flex w-1/3 h-36 px-5 py-5 cursor-pointer hover:brightness-95 rounded-lg bg-white"
                                 onClick={() => {
+                                    setShowOptions(false)
                                     setNoPosts(false)
+                                    setShowComments(false)
+
+                                    setCurrComments([])
+                                    setLastComment(null)
+                                    
                                     setCurrUserIndex(index)
                                     fetchUserPosts(index)
                                 }}
                             >
-                                <div className="relative w-[50px] h-[50px] my-auto">
+                                <div className="relative min-w-[50px] w-[50px] h-[50px] my-auto">
                                     <Image className="rounded-[50%]" src={val.data.profPic ? val.data.profPic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 500px)" />
                                 </div>
-                                <div className="flex flex-col">
-                                    <p className="my-auto text-[15px]">{val.data.displayName}</p>
+                                <div className="flex flex-col ml-5">
+                                    <p className="my-auto text-[12px]">{val.data.displayName}</p>
                                     
                                     {   noPosts && currUserIndex === index &&
                                         <p className="my-auto text-red-400 text-[12px]">USER HAS NO POSTS</p>
