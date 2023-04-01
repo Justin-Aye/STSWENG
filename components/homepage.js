@@ -141,17 +141,9 @@ export default function Homepage() {
                         setLoading(true);
                         setHasFired(true);
                     })
-                    /*
-                    setTimeout(() => {
-                        nextPostsQuery().then(() => {
-                            setLoading(true);
-                            setHasFired(true);
-                        })
-                    }, 500)
-                    */
                 }
                 else if (hasFired) {
-                    //setLoading(false);
+                    setLoading(false);
                 }
             }
         }
