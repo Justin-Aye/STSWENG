@@ -41,7 +41,6 @@ export default function Profile({ props }) {
             qSnapshot.forEach((doc) => {
                 setPostIDs((postIDs) => [...postIDs, doc.id])
                 setPosts((posts) => [...posts, {data: doc.data()}])
-                setLastDoc(doc);
             })
         }
     }

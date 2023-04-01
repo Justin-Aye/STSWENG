@@ -124,33 +124,36 @@ export default function Homepage() {
         })
     }, [])
 
-    function handleScroll(event){
-        if(!lastPost){
-            const target = event.target
-            // console.log(Math.round(target.scrollHeight - target.scrollTop))
-            // console.log(target.clientHeight)
-            if(Math.round(target.scrollHeight - target.scrollTop) == target.clientHeight){
-                
-                if(!lastPost && !hasFired){
-                    target.scrollTop = (target.scrollTop - 300) <= 0 ? 0 : (target.scrollTop-300)
+    function handleScroll(e){
+        if(!lastPost) {
+            if (loading && hasFired) {
+                setLoading(false);
+                return;
+            }
+
+            const scrollTop = e.target.scrollTop || e.target.body.scrollTop;
+            const scrollHeight = e.target.scrollHeight || e.target.body.scrollHeight;
+            const clientHeight = e.target.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight) {
+                if (!hasFired) {
                     setTimeout(() => {
-                        setLoading(true)
-                        setHasFired(true)
-                        nextPostsQuery()
-                    }, 250)
+                        setLoading(true);
+                        setHasFired(true);
+                        nextPostsQuery();
+                    }, 500)
                 }
-                
-                if(hasFired){
-                    setLoading(false)
-                    setLastPost(true)
+                else if (hasFired) {
+                    setLoading(false);
+                    setLastPost(true);
                 }
             }
         }
     }
 
     return (
-        <div id="homepage" className="text-center mt-0 flex flex-col h-[calc(100vh_-_80px)] overflow-y-auto " 
-            onScroll={(e) => { handleScroll(e) }}
+        <div id="homepage" className="text-center mt-0 flex flex-col h-[calc(100vh_-_80px)] overflow-y-auto "
+        onScroll={(e) => { handleScroll(e) }}
         >
             <div className="bg-doc_bg w-full self-center pt-8"> 
                 <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
