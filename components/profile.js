@@ -8,7 +8,6 @@ import { collection, query, where, getDocs, getDoc, doc, orderBy, limit, startAf
 export default function Profile({ props }) {
     const [ currUser, setCurrUser ] = useState({});
     const [ posts, setPosts ] = useState([]);
-    const [ postIDs, setPostIDs ] = useState([]);
 
     useEffect(() => {
         try {
@@ -26,15 +25,13 @@ export default function Profile({ props }) {
     }, []);
 
     const fetchPosts = async () => {
-
         const postsRef = collection(db, "posts");
         const q = query(postsRef, where("creatorID", "==", props.profileUID), orderBy("likes"));
         const qSnapshot = await getDocs(q);
 
         if (qSnapshot.size > 0) {
             qSnapshot.forEach((doc) => {
-                setPostIDs((postIDs) => [...postIDs, doc.id])
-                setPosts((posts) => [...posts, {data: doc.data()}])
+                setPosts((posts) => [...posts, {id: doc.id, data: doc.data()}])
             })
         }
     }
@@ -95,7 +92,7 @@ export default function Profile({ props }) {
                                 <Card key={index}
                                 post={post.data}
                                 profpic={props.data.profPic}
-                                postID={postIDs[index]}
+                                postID={post.id}
                                 currUser={currUser}
                                 />
                             )

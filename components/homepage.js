@@ -10,7 +10,6 @@ import Image from "next/image";
 export default function Homepage() {
     // Fetched data
     const [ posts, setPosts ] = useState([])
-    const [ postIDs, setPostIDs] = useState([])
     const [ lastDoc, setLastDoc ] = useState(null) 
     const [ loading, setLoading ] = useState(false)
     const [ lastPost, setLastPost ] = useState(false)
@@ -35,14 +34,13 @@ export default function Homepage() {
         const checkLast = async () => {
             const postsRef = collection(db, "posts");
             const qSnapshot = await getDocs(postsRef);
-            
             if (posts.length == qSnapshot.docs.length) {
                 setLastPost(true);
                 setLoading(false);
             }
         }
         checkLast();
-    })
+    }, [posts.length])
 
     function handlePost(){
         auth.onAuthStateChanged((user) => {
@@ -69,8 +67,9 @@ export default function Homepage() {
                         docs.forEach((postDoc) => {
                             const userRef = doc(db, "users", postDoc.data().creatorID);
                             getDoc(userRef).then((userDoc) => {
-                                setPostIDs((postIDs) => [...postIDs, postDoc.id])
-                                setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                                if (!posts.includes({id: postDoc.id, data: postDoc.data(), userData: userDoc.data()})) {
+                                    setPosts((posts) => [...posts, {id: postDoc.id, data: postDoc.data(), userData: userDoc.data()}]);
+                                }
                             })
                             setLastDoc(postDoc)
                             
@@ -84,6 +83,7 @@ export default function Homepage() {
         
                     p.then(() => {
                         //setLoading(false)
+                        setPosts((posts) => {return posts.filter((item, i) => posts.indexOf(item) === i)})
                         setHasFired(false)
                     })
 
@@ -114,8 +114,7 @@ export default function Homepage() {
             snap.forEach((postDoc) => {
                 const userRef = doc(db, "users", postDoc.data().creatorID);
                 getDoc(userRef).then((userDoc) => {
-                    setPostIDs((postIDs) => [...postIDs, postDoc.id])
-                    setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                    setPosts((posts) => [...posts, {id: postDoc.id, data: postDoc.data(), userData: userDoc.data()}]);
                 })
                 setLastDoc(postDoc)
             })
@@ -128,7 +127,7 @@ export default function Homepage() {
     function handleScroll(e){
         if(!lastPost) {
             if (loading && hasFired) {
-                setLoading(false);
+                //setLoading(false);
                 return;
             }
 
@@ -138,11 +137,18 @@ export default function Homepage() {
 
             if (scrollTop + clientHeight >= scrollHeight) {
                 if (!hasFired) {
-                    setTimeout(() => {
+                    nextPostsQuery().then(() => {
                         setLoading(true);
                         setHasFired(true);
-                        nextPostsQuery();
-                    }, 250)
+                    })
+                    /*
+                    setTimeout(() => {
+                        nextPostsQuery().then(() => {
+                            setLoading(true);
+                            setHasFired(true);
+                        })
+                    }, 500)
+                    */
                 }
                 else if (hasFired) {
                     //setLoading(false);
@@ -170,7 +176,7 @@ export default function Homepage() {
                         <Card key={index} 
                         post={post.data} 
                         profpic={post.userData.profPic} 
-                        postID={postIDs[index]}
+                        postID={post.id}
                         currUser={currUser}   
                         />
                     )
