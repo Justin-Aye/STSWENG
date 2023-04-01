@@ -16,6 +16,7 @@ export default function Homepage() {
     const [ loading, setLoading ] = useState()
     const [ showMore, setShowMore ] = useState(false)
     const [ lastPost, setLastPost ] = useState(false)
+    const [ hasFired, setHasFired ] = useState(false)
     const router = useRouter()
 
     const [ currUser, setCurrUser] = useState(null)
@@ -30,44 +31,69 @@ export default function Homepage() {
         })
     }
 
-    function nextPostsQuery( ){
-        setLoading(true)
-        setShowMore(false)
-        if (nextPosts.length > 0)
-            setNextPosts([])
+    async function nextPostsQuery( ){
+        if(!lastPost){
+            setShowMore(false)
+            if (nextPosts.length > 0)
+                setNextPosts([])
 
-        const q = query(collection(db, "posts"),
-            orderBy("likes"),
-            startAfter(lastDoc),
-            limit(3)
-        )
+            const q = query(collection(db, "posts"),
+                orderBy("likes"),
+                startAfter(lastDoc),
+                limit(3)
+            )
 
-        getDocs(q).then((docs) => {
-            docs.forEach((postDoc) => {
-                const userRef = doc(db, "users", postDoc.data().creatorID);
-                getDoc(userRef).then((userDoc) => {
-                    setPostIDs((postIDs) => [...postIDs, postDoc.id])
-                    setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
-                })
-                setLastDoc(postDoc)
+            getDocs(q).then((docs) => {
+
+                if(docs.size > 0){
+                    const p = new Promise((resolve, reject) => {
+                        var counter = 0
+                        docs.forEach((postDoc) => {
+                            const userRef = doc(db, "users", postDoc.data().creatorID);
+                            getDoc(userRef).then((userDoc) => {
+                                setPostIDs((postIDs) => [...postIDs, postDoc.id])
+                                setPosts((posts) => [...posts, {data: postDoc.data(), userData: userDoc.data()}]);
+                            })
+                            setLastDoc(postDoc)
+                            
+                            counter += 1
+    
+                            if(counter == docs.size - 1){
+                                resolve()
+                            }
+                        })
+                    })
+        
+                    p.then(() => {
+                        if(docs.size > 0)
+                            setShowMore(true)
+                        else
+                            setLastPost(true)
+    
+                        setLoading(false)
+                        setHasFired(false)
+                    })
+                } else{
+                    setShowMore(false)
+                    setLastPost(true)
+                    setLoading(false)
+                    setHasFired(true)
+                }
+
+            }).catch((error) => {
+                console.log(error)
             })
+        } 
+        else
             setLoading(false)
-
-            if(docs.size > 0)
-                setShowMore(true)
-            else
-                setLastPost(true)
-        }).catch((error) => {
-            console.log(error)
-        })
     }
 
     function fetchPosts(){
         setPosts([])
         setLoading(true)
 
-        const q = query(collection(db, "posts"), 
-            orderBy("likes"), 
+        const q = query(collection(db, "posts"),
+            orderBy("likes"),
             limit(3))
 
         getDocs(q).then((snap) => {
@@ -79,7 +105,6 @@ export default function Homepage() {
                 })
                 setLastDoc(postDoc)
             })
-            console.log(posts)
             setLoading(false)
             setShowMore(true)
         }).catch((error) => {
@@ -99,11 +124,36 @@ export default function Homepage() {
         })
     }, [])
 
+    function handleScroll(event){
+        if(!lastPost){
+            const target = event.target
+            // console.log(Math.round(target.scrollHeight - target.scrollTop))
+            // console.log(target.clientHeight)
+            if(Math.round(target.scrollHeight - target.scrollTop) == target.clientHeight){
+                
+                if(!lastPost && !hasFired){
+                    target.scrollTop = (target.scrollTop - 300) <= 0 ? 0 : (target.scrollTop-300)
+                    setTimeout(() => {
+                        setLoading(true)
+                        setHasFired(true)
+                        nextPostsQuery()
+                    }, 250)
+                }
+                
+                if(hasFired){
+                    setLoading(false)
+                    setLastPost(true)
+                }
+            }
+        }
+    }
+
     return (
-        <div className="text-center mt-0 flex flex-col">
-            {/* <div className="bg-feed_bg w-4/5 self-center pt-8"> //use this if we add extra stuff on the right of feed */}
+        <div id="homepage" className="text-center mt-0 flex flex-col h-[calc(100vh_-_80px)] overflow-y-auto " 
+            onScroll={(e) => { handleScroll(e) }}
+        >
             <div className="bg-doc_bg w-full self-center pt-8"> 
-                <div className="mb-5 w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
+                <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav_bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
                                  hover:bg-nav_bg_dark flex justify-center items-center"
                     onClick={() => handlePost()}
                 >
@@ -124,28 +174,21 @@ export default function Homepage() {
                 })
             }
             
-            {
-                loading && 
-                <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
-                    <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
-                </div>
-            }
+            <div className="w-full h-[500px] pb-[100px]">
+                {
+                    loading && 
+                    <div className="w-[75px] h-[75px] mx-auto mb-5 relative justify-center">
+                        <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+                    </div>
+                }
 
-            
-            {
-                showMore &&
-                <p className="text-center text-[20px] text-blue-500 mb-20 cursor-pointer hover:underline"
-                    onClick={() => nextPostsQuery()}>
-                    View More...
-                </p>
-            }
-
-            {
-                lastPost &&
-                <p className="text-center text-[20px] mb-20">
-                    Sorry, there are no more posts.
-                </p>
-            }
+                {
+                    lastPost &&
+                    <p className="text-center text-[20px]">
+                        Sorry, there are no more posts.
+                    </p>
+                }
+            </div>
 
         </div>
     )

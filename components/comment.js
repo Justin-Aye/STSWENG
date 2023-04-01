@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { onSnapshot, increment, updateDoc, doc, arrayUnion, getDoc, getDocs, deleteDoc, arrayRemove, query, collection, where, union } from "firebase/firestore";
 import { db  } from "../firebaseConfig";
-import { useRouter } from "next/router";
 
 
 export default function Comment( { index, currUser, item, postID } ) {
@@ -21,6 +20,7 @@ export default function Comment( { index, currUser, item, postID } ) {
     const [ askDeleteComment, setAskDeleteComment ] = useState(false)
 
     const [disable, setDisabled] = useState(false);
+    const [deleted, setDeleted] = useState(false);
 
     useEffect(() => {
         const docRef = doc(db, "comments", item.commentID);
@@ -30,14 +30,15 @@ export default function Comment( { index, currUser, item, postID } ) {
                 setCommentLikeCount(doc.data().likes);
                 setCommentDislikeCount(doc.data().dislikes);
             } catch (e) {
-                console.log("comment no longer exists.");
+                console.log(`comment ${item.commentID} no longer exists. (has been deleted)`);
             }
         })
-    });
+    }, [item.commentID]);
 
     async function handleLikeComment(item) {
         try {
             if (currUser) {
+                //console.log(item);
                 const userRef = doc(db, "users", currUser.uid);
                 const commentRef = doc(db, "comments", item.commentID);
                 const userSnap = await getDoc(userRef);
@@ -171,135 +172,138 @@ export default function Comment( { index, currUser, item, postID } ) {
 
                 // Delete the comment
                 const commentRef = doc(db, "comments", item.commentID);
-                deleteDoc(commentRef)
-                setAskDeleteComment(false);
-                //window.location.reload();
-                console.log("Successfully deleted comment");
+                deleteDoc(commentRef).then(() => {
+                    setDeleted(true);
+                    setAskDeleteComment(false);
+                    //window.location.reload();
+                    console.log("Successfully deleted comment");
+                })
             }
         } catch (e) {
             console.log(e);
         }
     }
 
-
-    return (
-        <div>
-            <div>
-                {
-                showEditComment &&
-                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
-                        <p className="text-center text-[20px] font-bold">EDIT COMMENT</p>
-                        
-                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
-                            value={selectedCommentVal} onChange={(e) => {setSelectedCommentVal(e.target.value)}} 
-                        />
-                        <div className="flex mt-10 justify-center gap-5">
-                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => saveCommentEdit()}
-                            >
-                                Save Edits
-                            </button>
-                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => setShowEditComment(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                }
-
-                {/* Warns User before deleting the comment */}
-                {
-                askDeleteComment &&
-                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
-                        <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
-                        <p>You are about to delete a comment.</p>
-                        <div className="flex mt-10 justify-center gap-5">
-                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => deleteComment()}
-                            >
-                                Delete Comment
-                            </button>
-                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => setAskDeleteComment(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                }
-
-            </div>
-
-
-            <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">            
-                
-                <div className="flex w-full mb-2">
-                    <div className="flex relative w-[30px] h-[30px]">
-                        <Image className="rounded-[50%]" src={item.userData.profPic} alt="" fill sizes="(max-width: 30px)"/>
-                    </div>
-
-                    <p className="ml-5 w-full text-left my-auto">{item.userData.email}</p>
-                
-                    {/* Triple Dot Button */}
+    if (!deleted ) {
+        return (
+            <div data-testid="comment_container">
+                <div>
                     {
-                        (currUser && currUser.uid == item.commentData.creator) &&
-                        <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
-                            onClick={() => setShowOptions(true)}
-                        >
-                            <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
+                    showEditComment &&
+                    <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
+                        <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
+                            <p className="text-center text-[20px] font-bold">EDIT COMMENT</p>
+                            
+                            <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                                value={selectedCommentVal} onChange={(e) => {setSelectedCommentVal(e.target.value)}} 
+                            />
+                            <div className="flex mt-10 justify-center gap-5">
+                                <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                    onClick={() => saveCommentEdit()}
+                                >
+                                    Save Edits
+                                </button>
+                                <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                    onClick={() => setShowEditComment(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
+                    </div>
                     }
 
-                    {/* EDIT / DELETE OPTION */}
-                    {   
-                        showOptions &&
-                        <div className="absolute top-0 right-0 w-1/4 h-fit drop-shadow-xl shadow-xl flex flex-col z-10">
-                            <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
-                                onClick={() => {setShowEditComment(true)}}
-                            >
-                                Edit
-                            </p>
-                            <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
-                                onClick={() => {setAskDeleteComment(true); setShowOptions(false)}}
-                            >
-                                Delete
-                            </p>
-
-                            <p className="hover:brightness-95 bg-red-200 border-separate border-black cursor-pointer"
-                                onClick={() => setShowOptions(false)}
-                            >
-                                Cancel
-                            </p>
+                    {/* Warns User before deleting the comment */}
+                    {
+                    askDeleteComment &&
+                    <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
+                        <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
+                            <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
+                            <p>You are about to delete a comment.</p>
+                            <div className="flex mt-10 justify-center gap-5">
+                                <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                    onClick={() => deleteComment()}
+                                >
+                                    Delete Comment
+                                </button>
+                                <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                    onClick={() => setAskDeleteComment(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
+                    </div>
                     }
 
                 </div>
 
-                <p className="text-left w-full">{commentText}</p>
-                
 
-                {/* TEMPORARY COMMENT LIKE & DISLIKE BUTTONS TODO: change if needed */}
-                <div className="flex gap-5 mb-5" data-testid="buttons_container">
-                    <div className="flex gap-1">
-                        <button onClick={() => {handleLikeComment(item)}} disabled={disable}>
-                            <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                        </button>
-                        <p className="my-auto">{commentLikeCount}</p>
-                    </div>
+                <div key={index} className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300">            
                     
-                    <div className="flex gap-1">
-                        <button onClick={() => {handleDislikeComment(item)}} disabled={disable}>
-                            <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
-                        </button>
-                        <p className="my-auto">{commentDislikeCount}</p>
+                    <div className="flex w-full mb-2">
+                        <div className="flex relative w-[30px] h-[30px]">
+                            <Image className="rounded-full" src={item.userData.profPic} alt="" fill sizes="(max-width: 30px)"/>
+                        </div>
+
+                        <p className="ml-5 w-full text-left my-auto">{item.userData.displayName}</p>
+                    
+                        {/* Triple Dot Button */}
+                        {
+                            (currUser && currUser.uid == item.commentData.creator) &&
+                            <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
+                                onClick={() => setShowOptions(true)}
+                            >
+                                <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
+                            </div>
+                        }
+
+                        {/* EDIT / DELETE OPTION */}
+                        {   
+                            showOptions &&
+                            <div className="absolute top-0 right-0 w-1/4 h-fit drop-shadow-xl shadow-xl flex flex-col z-10">
+                                <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
+                                    onClick={() => {setShowEditComment(true)}}
+                                >
+                                    Edit
+                                </p>
+                                <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
+                                    onClick={() => {setAskDeleteComment(true); setShowOptions(false)}}
+                                >
+                                    Delete
+                                </p>
+
+                                <p className="hover:brightness-95 bg-white text-red-400 border-separate border-black cursor-pointer"
+                                    onClick={() => setShowOptions(false)}
+                                >
+                                    Cancel
+                                </p>
+                            </div>
+                        }
+
+                    </div>
+
+                    <p className="text-left w-full">{commentText}</p>
+                    
+
+                    {/* TEMPORARY COMMENT LIKE & DISLIKE BUTTONS TODO: change if needed */}
+                    <div className="flex gap-5 mt-3" data-testid="buttons_container">
+                        <div className="flex gap-1">
+                            <button onClick={() => {handleLikeComment(item)}} disabled={disable}>
+                                <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                            </button>
+                            <span className="my-auto">{commentLikeCount}</span>
+                        </div>
+                        
+                        <div className="flex gap-1">
+                            <button onClick={() => {handleDislikeComment(item)}} disabled={disable}>
+                                <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                            </button>
+                            <span className="my-auto">{commentDislikeCount}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
 }

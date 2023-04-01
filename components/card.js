@@ -2,7 +2,7 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { arrayRemove, onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc } from "firebase/firestore";
+import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc, limit, startAfter } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
@@ -13,30 +13,32 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     var hasVoted = false;
     
-    const [ commentsid, setCommentsid ] = useState(post.commentsID || "")
+    const [ commentsid, setCommentsid ] = useState(post.commentsID || [])
     const [ loading, setLoading ] = useState(false)
     const [ showComments, setShowComments ] = useState(false)
+    const [ commentsCount, setCommentsCount ] = useState(post.commentsID.length || 0)  
     const [ addComment, setAddComment ] = useState('')
     const [ comments, setComments ] = useState([]);
     const [ postOwner, setPostOwner ] = useState("");
     const [ postLikeCount, setPostLikeCount ] = useState(post.likes || 0);
     const [ postDislikeCount, setPostDislikeCount ] = useState(post.dislikes || 0);
     const [ showOptions, setShowOptions ] = useState(false)
-    const [ postImg, setPostImg ] = useState(post.imageSrc);
     const [ askDeletePost, setaskDeletePost ] = useState(false)
 
 
     const router = useRouter()
-    // const [ lastComment, setLastComment ] = useState()
+    const [ lastComment, setLastComment ] = useState()
 
     const [disable, setDisabled] = useState(false);
 
     useEffect(() => {
         try {
-            const postOwnerRef = doc(db, "users", post.creatorID);
-            getDoc(postOwnerRef).then((doc) => {
-                setPostOwner(doc.data().email); // TODO: change to displayName later
-            });
+            if (post.creatorID) {
+                const postOwnerRef = doc(db, "users", post.creatorID);
+                getDoc(postOwnerRef).then((doc) => {
+                    setPostOwner(doc.data().displayName);
+                });
+            }
         } catch (e) {
             console.log(e);
         }
@@ -48,19 +50,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
             try {
                 setPostLikeCount(doc.data().likes);
                 setPostDislikeCount(doc.data().dislikes);
+                setCommentsCount(doc.data().commentsID.length);
             } catch (e) {
                 console.log("post no longer exists.");
             }
         })
     }, [postID]);
-
-    useEffect(() => {
-        if (post.imageSrc)
-            setPostImg(post.imageSrc)
-        else
-            setPostImg(null);
-    }, [post.imageSrc])
-
     
     useEffect(() => {
         return () => {
@@ -146,56 +141,109 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     async function deletePost(){
         const post = await getDoc(doc(db, "posts", postID))
-        const data = post.data()
+        if (post.exists()) {
+            try {
+                const data = post.data()
+                var commentIDs = data.commentsID
 
-        var commentIDs = data.commentsID
-        
-        
-        if(commentIDs.length > 0){
-            // Delete Every Comment in the post
-            const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
-            querySnapshot.forEach((doc) => {
-                deleteDoc(doc.ref)
-            })
+                if(commentIDs.length > 0){
+                    // Delete Every Comment in the post
+                    const querySnapshot = await getDocs(query(collection(db, "comments"), where(documentId(), 'in', commentIDs)))
+                    querySnapshot.forEach((doc) => {
+                        deleteDoc(doc.ref)
+                    })
 
-            // Remove deleted comments from user's commentIDs
-            const qUsers = await getDocs(query(collection(db, "users"), where("commentIDs", "array-contains-any", commentIDs)))
-            qUsers.forEach(async (userDoc) => {
-                const userRef = doc(db, "users", userDoc.id)
-                const userSnap = await getDoc(userRef)
+                    // Remove deleted comments from user's commentIDs
+                    const qUsers = await getDocs(query(collection(db, "users"), where("commentIDs", "array-contains-any", commentIDs)))
+                    qUsers.forEach(async (userDoc) => {
+                        const userRef = doc(db, "users", userDoc.id)
+                        const userSnap = await getDoc(userRef)
+                        if (userSnap.exists()) {
+                            const newComments = userSnap.data().commentIDs.filter((val) => !commentIDs.includes(val));
+                            updateDoc(userRef, {
+                                commentIDs: newComments
+                            })
+                        }
+                    })
 
-                if (userSnap.exists()) {
-                    const newComments = userSnap.data().commentIDs.filter((val) => !commentIDs.includes(val));
-                    updateDoc(userRef, {
-                        commentIDs: newComments
+                    // Remove deleted comments from user's liked & disliked
+                    const qLikedComments = await getDocs(query(collection(db, "users"), where("liked", "array-contains-any", commentIDs)));
+                    const qDislikedComments = await getDocs(query(collection(db, "users"), where("disliked", "array-contains-any", commentIDs)));
+
+                    if (qLikedComments.size > 0) {
+                        qLikedComments.forEach(async (userDoc) => {
+                            const userRef = doc(db, "users", userDoc.id);
+                            const userSnap = await getDoc(userRef);
+                            if (userSnap.exists()) {
+                                updateDoc(userRef, {
+                                    liked: userSnap.data().liked.filter((val) => !commentIDs.includes(val))
+                                })
+                            }
+                        })
+                    }
+
+                    if (qDislikedComments.size > 0) {
+                        qDislikedComments.forEach(async (userDoc) => {
+                            const userRef = doc(db, "users", userDoc.id);
+                            const userSnap = await getDoc(userRef);
+                            if (userSnap.exists()) {
+                                updateDoc(userRef, {
+                                    liked: userSnap.data().disliked.filter((val) => !commentIDs.includes(val))
+                                })
+                            }
+                        })
+                    }
+                }
+
+                // Remove post from users liked & disliked fields
+                const qLikedPosts = await getDocs(query(collection(db, "users"), where("liked", "array-contains", postID)));
+                const qDislikedPosts = await getDocs(query(collection(db, "users"), where("disliked", "array-contains", postID)));
+
+                if (qLikedPosts.size > 0) {
+                    qLikedPosts.forEach(async (userDoc) => {
+                        const userSnap = await getDoc(doc(db, "users", userDoc.id));
+                        if (userSnap.exists()) {
+                            updateDoc(doc(db, "users", userDoc.id), {
+                                liked: userSnap.data().liked.filter((val) => val != postID)
+                            })
+                        }
                     })
                 }
-                console.log(userDoc.id);
-            })
-        }
-        
-        // Delete Image
-        if(data.imageSrc.length > 0){
-            deleteObject(ref(storage, data.imageSrc))
-        }
 
-        // Delete Post
-        deleteDoc(doc(db, "posts", postID)).then(async () => {
-            // Update postsID array of user afterr deleting the post
-            const userRef = doc(db, "users", currUser.uid);
-            const userSnap = await getDoc(userRef);
+                if (qDislikedPosts.size > 0) {
+                    qDislikedPosts.forEach(async (userDoc) => {
+                        const userSnap = await getDoc(doc(db, "users", userDoc.id));
+                        if (userSnap.exists()) {
+                            updateDoc(doc(db, "users", userDoc.id), {
+                                disliked: userSnap.data().disliked.filter((val) => val != postID)
+                            })
+                        }
+                    })
+                }
 
-            if (userSnap.exists()) {
-                updateDoc(userRef, {
-                    postsID: userSnap.data().postsID.filter((val) => {return val != postID})
+                // Delete Image
+                if(data.imageSrc.length > 0){
+                    deleteObject(ref(storage, data.imageSrc))
+                }
+
+                // Delete Post
+                deleteDoc(doc(db, "posts", postID)).then(async () => {
+                    // Update postsID array of user afterr deleting the post
+                    const userRef = doc(db, "users", currUser.uid);
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        updateDoc(userRef, {
+                            postsID: userSnap.data().postsID.filter((val) => {return val != postID})
+                        })
+                    }
+                    console.log("Successfully deleted")
+                    window.location.reload()
                 })
+            } catch (e) {
+                console.log(e);
             }
-
-            console.log("Successfully deleted")
-            window.location.reload()
-        }).catch((error) => {
-            console.log(error)
-        })
+        }
     }
 
     function handleInsertComment(){
@@ -215,9 +263,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         getDoc(com).then((snap) => {
                             const userRef = doc(db, "users", snap.data().creator);
                             getDoc(userRef).then((userDoc) => {
-                                setComments((comments) => [...comments, {commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}]);
+                                setComments((comments) => [{commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}, ...comments]);
                             })
-                            //setComments((comments) => [...comments, snap.data()])
                             setLoading(false)
                         })
 
@@ -239,19 +286,35 @@ export default function Card( { currUser, post, profpic, postID } ) {
             }
     }
 
-
     function fetchComments(){
         if(commentsid.length > 0 && comments.length == 0){
             setLoading(true)
-            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid))
+
+            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid), limit(3))
             getDocs(q).then((docs) => {
                 docs.forEach((commentDoc) => {
-                    //console.log(commentDoc.data().creator)
                     const userRef = doc(db, "users", commentDoc.data().creator);
                     getDoc(userRef).then((userDoc) => {
                         setComments((comments) => [...comments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
                     });
-                    // setLastComment(commentDoc)
+                    setLastComment(commentDoc)
+                })
+                setLoading(false)
+            })
+        }
+    }
+    
+    function fetchNextComments(){
+        if(commentsid.length > 0 && comments.length < commentsid.length){
+            setLoading(true)
+            const q = query(collection(db, "comments"), where(documentId(), "in", commentsid), startAfter(lastComment), limit(3))
+            getDocs(q).then((docs) => {
+                docs.forEach((commentDoc) => {
+                    const userRef = doc(db, "users", commentDoc.data().creator);
+                    getDoc(userRef).then((userDoc) => {
+                        setComments((comments) => [...comments, {commentData: commentDoc.data(), commentID: commentDoc.id, userData: userDoc.data()}])
+                    });
+                    setLastComment(commentDoc)
                 })
                 setLoading(false)
             })
@@ -260,7 +323,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     return (
         <>
-        <div className="relative mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <div className="relative mx-auto mb-28 w-4/5 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
             <div className="flex mb-5 gap-5 relative" data-testid="user_container">
@@ -312,7 +375,6 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 }
             </div>
             
-
             {/* Warns User before deleting the post */}
             {
                 askDeletePost &&
@@ -338,9 +400,9 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
-                postImg != 0 &&
-                <div className="w-full h-full min-h-[400px] mb-5 relative" data-testid="image">
-                    <Image className="rounded-lg" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)"/>    
+                post.imageSrc != 0 &&
+                <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] mb-5 relative" data-testid="image">
+                    <Image className="rounded-lg object-contain" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)" priority/>    
                 </div>
             }   
 
@@ -350,17 +412,17 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <button onClick={handleLikePost} disabled={disable}>
+                    <button onClick={handleLikePost} disabled={disable} data-testid="postLikeBtn">
                         <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
-                    <p className="my-auto">{postLikeCount}</p>
+                    <p className="my-auto" data-testid="postLikeCount">{postLikeCount}</p>
                 </div>
                 
                 <div className="flex gap-1">
-                    <button onClick={handleDislikePost} disabled={disable}>
+                    <button onClick={handleDislikePost} disabled={disable} data-testid="postDislikeBtn">
                         <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
-                    <p className="my-auto">{postDislikeCount}</p>
+                    <p className="my-auto" data-testid="postDislikeCount">{postDislikeCount}</p>
                 </div>
             </div>
 
@@ -370,11 +432,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 {
                     showComments &&
                     <div className="flex flex-col gap-5">
-                        <textarea className="border border-black h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                        <textarea className="border border-gray-400 h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
                             value={addComment} onChange={(e) => {setAddComment(e.target.value)}} 
                         />
                         <div className="flex">
-                            <button className="w-1/3 ml-auto border border-black rounded-xl bg-nav_bg text-white hover:brightness-110"
+                            <button className="w-1/4 ml-auto p-1 rounded-full bg-nav_bg text-white hover:transition duration-300
+                                 hover:bg-nav_bg_dark"
                                 onClick={() => {
                                     if(currUser)
                                         handleInsertComment()
@@ -385,24 +448,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 Add Comment
                             </button>
                         </div>
-                        <p className="text-left">Number of Comments: {commentsid.length}</p>
+                        <p className="text-left">Number of Comments: {commentsCount}</p>
                     </div>
-                }
-
-                
-                {/* SHOW ALL COMMENTS */}
-                {
-                    showComments &&
-                    comments.map((item, index) => {
-                        return (
-                            <Comment 
-                            key={index}
-                            currUser={currUser}
-                            item={item}
-                            postID={postID}
-                            />
-                        )
-                    })
                 }
 
                 {/* LOADING SYMBOL */}
@@ -411,6 +458,37 @@ export default function Card( { currUser, post, profpic, postID } ) {
                     <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
                         <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
                     </div>
+                }
+                
+                {/* SHOW ALL COMMENTS */}
+                {
+                    showComments &&
+                    comments.map((item, index) => {
+                        return (
+                            <Comment 
+                                key={index}
+                                currUser={currUser}
+                                item={item}
+                                postID={postID}
+                            />
+                        )
+                    })
+                }
+
+                {
+                    comments.length < commentsid.length && showComments &&
+                    <p className="my-5 text-purple-800 cursor-pointer"
+                        onClick={() => fetchNextComments()}
+                    >
+                        View More
+                    </p>
+                }
+
+                {
+                    comments.length == commentsid.length && showComments &&
+                    <p className="my-5">
+                        There are no more comments.
+                    </p>
                 }
 
                 {/* SHOW COMMENTS BUTTON */}                
