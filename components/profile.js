@@ -9,11 +9,6 @@ export default function Profile({ props }) {
     const [ currUser, setCurrUser ] = useState({});
     const [ posts, setPosts ] = useState([]);
     const [ postIDs, setPostIDs ] = useState([]);
-    const [ nextPosts, setNextPosts ] = useState([]);
-    const [ lastDoc, setLastDoc ] = useState(null);
-    const [ loading, setLoading ] = useState(false);
-    const [ showMore, setShowMore ] = useState(false);
-    const [ lastPost, setLastPost ] = useState(false);
 
     useEffect(() => {
         try {
@@ -31,7 +26,6 @@ export default function Profile({ props }) {
     }, []);
 
     const fetchPosts = async () => {
-        setLoading(true);
 
         const postsRef = collection(db, "posts");
         const q = query(postsRef, where("creatorID", "==", props.profileUID), orderBy("likes"));

@@ -11,15 +11,38 @@ export default function Homepage() {
     // Fetched data
     const [ posts, setPosts ] = useState([])
     const [ postIDs, setPostIDs] = useState([])
-    const [ nextPosts, setNextPosts ] = useState([])
-    const [ lastDoc, setLastDoc ] = useState() 
-    const [ loading, setLoading ] = useState()
-    const [ showMore, setShowMore ] = useState(false)
+    const [ lastDoc, setLastDoc ] = useState(null) 
+    const [ loading, setLoading ] = useState(false)
     const [ lastPost, setLastPost ] = useState(false)
     const [ hasFired, setHasFired ] = useState(false)
     const router = useRouter()
 
     const [ currUser, setCurrUser] = useState(null)
+
+    useEffect(() => {
+        fetchPosts()
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                getDoc(userRef).then((doc) => {
+                    setCurrUser({uid: user.uid, data: doc.data()});
+                })
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        const checkLast = async () => {
+            const postsRef = collection(db, "posts");
+            const qSnapshot = await getDocs(postsRef);
+            
+            if (posts.length == qSnapshot.docs.length) {
+                setLastPost(true);
+                setLoading(false);
+            }
+        }
+        checkLast();
+    })
 
     function handlePost(){
         auth.onAuthStateChanged((user) => {
@@ -33,10 +56,6 @@ export default function Homepage() {
 
     async function nextPostsQuery( ){
         if(!lastPost){
-            setShowMore(false)
-            if (nextPosts.length > 0)
-                setNextPosts([])
-
             const q = query(collection(db, "posts"),
                 orderBy("likes"),
                 startAfter(lastDoc),
@@ -44,7 +63,6 @@ export default function Homepage() {
             )
 
             getDocs(q).then((docs) => {
-
                 if(docs.size > 0){
                     const p = new Promise((resolve, reject) => {
                         var counter = 0
@@ -65,18 +83,12 @@ export default function Homepage() {
                     })
         
                     p.then(() => {
-                        if(docs.size > 0)
-                            setShowMore(true)
-                        else
-                            setLastPost(true)
-    
-                        setLoading(false)
+                        //setLoading(false)
                         setHasFired(false)
                     })
+
                 } else{
-                    setShowMore(false)
-                    setLastPost(true)
-                    setLoading(false)
+                    //setLoading(false)
                     setHasFired(true)
                 }
 
@@ -84,8 +96,10 @@ export default function Homepage() {
                 console.log(error)
             })
         } 
-        else
-            setLoading(false)
+        else {
+            //setLoading(false)
+        }
+        console.log(lastPost)
     }
 
     function fetchPosts(){
@@ -106,23 +120,10 @@ export default function Homepage() {
                 setLastDoc(postDoc)
             })
             setLoading(false)
-            setShowMore(true)
         }).catch((error) => {
             console.log(error)
         })
     }
-
-    useEffect(() => {
-        fetchPosts()
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                const userRef = doc(db, "users", user.uid);
-                getDoc(userRef).then((doc) => {
-                    setCurrUser({uid: user.uid, data: doc.data()});
-                })
-            }
-        })
-    }, [])
 
     function handleScroll(e){
         if(!lastPost) {
@@ -131,8 +132,8 @@ export default function Homepage() {
                 return;
             }
 
-            const scrollTop = e.target.scrollTop || e.target.body.scrollTop;
-            const scrollHeight = e.target.scrollHeight || e.target.body.scrollHeight;
+            const scrollTop = e.target.scrollTop;
+            const scrollHeight = e.target.scrollHeight;
             const clientHeight = e.target.clientHeight;
 
             if (scrollTop + clientHeight >= scrollHeight) {
@@ -141,11 +142,10 @@ export default function Homepage() {
                         setLoading(true);
                         setHasFired(true);
                         nextPostsQuery();
-                    }, 500)
+                    }, 250)
                 }
                 else if (hasFired) {
-                    setLoading(false);
-                    setLastPost(true);
+                    //setLoading(false);
                 }
             }
         }
@@ -176,7 +176,7 @@ export default function Homepage() {
                     )
                 })
             }
-            
+
             <div className="w-full h-[500px] pb-[100px]">
                 {
                     loading && 
