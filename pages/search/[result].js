@@ -15,7 +15,7 @@ export async function getServerSideProps(context) {
             results.push({uid: userDoc.id, data: userDoc.data()});
     })
     return {
-        props: {results, searchInput}
+        props: {results}
     }
     
 }

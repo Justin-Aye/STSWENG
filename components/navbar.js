@@ -6,7 +6,6 @@ import { auth, db } from "../firebaseConfig";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 export default function Navbar() {
-    // FIXME: keep data even after refreshing
     const router = useRouter();
     const [currUser, setUser] = useState(null);
     const [currName, setName] = useState("");
