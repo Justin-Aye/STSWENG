@@ -327,11 +327,21 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
             {/* USER PROFILE PIC */}
             <div className="flex mb-5 gap-5 relative" data-testid="user_container">
-                <div className="flex relative w-[50px] h-[50px]">
-                    <Image className="rounded-[50%]" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
+                <div className="flex relative w-[50px] h-[50px] cursor-pointer"
+                    onClick={() => {
+                        router.push(`/profile/${post.creatorID}`)
+                    }}
+                >
+                    <Image className="rounded-[50%] hover:brightness-95" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                 </div>
 
-                <p className="my-auto text-left">{postOwner}</p>
+                <p className="my-auto text-left cursor-pointer hover:underline"
+                    onClick={() => {
+                        router.push(`/profile/${post.creatorID}`)
+                    }}
+                >
+                    {postOwner}
+                </p>
 
                 {/* Triple Dot Button */}
                 {
