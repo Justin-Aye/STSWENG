@@ -59,6 +59,34 @@ export default function EditPost(){
             }
         }
 
+        /* NEW , if user deleted image, remove image from db */
+        else if (image == '' && caption.length > 0 && oldImgUrl.length > 0){
+            
+            // Delete Previously stored image
+           try {
+                deleteObject(ref(storage, oldImgUrl))
+           }
+           catch (error) {
+             console.log("Error in deleting image")
+             console.log(error)
+           }
+            // Update Post data
+            try {
+                updateDoc(doc(db, "posts", postID), {
+                    caption: caption,
+                    imageSrc: ""
+                }).then(() => {
+                    router.push("/")
+                }).catch((error) => {
+                    console.log(error)
+                })
+            } 
+            catch (error) {
+                console.log(error)
+            }
+            
+        }
+
         // New image, while post already has a previous image
         else if( image != null && oldImgUrl.length > 0){
 
@@ -109,7 +137,7 @@ export default function EditPost(){
             const filename = "images/" + image.name + "_" + uid
 
             // Reference to firebase storage, and intended filename
-            const storageRef = ref( storage, filename)
+            const storageRef = ref(storage, filename)
             
             // Uploads new Image to Firebase
             uploadBytesResumable( storageRef,  image).then((uploadResult) => {
@@ -155,6 +183,12 @@ export default function EditPost(){
         }
     }
 
+    function removeImage(){
+        document.getElementById('image_files').value = ''
+        setImage('')
+        setUrl(null)
+    }
+
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if(user){
@@ -183,7 +217,7 @@ export default function EditPost(){
 
     return (
         <div className="h-screen overflow-y-scroll">
-            <p className="my-10 text-center text-[40px]">Edit a Post</p>
+            <p className="my-10 text-center text-[40px]"><i className="fa fa-pencil-square-o mr-2" />EDIT POST</p>
             <div className="flex flex-col mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
                 <div className="flex mb-5 gap-5" data-testid="user_container">
@@ -193,20 +227,8 @@ export default function EditPost(){
                     <p className="my-auto text-left">{displayName}</p>
                 </div>
 
-                {
-                    !imgUrl &&
-                    <p className="mb-2 text-red-500 text-center text-[14px]">Reminder: The image below is only a default image, and this will not be uploaded.</p>
-                }
-
-                <div className="w-full h-[500px] bg-gray-300 mx-auto mb-5 relative justify-center">
-                    <Image src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)"/>
-                </div>
-
-                <textarea className="w-full h-[100px] p-5 mx-auto border border-black mb-5" placeholder="Image Caption" 
-                    onChange={(e) => {setCaption(e.target.value)}} value={caption}
-                />
-
-                <div className="mx-auto py-2 relative w-1/2 justify-center bg-gray-100 rounded-md border-2 border-black border-dotted cursor-pointer hover:brightness-90">
+                <div className="mx-auto mb-10 py-2 relative w-full justify-center bg-gray-100 rounded-md border-2 border-black border-dashed cursor-pointer
+                                hover:transition duration-100 hover:bg-gray-300">
                     <input
                         id="image_files"
                         type="file"
@@ -225,27 +247,50 @@ export default function EditPost(){
                     </p>
                 </div>
 
+
+                {
+                    imgUrl &&
+                    <div className="grid justify-items-center">
+                        <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] bg-gray-100 relative" data-testid="image">
+                            <Image className="rounded-lg object-contain" src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)" priority/>    
+                        </div>
+                        <button className="my-5 w-1/4 bg-red-500 px-5 py-1 text-white rounded-full hover:transition duration-300
+                                        hover:bg-red-800" 
+                            onClick={() => removeImage()}
+                        >
+                        <i className="fa fa-times mr-2" /> Delete Image
+                        </button>
+                    </div> 
+                }
+
+                <textarea className="w-full h-[100px] p-5 mx-auto border border-black mb-5" placeholder="Image Caption" 
+                    onChange={(e) => {setCaption(e.target.value)}} value={caption}
+                />
+
                 {   
                     needEdit &&
-                    <p className=" text-center text-red-500 mt-5 underline">No new edits have been made</p>
+                    <span className=" text-center text-red-500 my-5 font-bold">No new edits have been made</span>
                 }
 
                 {
                     emptyPost &&
-                    <p className=" text-center text-red-500 mt-5 underline">Empty Posts are not Allowed</p>
+                    <span className=" text-center text-red-500 my-5 font-bold">Empty posts are not allowed.</span>
                 }
+                
 
                 <div className="flex w-full gap-5">
-                    <button className="ml-auto border mt-10 mb-5 border-black w-1/4 bg-red-300 px-5 py-1 text-white rounded-xl hover:brightness-95" 
-                        onClick={() => {router.push("/")}}
-                    >
-                        Cancel
-                    </button>
+                    <button className="ml-auto mb-5 w-1/4 bg-gray-400 px-5 py-1 text-white rounded-full hover:transition duration-300
+                                        hover:bg-gray-500" 
+                            onClick={() => {router.push("/")}}
+                        >
+                            Cancel
+                        </button>
 
-                    <button className="border mt-10 mb-5 border-black w-1/4 bg-nav_bg px-5 py-1 text-white rounded-xl hover:brightness-95" 
-                        onClick={() => saveEdits()}
-                    >
-                        Save Edits
+                        <button className="mb-5 w-1/4 bg-nav_bg px-5 py-1 text-white rounded-full hover:transition duration-300
+                                        hover:bg-nav_bg_dark" 
+                            onClick={() => saveEdits()}
+                        >
+                            Save Edits
                     </button>
                 </div>
                 

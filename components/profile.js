@@ -85,6 +85,9 @@ export default function Profile({ props }) {
             </div>
             
             <div className="text-center mt-0 flex flex-col h-screen">
+                <div className="flex flex-col mt-10 mb-5">
+                    <span className="text-2xl font-bold">POSTS by {props.data.displayName}</span>
+                </div>
                 {posts.length < 1 ? <h2> No posts found! </h2> : 
                     (
                         posts.map((post, index) => {

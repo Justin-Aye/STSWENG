@@ -370,13 +370,13 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         >
                             Edit
                         </p>
-                        <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
+                        <p className="hover:brightness-95 bg-white text-red-500 border-separate border-black cursor-pointer"
                             onClick={() => {setaskDeletePost(true); setShowOptions(false)}}
                         >
                             Delete
                         </p>
 
-                        <p className="hover:brightness-95 bg-red-200 border-separate border-black cursor-pointer"
+                        <p className="hover:brightness-95 bg-white text-gray-400 border-separate border-black cursor-pointer"
                             onClick={() => setShowOptions(false)}
                         >
                             Cancel
@@ -417,7 +417,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
             }   
 
             {/* CAPTION OF POST */}
-            <p className="mb-5 text-left" data-testid="caption">{post.caption}</p>
+            <p className="mb-5 text-left whitespace-pre-wrap" data-testid="caption">{post.caption}</p>
 
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
             <div className="flex gap-5 mb-5" data-testid="buttons_container">

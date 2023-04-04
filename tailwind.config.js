@@ -28,7 +28,7 @@ module.exports = {
       backgroundImage: {
         'signup_page': "url('/images/signup_bg.png')",
         'login_page': "url('/images/login_bg.png')",
-      }
+      },
     },
   },
   plugins: [],
