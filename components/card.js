@@ -259,13 +259,16 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         setCommentsid((commentsid) => [...commentsid, com.id])
 
                         setLoading(true)
-                        setAddComment('')
+
                         getDoc(com).then((snap) => {
                             const userRef = doc(db, "users", snap.data().creator);
                             getDoc(userRef).then((userDoc) => {
-                                setComments((comments) => [{commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}, ...comments]);
+                                console.log(snap.data())
+
+                                setComments((comments) => [ { commentData: snap.data(), commentID: snap.id, userData: userDoc.data() }, ...comments ]);
                             })
                             setLoading(false)
+                            setAddComment('')
                         })
 
                         // Insert comment into post via postid
@@ -480,6 +483,11 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 currUser={currUser}
                                 item={item}
                                 postID={postID}
+                                comments_arr={comments}
+                                setComments={setComments}
+                                commIDs = {commentsid}
+                                setCommIDs = {setCommentsid}
+                                showComments = {setShowComments}
                             />
                         )
                     })
