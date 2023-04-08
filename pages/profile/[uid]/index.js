@@ -4,8 +4,6 @@ import { doc, getDoc } from "firebase/firestore";;
 // @ts-ignore
 import Profile from "@/components/profile";
 
-
-
 export async function getServerSideProps(context) {
     const profileUID = context.query.uid;
 
