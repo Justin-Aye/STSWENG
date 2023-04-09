@@ -63,7 +63,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
         setLiked(currUser.data.liked.includes(postID))
         setDisliked(currUser.data.disliked.includes(postID))
-        console.log(currUser.data.liked)
+        //console.log(currUser.data.liked)
         return () => {
             clearTimeout();
         }
