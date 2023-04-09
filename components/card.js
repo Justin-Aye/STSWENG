@@ -93,7 +93,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 liked: userSnap.data().liked.filter((val) => {return val != postID})
                             })
                         }
-                        setLiked(true)
+                        setLiked(hasDisliked ? hasLiked : !hasLiked)
                     }
                     else {
                         alert("liking own post prohibited");    // TODO: should do something
@@ -133,7 +133,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             })
                         }
 
-                        setDisliked(true)
+                        setDisliked(hasLiked ? hasDisliked : !hasDisliked)
                     }
                     else {
                         alert("disliking own post prohibited");    // TODO:
@@ -433,14 +433,14 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <button onClick={handleLikePost} disabled={hasLiked} data-testid="postLikeBtn">
+                    <button onClick={handleLikePost} data-testid="postLikeBtn">
                         <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasLiked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postLikeCount">{postLikeCount}</p>
                 </div>
                 
                 <div className="flex gap-1">
-                    <button onClick={handleDislikePost} disabled={hasDisliked} data-testid="postDislikeBtn">
+                    <button onClick={handleDislikePost} data-testid="postDislikeBtn">
                         <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasDisliked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postDislikeCount">{postDislikeCount}</p>
