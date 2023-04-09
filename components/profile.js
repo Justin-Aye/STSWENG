@@ -35,7 +35,7 @@ export default function Profile({ props }) {
         } catch (err) {
             console.log(err);
         }
-    }, []);
+    }, [followingState]);
 
     useEffect(() => {
         try {
@@ -63,6 +63,24 @@ export default function Profile({ props }) {
         }
     }, [currUser, props.profileUID])
 
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            setPosts([])
+            const postsRef = collection(db, "posts");
+            const q = query(postsRef, where("creatorID", "==", props.profileUID), orderBy("likes"));
+            const qSnapshot = await getDocs(q);
+    
+            if (qSnapshot.size > 0) {
+                qSnapshot.forEach((doc) => {
+                    setPosts((posts) => [...posts, {id: doc.id, data: doc.data()}])
+                })
+            }
+        }
+        updateFollowers();
+        fetchPosts();
+    }, [props.profileUID, setPosts]);
+
     // update profile follower/following count
     async function updateFollowers() {
         const userRef = doc(db, "users", props.profileUID);
@@ -76,17 +94,16 @@ export default function Profile({ props }) {
 
     async function getFollowerDetails() {
         try {
+            updateFollowers()
             if (!showFollowers) {
-                if (followerDetails.length != followers.length) {
-                    setFollowerDetails([])
-                    followers.forEach(async (follower) => {
-                            const userRef = doc(db, "users", follower)
-                            const uSnap = await getDoc(userRef)
-                            if (uSnap.exists()) {
-                                setFollowerDetails((followerDetails) => [...followerDetails, {uid: uSnap.id, data: uSnap.data()}])
-                            }
-                    })
-                }
+                setFollowerDetails([])
+                followers.forEach(async (follower) => {
+                        const userRef = doc(db, "users", follower)
+                        const uSnap = await getDoc(userRef)
+                        if (uSnap.exists()) {
+                            setFollowerDetails((followerDetails) => [...followerDetails, {uid: uSnap.id, data: uSnap.data()}])
+                        }
+                })
                 setShowFollowers(true)                
             } else
                 setShowFollowers(false)
@@ -97,17 +114,16 @@ export default function Profile({ props }) {
 
     async function getFollowingDetails() {
         try {
+            updateFollowers()
             if (!showFollowing) {
-                if (followingDetails.length != following.length) {
-                    setFollowingDetails([])
-                    following.forEach(async (following) => {
-                        const userRef = doc(db, "users", following)
-                        const uSnap = await getDoc(userRef)
-                        if (uSnap.exists()) {
-                            setFollowingDetails((followingDetails) => [...followingDetails, {uid: uSnap.id, data: uSnap.data()}])
-                        }
-                    })
-                }
+                setFollowingDetails([])
+                following.forEach(async (following) => {
+                    const userRef = doc(db, "users", following)
+                    const uSnap = await getDoc(userRef)
+                    if (uSnap.exists()) {
+                        setFollowingDetails((followingDetails) => [...followingDetails, {uid: uSnap.id, data: uSnap.data()}])
+                    }
+                })
                 setShowFollowing(true)
             } else
                 setShowFollowing(false)
@@ -176,23 +192,6 @@ export default function Profile({ props }) {
             }
         }
     }
-
-    useEffect(() => {
-        const fetchPosts = async () => {
-            setPosts([])
-            const postsRef = collection(db, "posts");
-            const q = query(postsRef, where("creatorID", "==", props.profileUID), orderBy("likes"));
-            const qSnapshot = await getDocs(q);
-    
-            if (qSnapshot.size > 0) {
-                qSnapshot.forEach((doc) => {
-                    setPosts((posts) => [...posts, {id: doc.id, data: doc.data()}])
-                })
-            }
-        }
-
-        fetchPosts();
-    }, [props.profileUID, setPosts]);
 
     return (
         <div className="overflow-y-auto h-screen">
