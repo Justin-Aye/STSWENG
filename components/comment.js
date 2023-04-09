@@ -48,7 +48,8 @@ export default function Comment({
     const [showOptions, setShowOptions] = useState(false);
     const [askDeleteComment, setAskDeleteComment] = useState(false);
 
-    const [disable, setDisabled] = useState(false);
+    const [ likeDisabled, setLikeDisabled ] = useState(false)
+    const [ dislikeDisabled, setDislikeDisabled ] = useState(false)
     const [deleted, setDeleted] = useState(false);
 
     useEffect(() => {
@@ -69,7 +70,9 @@ export default function Comment({
     async function handleLikeComment(item) {
         try {
             if (currUser) {
-                //console.log(item);
+                if (likeDisabled) return;
+                setLikeDisabled(true);
+                
                 const userRef = doc(db, "users", currUser.uid);
                 const commentRef = doc(db, "comments", item.commentID);
                 const userSnap = await getDoc(userRef);
@@ -107,8 +110,7 @@ export default function Comment({
                         alert("liking own comment prohibited"); // TODO:
                     }
                 }
-                setDisabled(true);
-                setTimeout(() => setDisabled(false), 500);
+                setLikeDisabled(false);
             }
         } catch (e) {
             console.log(e);
@@ -118,6 +120,9 @@ export default function Comment({
     async function handleDislikeComment(item) {
         try {
             if (currUser) {
+                if (dislikeDisabled) return;
+                setDislikeDisabled(true);
+
                 const userRef = doc(db, "users", currUser.uid);
                 const commentRef = doc(db, "comments", item.commentID);
                 const userSnap = await getDoc(userRef);
@@ -154,8 +159,7 @@ export default function Comment({
                         alert("disliking own comment prohibited"); // TODO:
                     }
                 }
-                setDisabled(true);
-                setTimeout(() => setDisabled(false), 500);
+                setDislikeDisabled(false);
             }
         } catch (e) {
             console.log(e);
@@ -414,7 +418,6 @@ export default function Comment({
                                 onClick={() => {
                                     handleLikeComment(item);
                                 }}
-                                disabled={disable}
                             >
                                 <HiThumbUp
                                     className={`text-[30px] cursor-pointer rounded-lg align-middle ${
@@ -432,7 +435,6 @@ export default function Comment({
                                 onClick={() => {
                                     handleDislikeComment(item);
                                 }}
-                                disabled={disable}
                             >
                                 <HiThumbDown
                                     className={`text-[30px] cursor-pointer rounded-lg align-middle ${
