@@ -96,7 +96,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         setLiked(hasDisliked ? hasLiked : !hasLiked)
                     }
                     else {
-                        alert("liking own post prohibited");    // TODO: should do something
+                        alert("liking own post prohibited");
                     }
                 }
                 setDisabled(true);

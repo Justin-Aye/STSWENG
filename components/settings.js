@@ -17,7 +17,6 @@ export default function Settings() {
     const router = useRouter()
     
     // get logged in user's data
-    // FIXME: reader.result, profPic.name
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             try {
@@ -39,7 +38,6 @@ export default function Settings() {
         })
     }, []);
 
-    // TODO: refactor
     const handleNameChange = function (e) {
         setDisplayName(e.target.value);
     };
@@ -69,7 +67,6 @@ export default function Settings() {
 
 
             if (matchingUsers.size > 0) {
-                // TODO: dont use alert
                 console.log("entered displayname already exists");
                 alert("name already exists");
                 return

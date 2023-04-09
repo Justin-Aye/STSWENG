@@ -8,10 +8,10 @@ export async function getServerSideProps(context) {
     const profileUID = context.query.uid;
 
     // get profile data
-    const docRef = doc(db, "users", profileUID);
-    const docSnap = await getDoc(docRef)
+    let docRef = doc(db, "users", profileUID);
+    let docSnap = await getDoc(docRef)
     const data = docSnap.data();
-
+    
     return {
         props: { profileUID, data }
     }

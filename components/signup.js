@@ -39,6 +39,8 @@ export default function Signup(){
                         postsID: [],
                         liked: [],
                         disliked: [],
+                        followers: [],
+                        following: [],
                         displayName: email,
                         lowerCaseDisplayName: email.toLowerCase(),
                         bio: ""
