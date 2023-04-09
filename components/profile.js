@@ -74,23 +74,20 @@ export default function Profile({ props }) {
         }
     }
 
-
-    // FIXME: DOESNT WORK WHEN USER HAS MORE THAN 10 FOLLOWERS
     async function getFollowerDetails() {
         try {
             if (!showFollowers) {
-                let deets = [];
-                const usersRef = collection(db, "users")
-                const q = query(usersRef, where(documentId(), "in", followers))
-                const qSnap = await getDocs(q);
-                if (qSnap.size > 0) {
-                    qSnap.forEach((doc) => {
-                        deets.push({uid: doc.id, data: doc.data()})
+                setFollowerDetails([])
+                if (followerDetails.length != followers.length) {
+                    followers.forEach(async (follower) => {
+                            const userRef = doc(db, "users", follower)
+                            const uSnap = await getDoc(userRef)
+                            if (uSnap.exists()) {
+                                setFollowerDetails((followerDetails) => [...followerDetails, {uid: uSnap.id, data: uSnap.data()}])
+                            }
                     })
                 }
-
-                setFollowerDetails(deets)
-                setShowFollowers(true)
+                setShowFollowers(true)                
             } else
                 setShowFollowers(false)
         } catch (e) {
@@ -98,23 +95,20 @@ export default function Profile({ props }) {
         }
     }
 
-    // FIXME: DOESNT WORK WHEN USER HAS MORE THAN 10 FOLLOWING
     async function getFollowingDetails() {
         try {
             if (!showFollowing) {
-                const usersRef = collection(db, "users")
-
-                let deets = [];
-
-                const q = query(usersRef, where(documentId(), "in", following))
-                const qSnap = await getDocs(q);
-                if (qSnap.size > 0) {
-                    qSnap.forEach((doc) => {
-                        deets.push({uid: doc.id, data: doc.data()})
+                setFollowerDetails([])
+                if (followingDetails.length != following.length) {
+                    following.forEach(async (following) => {
+                        const userRef = doc(db, "users", following)
+                        const uSnap = await getDoc(userRef)
+                        if (uSnap.exists()) {
+                            if (!followingDetails.includes({uid: following}))
+                                setFollowingDetails((followingDetails) => [...followingDetails, {uid: uSnap.id, data: uSnap.data()}])
+                        }
                     })
                 }
-
-                setFollowingDetails(deets)
                 setShowFollowing(true)
             } else
                 setShowFollowing(false)
@@ -220,9 +214,9 @@ export default function Profile({ props }) {
                                 :                                    
                                 <div>
                                     { !followingState ? 
-                                        <span onClick = {followUser}> Follow </span>
+                                        <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-sky-600" onClick={followUser}> Follow </span>
                                         :
-                                        <span onClick = {unfollowUser}> Unfollow </span>
+                                        <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
                                     }
                                 </div>
                                 }
@@ -234,11 +228,11 @@ export default function Profile({ props }) {
                             <span className="font-bold text-3xl text-icon_color my-4"> {props.data.displayName}</span>
 
                             <div className="grid gap-y-4 grid-cols-2 mb-4 w-1/3">
-                                <span className="text-xl font-bold" onClick={getFollowerDetails}>
+                                <span className="text-xl font-bold hover:cursor-pointer hover:transition duration-300 hover:text-sky-500" onClick={getFollowerDetails}>
                                     Followers: {followers.length}
                                 </span>
 
-                                <span className="text-xl font-bold" onClick={getFollowingDetails}>
+                                <span className="text-xl font-bold hover:cursor-pointer hover:transition duration-300 hover:text-sky-500" onClick={getFollowingDetails}>
                                     Following: {following.length}
                                 </span>
                             </div>
@@ -270,18 +264,24 @@ export default function Profile({ props }) {
                 <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-20 backdrop-blur-sm" onClick={() => setShowFollowers(false)}>
                     <div className="w-1/3 max-h-2/3 flex flex-col fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-md shadow-lg p-6 overflow-auto">
                         <h2 className="text-2xl font-bold mb-5"> Followers </h2>
-                        {followerDetails.map((follower, index) => {
-                            return (
-                                <div key={index} className="mb-3 flex justify-start">
-                                    <Link href={`../profile/${follower.uid}`}>
-                                        <div className="flex items-center">
-                                            <Image className="rounded-[50%] mr-3" src={follower.data.profPic} alt="" width={60} height={51} />
-                                            <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {follower.data.displayName} </span>
-                                        </div>
-                                    </Link>
-                                </div>
-                            )
-                        })}
+                        { followerDetails.length > 0 ? 
+                            <>
+                            {followerDetails.map((follower, index) => {
+                                return (
+                                    <div key={index} className="mb-3 flex justify-start">
+                                        <Link href={`../profile/${follower.uid}`}>
+                                            <div className="flex items-center">
+                                                <Image className="rounded-[50%] mr-3" src={follower.data.profPic} alt="" width={60} height={51} />
+                                                <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {follower.data.displayName} </span>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                )
+                            })}
+                            </>
+                            :
+                            <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> No users found! </span>
+                        }
                     </div>
                 </div>
             )
@@ -291,18 +291,24 @@ export default function Profile({ props }) {
                 <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-20 backdrop-blur-sm" onClick={() => setShowFollowing(false)}>
                     <div className="w-1/3 max-h-2/3 flex flex-col fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-md shadow-lg p-6 overflow-auto">
                         <h2 className="text-2xl font-bold mb-5"> Following </h2>
-                        {followingDetails.map((following, index) => {
-                            return (
-                                <div key={index} className="mb-3 flex justify-start">
-                                    <Link href={`../profile/${following.uid}`}>
-                                        <div className="flex items-center">
-                                            <Image className="rounded-[50%] mr-3" src={following.data.profPic} alt="" width={60} height={51} />
-                                            <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {following.data.displayName} </span>
-                                        </div>
-                                    </Link>
-                                </div>
-                            )
-                        })}
+                        { followingDetails.length > 0 ? 
+                            <>
+                            {followingDetails.map((following, index) => {
+                                return (
+                                    <div key={index} className="mb-3 flex justify-start">
+                                        <Link href={`../profile/${following.uid}`}>
+                                            <div className="flex items-center">
+                                                <Image className="rounded-[50%] mr-3" src={following.data.profPic} alt="" width={60} height={51} />
+                                                <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {following.data.displayName} </span>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                )
+                            })} 
+                            </>
+                            :
+                            <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> No users found! </span>
+                        }
                     </div>
                 </div>
             )
