@@ -11,7 +11,8 @@ import Comment from "./comment";
 
 export default function Card( { currUser, post, profpic, postID } ) {
 
-    var hasVoted = false;
+    const [ hasLiked, setLiked ] = useState(false)
+    const [ hasDisliked, setDisliked ] = useState(false)
     
     const [ commentsid, setCommentsid ] = useState(post.commentsID || [])
     const [ loading, setLoading ] = useState(false)
@@ -58,6 +59,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
     }, [postID]);
     
     useEffect(() => {
+
+        setLiked(currUser.data.liked.includes(postID))
+        setDisliked(currUser.data.disliked.includes(postID))
+        console.log(currUser.data.liked)
         return () => {
             clearTimeout();
         }
@@ -88,6 +93,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 liked: userSnap.data().liked.filter((val) => {return val != postID})
                             })
                         }
+                        setLiked(true)
                     }
                     else {
                         alert("liking own post prohibited");    // TODO: should do something
@@ -126,6 +132,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 disliked: userSnap.data().disliked.filter((val) => {return val != postID})
                             })
                         }
+
+                        setDisliked(true)
                     }
                     else {
                         alert("disliking own post prohibited");    // TODO:
@@ -425,15 +433,15 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <button onClick={handleLikePost} disabled={disable} data-testid="postLikeBtn">
-                        <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    <button onClick={handleLikePost} disabled={hasLiked} data-testid="postLikeBtn">
+                        <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasLiked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postLikeCount">{postLikeCount}</p>
                 </div>
                 
                 <div className="flex gap-1">
-                    <button onClick={handleDislikePost} disabled={disable} data-testid="postDislikeBtn">
-                        <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    <button onClick={handleDislikePost} disabled={hasDisliked} data-testid="postDislikeBtn">
+                        <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasDisliked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postDislikeCount">{postDislikeCount}</p>
                 </div>
