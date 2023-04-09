@@ -2,7 +2,7 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc, limit, startAfter } from "firebase/firestore";
+import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, arrayRemove, getDoc, deleteDoc, limit, startAfter } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
@@ -26,11 +26,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ showOptions, setShowOptions ] = useState(false)
     const [ askDeletePost, setaskDeletePost ] = useState(false)
 
+    const [ likeDisabled, setLikeDisabled ] = useState(false)
+    const [ dislikeDisabled, setDislikeDisabled ] = useState(false)
+
 
     const router = useRouter()
     const [ lastComment, setLastComment ] = useState()
-
-    const [disable, setDisabled] = useState(false);
 
     useEffect(() => {
         try {
@@ -71,6 +72,9 @@ export default function Card( { currUser, post, profpic, postID } ) {
     async function handleLikePost() {
         try {
             if (currUser) {
+                if (likeDisabled) return;
+                setLikeDisabled(true);
+
                 const userRef = doc(db, "users", currUser.uid);
                 const postRef = doc(db, "posts", postID);
                 const userSnap = await getDoc(userRef);
@@ -90,7 +94,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 likes: increment(-1)
                             });
                             await updateDoc(userRef, {
-                                liked: userSnap.data().liked.filter((val) => {return val != postID})
+                                //liked: userSnap.data().liked.filter((val) => {return val != postID})
+                                liked: arrayRemove(postID)
                             })
                         }
                         setLiked(hasDisliked ? hasLiked : !hasLiked)
@@ -99,8 +104,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         alert("liking own post prohibited");
                     }
                 }
-                setDisabled(true);
-                setTimeout(() => setDisabled(false), 500);
+                setLikeDisabled(false);
             }
         } catch (e) {
             console.log(e);
@@ -110,6 +114,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
     async function handleDislikePost() {
         try {
             if (currUser) {
+                if (dislikeDisabled) return;
+                setDislikeDisabled(true);
                 const userRef = doc(db, "users", currUser.uid);
                 const postRef = doc(db, "posts", postID);
                 const userSnap = await getDoc(userRef);
@@ -129,7 +135,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 dislikes: increment(1)
                             });
                             await updateDoc(userRef, {
-                                disliked: userSnap.data().disliked.filter((val) => {return val != postID})
+                                //disliked: userSnap.data().disliked.filter((val) => {return val != postID})
+                                disliked: arrayRemove(postID)
                             })
                         }
 
@@ -139,8 +146,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         alert("disliking own post prohibited");    // TODO:
                     }
                 }
-                setDisabled(true);
-                setTimeout(() => setDisabled(false), 500);
+                setDislikeDisabled(false);
             }
         } catch (e) {
             console.log(e);
