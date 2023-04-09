@@ -180,6 +180,7 @@ export default function Profile({ props }) {
 
     useEffect(() => {
         const fetchPosts = async () => {
+            setPosts([])
             const postsRef = collection(db, "posts");
             const q = query(postsRef, where("creatorID", "==", props.profileUID), orderBy("likes"));
             const qSnapshot = await getDocs(q);
@@ -271,7 +272,9 @@ export default function Profile({ props }) {
                                     <div key={index} className="mb-3 flex justify-start">
                                         <Link href={`../profile/${follower.uid}`}>
                                             <div className="flex items-center">
-                                                <Image className="rounded-[50%] mr-3" src={follower.data.profPic} alt="" width={60} height={51} />
+                                                <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
+                                                    <Image className="rounded-[50%]" src={follower.data.profPic} alt="" width={60} height={51} />
+                                                </div>
                                                 <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {follower.data.displayName} </span>
                                             </div>
                                         </Link>
@@ -298,7 +301,9 @@ export default function Profile({ props }) {
                                     <div key={index} className="mb-3 flex justify-start">
                                         <Link href={`../profile/${following.uid}`}>
                                             <div className="flex items-center">
-                                                <Image className="rounded-[50%] mr-3" src={following.data.profPic} alt="" width={60} height={51} />
+                                                <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
+                                                    <Image className="rounded-[50%]" src={following.data.profPic} alt="" width={60} height={51} />
+                                                </div>
                                                 <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {following.data.displayName} </span>
                                             </div>
                                         </Link>
