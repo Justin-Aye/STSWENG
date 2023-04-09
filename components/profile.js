@@ -77,8 +77,8 @@ export default function Profile({ props }) {
     async function getFollowerDetails() {
         try {
             if (!showFollowers) {
-                setFollowerDetails([])
                 if (followerDetails.length != followers.length) {
+                    setFollowerDetails([])
                     followers.forEach(async (follower) => {
                             const userRef = doc(db, "users", follower)
                             const uSnap = await getDoc(userRef)
@@ -98,14 +98,13 @@ export default function Profile({ props }) {
     async function getFollowingDetails() {
         try {
             if (!showFollowing) {
-                setFollowerDetails([])
                 if (followingDetails.length != following.length) {
+                    setFollowingDetails([])
                     following.forEach(async (following) => {
                         const userRef = doc(db, "users", following)
                         const uSnap = await getDoc(userRef)
                         if (uSnap.exists()) {
-                            if (!followingDetails.includes({uid: following}))
-                                setFollowingDetails((followingDetails) => [...followingDetails, {uid: uSnap.id, data: uSnap.data()}])
+                            setFollowingDetails((followingDetails) => [...followingDetails, {uid: uSnap.id, data: uSnap.data()}])
                         }
                     })
                 }
