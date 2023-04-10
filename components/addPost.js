@@ -141,10 +141,9 @@ export default function AddPost(){
         )
 
     return (
-        <div className="h-screen overflow-y-scroll">
+        <div className="h-[calc(100vh_-_80px)] overflow-y-scroll">
             <p className="my-10 text-center text-[38px]"><i className="fa fa-pencil mr-2" />CREATE NEW POST</p>
-            <div className="flex flex-col mx-auto mb-28 w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
-
+            <div className="flex flex-col mx-auto mb-28 w-3/4 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-5/12 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
                 <div className="flex mb-5 gap-5" data-testid="user_container">
                     <div className="flex relative w-[50px] h-[50px]">
                         <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>

@@ -22,8 +22,8 @@ export async function getServerSideProps(context) {
 
 export default function search(props) {
     return (
-        <div>
-            {props.results.length < 1 ? <h2> No results found! </h2> :
+        <div className="flex flex-col text-center overflow-y-auto h-screen pt-8">
+            {props.results.length < 1 ? <h2 className="pt-8 font-bold text-2xl"> No results found! </h2> :
                 (
                     props.results.map((user, index) => {
                         return (
@@ -36,6 +36,7 @@ export default function search(props) {
                     })
                 )
             }
+        <div className="pt-20"></div>
         </div>
     )
 }

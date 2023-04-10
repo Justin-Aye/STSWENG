@@ -23,7 +23,7 @@ export default function Navbar() {
     }
 
     useEffect(() => {
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 setUser(auth.currentUser.uid);
                 const docRef = doc(db, "users", auth.currentUser.uid);
@@ -101,7 +101,7 @@ export default function Navbar() {
                 </div>
 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <Link href={`/profile/${currUser}`} className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
+                    <Link href={`/profile/${currUser}`}  className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
                 </div>
                 
                 {

@@ -6,7 +6,7 @@ import { onSnapshot, updateDoc, doc, getDoc, getDocs, deleteDoc, arrayRemove, qu
 import { db  } from "../../firebaseConfig";
 
 
-export default function Comments( { index, currUser, item, postID } ) {
+export default function Comments( { index, currUser, item, postID} ) {
 
     var hasVoted = false;
     const [ commentLikeCount, setCommentLikeCount ] = useState(item.commentData.likes || 0);
@@ -43,6 +43,7 @@ export default function Comments( { index, currUser, item, postID } ) {
                 updateDoc(doc(db, "posts", postID), {
                     commentsID: arrayRemove(item.commentID)
                 })
+
                 // Remove deleted comment from user's commentIDs, liked, and disliked fields
                 updateDoc(currUserRef, {
                     commentIDs: currUserSnap.data().commentIDs.filter((val) => val != item.commentID),
@@ -79,8 +80,9 @@ export default function Comments( { index, currUser, item, postID } ) {
                 deleteDoc(commentRef).then(() => {
                     setDeleted(true);
                     setAskDeleteComment(false);
-                    //window.location.reload();
                     console.log("Successfully deleted comment");
+
+                    window.location.reload();
                 })
             }
         } catch (e) {

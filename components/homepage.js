@@ -55,7 +55,8 @@ export default function Homepage() {
     async function nextPostsQuery( ){
         if(!lastPost){
             const q = query(collection(db, "posts"),
-                orderBy("likes"),
+                orderBy("likes", "desc"),
+                orderBy("dislikes", "desc"),
                 startAfter(lastDoc),
                 limit(3)
             )
@@ -107,7 +108,8 @@ export default function Homepage() {
         setLoading(true)
 
         const q = query(collection(db, "posts"),
-            orderBy("likes"),
+            orderBy("likes", "desc"),
+            orderBy("dislikes", "desc"),
             limit(3))
 
         getDocs(q).then((snap) => {

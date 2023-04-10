@@ -2,7 +2,7 @@
 import { HiThumbUp, HiThumbDown } from "react-icons/hi";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, getDoc, deleteDoc, limit, startAfter } from "firebase/firestore";
+import { onSnapshot, increment, collection, documentId, getDocs, query, where, addDoc, updateDoc, doc, arrayUnion, arrayRemove, getDoc, deleteDoc, limit, startAfter } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
 import { useRouter } from "next/router";
@@ -11,7 +11,8 @@ import Comment from "./comment";
 
 export default function Card( { currUser, post, profpic, postID } ) {
 
-    var hasVoted = false;
+    const [ hasLiked, setLiked ] = useState(false)
+    const [ hasDisliked, setDisliked ] = useState(false)
     
     const [ commentsid, setCommentsid ] = useState(post.commentsID || [])
     const [ loading, setLoading ] = useState(false)
@@ -25,11 +26,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
     const [ showOptions, setShowOptions ] = useState(false)
     const [ askDeletePost, setaskDeletePost ] = useState(false)
 
+    const [ likeDisabled, setLikeDisabled ] = useState(false)
+    const [ dislikeDisabled, setDislikeDisabled ] = useState(false)
+
 
     const router = useRouter()
     const [ lastComment, setLastComment ] = useState()
-
-    const [disable, setDisabled] = useState(false);
 
     useEffect(() => {
         try {
@@ -58,6 +60,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
     }, [postID]);
     
     useEffect(() => {
+
+        setLiked(currUser.data.liked.includes(postID))
+        setDisliked(currUser.data.disliked.includes(postID))
+        //console.log(currUser.data.liked)
         return () => {
             clearTimeout();
         }
@@ -66,6 +72,9 @@ export default function Card( { currUser, post, profpic, postID } ) {
     async function handleLikePost() {
         try {
             if (currUser) {
+                if (likeDisabled) return;
+                setLikeDisabled(true);
+
                 const userRef = doc(db, "users", currUser.uid);
                 const postRef = doc(db, "posts", postID);
                 const userSnap = await getDoc(userRef);
@@ -85,16 +94,17 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 likes: increment(-1)
                             });
                             await updateDoc(userRef, {
-                                liked: userSnap.data().liked.filter((val) => {return val != postID})
+                                //liked: userSnap.data().liked.filter((val) => {return val != postID})
+                                liked: arrayRemove(postID)
                             })
                         }
+                        setLiked(hasDisliked ? hasLiked : !hasLiked)
                     }
                     else {
-                        alert("liking own post prohibited");    // TODO: should do something
+                        alert("liking own post prohibited");
                     }
                 }
-                setDisabled(true);
-                setTimeout(() => setDisabled(false), 500);
+                setLikeDisabled(false);
             }
         } catch (e) {
             console.log(e);
@@ -104,6 +114,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
     async function handleDislikePost() {
         try {
             if (currUser) {
+                if (dislikeDisabled) return;
+                setDislikeDisabled(true);
                 const userRef = doc(db, "users", currUser.uid);
                 const postRef = doc(db, "posts", postID);
                 const userSnap = await getDoc(userRef);
@@ -123,16 +135,18 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 dislikes: increment(1)
                             });
                             await updateDoc(userRef, {
-                                disliked: userSnap.data().disliked.filter((val) => {return val != postID})
+                                //disliked: userSnap.data().disliked.filter((val) => {return val != postID})
+                                disliked: arrayRemove(postID)
                             })
                         }
+
+                        setDisliked(hasLiked ? hasDisliked : !hasDisliked)
                     }
                     else {
                         alert("disliking own post prohibited");    // TODO:
                     }
                 }
-                setDisabled(true);
-                setTimeout(() => setDisabled(false), 500);
+                setDislikeDisabled(false);
             }
         } catch (e) {
             console.log(e);
@@ -259,13 +273,16 @@ export default function Card( { currUser, post, profpic, postID } ) {
                         setCommentsid((commentsid) => [...commentsid, com.id])
 
                         setLoading(true)
-                        setAddComment('')
+
                         getDoc(com).then((snap) => {
                             const userRef = doc(db, "users", snap.data().creator);
                             getDoc(userRef).then((userDoc) => {
-                                setComments((comments) => [{commentData: snap.data(), commentID: snap.id, userData: userDoc.data()}, ...comments]);
+                                console.log(snap.data())
+
+                                setComments((comments) => [ { commentData: snap.data(), commentID: snap.id, userData: userDoc.data() }, ...comments ]);
                             })
                             setLoading(false)
+                            setAddComment('')
                         })
 
                         // Insert comment into post via postid
@@ -422,15 +439,15 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
             <div className="flex gap-5 mb-5" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <button onClick={handleLikePost} disabled={disable} data-testid="postLikeBtn">
-                        <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    <button onClick={handleLikePost} data-testid="postLikeBtn">
+                        <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasLiked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postLikeCount">{postLikeCount}</p>
                 </div>
                 
                 <div className="flex gap-1">
-                    <button onClick={handleDislikePost} disabled={disable} data-testid="postDislikeBtn">
-                        <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasVoted ? "text-red-500" : "text-gray-800"} hover:opacity-75`}/>
+                    <button onClick={handleDislikePost} data-testid="postDislikeBtn">
+                        <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasDisliked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postDislikeCount">{postDislikeCount}</p>
                 </div>
@@ -480,6 +497,11 @@ export default function Card( { currUser, post, profpic, postID } ) {
                                 currUser={currUser}
                                 item={item}
                                 postID={postID}
+                                comments_arr={comments}
+                                setComments={setComments}
+                                commIDs = {commentsid}
+                                setCommIDs = {setCommentsid}
+                                showComments = {setShowComments}
                             />
                         )
                     })

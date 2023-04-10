@@ -276,6 +276,7 @@ export default function Admin_homepage(){
                     <div className="absolute top-10 right-10 w-7/12 h-auto rounded-lg bg-gray-200 overflow-auto py-10">
                         {
                             postBuffer?.posts.map((val, index) => {
+                                
                                 return(
                                     <div key={index} className="relative mx-auto mb-28 w-4/5 sm:w-4/5 md:w-3/5 lg:w-3/5 xl:w-4/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
         
@@ -397,8 +398,6 @@ export default function Admin_homepage(){
                                                             currUser={{...allUsers[currUserIndex].data, uid: allUsers[currUserIndex].userID}}
                                                             item={item}
                                                             postID={val.postID}
-                                                            currComments={currComments}
-                                                            setCurrComments={setCurrComments}
                                                         />
                                                     )
                                                 })
@@ -414,7 +413,7 @@ export default function Admin_homepage(){
                                             }
         
                                             {
-                                                currComments.length == val.data.commentsID.length && showComments && current === index &&
+                                                currComments.length === val.data.commentsID.length && showComments && current === index &&
                                                 <p className="my-5">
                                                     There are no more comments.
                                                 </p>
