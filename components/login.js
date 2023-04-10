@@ -20,7 +20,7 @@ export default function Login(){
     function handleSubmit(){
         signInWithEmailAndPassword(auth, email, password)
         .then((user) => {
-            router.push("")
+            router.push("/")
         })
         .catch((error) => {
             setWrongCred(true)

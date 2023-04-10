@@ -215,7 +215,7 @@ export default function Profile({ props }) {
                                     { !followingState ? 
                                         <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-sky-600" onClick={followUser}> Follow </span>
                                         :
-                                        <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
+                                        <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
                                     }
                                 </div>
                                 }

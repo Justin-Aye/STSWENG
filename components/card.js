@@ -61,8 +61,11 @@ export default function Card( { currUser, post, profpic, postID } ) {
     
     useEffect(() => {
 
-        setLiked(currUser.data.liked.includes(postID))
-        setDisliked(currUser.data.disliked.includes(postID))
+        if(currUser && currUser.data){
+            setLiked(currUser.data.liked.includes(postID))
+            setDisliked(currUser.data.disliked.includes(postID))
+        } 
+        
         //console.log(currUser.data.liked)
         return () => {
             clearTimeout();
