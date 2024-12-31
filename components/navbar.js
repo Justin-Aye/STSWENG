@@ -54,7 +54,7 @@ export default function Navbar() {
 
     function handleSearch(e) {
         if (currUser) {
-            if (searchInput.trim() != "" && !searchInput.startsWith(".") && !searchInput.includes("/")) {
+            if (searchInput.trim().length > 0 && !searchInput.startsWith(".") && !searchInput.includes("/")) {
                 console.log(searchInput)
                 e.preventDefault();
                 router.push(`/search/${searchInput}`);
@@ -76,7 +76,7 @@ export default function Navbar() {
                 <input className="my-auto max-w-sm px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
                     onChange={(e) => setSearch(e.target.value)} 
                     onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
-                    type="text" size="75" placeholder="Search..."/>
+                    type="text" placeholder="Search..."/>
             </div>
             
             {/* Nav Links */}
@@ -115,8 +115,15 @@ export default function Navbar() {
               <FiMenu className={`my-auto w-6 h-6 transition duration-300 hover:text-violet-800 ${mobileMenuOpen ? 'text-violet-800' : 'text-white'}`} />
             </button>
 
-            {/* Mobile Nav Links */}
+            {/* Mobile Nav Links & Search */}
             <div id="mobile-menu" className={`bg-nav_bg z-10 left-0 top-20 absolute ${mobileMenuOpen ? 'flex' : 'hidden'} flex-col items-center w-full md:hidden`}>
+                <div className="w-full px-4 py-2">
+                    <input className="w-full px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
+                        onChange={(e) => setSearch(e.target.value)} 
+                        onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
+                        type="text" placeholder="Search..."/>
+                </div>
+
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
                     <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
                         onClick={() => handlePost()}>
@@ -125,15 +132,9 @@ export default function Navbar() {
                     </div>   
                 </div>
                 <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
-                <div className={`my-auto w-full ${currUser ? "hidden" : ""}`} data-testid="signup_link">
-                    <Link href="/signup" className="hover:transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Sign Up</Link>
-                </div>
-                <div className={`my-auto w-full ${currUser ? "hidden" : ""}`} data-testid="login_link">
-                    <Link href="/login" className="hover:transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Login</Link>
-                </div>
-                <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <Link href={`/profile/${currUser}`}  className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
-                </div>
+                <Link data-testid="signup_link" href="/signup" className={`transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
+                <Link data-testid="login_link" href="/login" className={`transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Login</Link>
+                <Link href={`/profile/${currUser}`}  className={`transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "" : "hidden"}`}> {currName} </Link>
             </div>
 
           </div>
