@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { auth, db } from "../firebaseConfig";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { FiMenu } from "react-icons/fi";
 
 export default function Navbar() {
     const router = useRouter();
@@ -12,6 +13,8 @@ export default function Navbar() {
     
     const [ isAdmin, setAdmin ] = useState(false)
     const [searchInput, setSearch] = useState("");
+
+    const [ mobileMenuOpen, setMobileMenuOpen ] = useState(false);
 
     function logout(){
         auth.signOut().then(() => {
@@ -60,50 +63,38 @@ export default function Navbar() {
     }
 
     return (
-        <div className="w-full h-20 bg-nav_bg px-10 drop-shadow-md shadow-sm text-white sticky top-0 z-50
-                        grid grid-flow-col auto-col-max"
-                data-testid="nav_container">
+        <nav className="w-full px-4 h-20 bg-nav_bg drop-shadow-md shadow-sm text-white sticky top-0 z-50" data-testid="nav_container">
+          <div className="mx-auto max-w-screen-xl h-full flex flex-row items-center justify-between">
 
-            <div className="my-auto w-fit">
-                <Link href="/" className="hover:transition duration-300 hover:text-violet-800 w-fit flex items-center">
-                    <Image src={"/images/logo.png"} width={50} height={50} alt="FaceGram logo" />
-                    <span className="w-fit px-2 text-[32px] font-logo">FaceGram</span>
-                </Link>
-            </div>
+            <Link href="/" className="transition duration-300 hover:text-violet-800 h-full gap-2 flex items-center">
+                <Image src={"/images/logo.png"} width={50} height={50} alt="FaceGram logo" />
+                <span className="hidden md:block text-4xl font-logo">FaceGram</span>
+            </Link>
             
-
-            <div className="hidden md:flex mx-auto my-auto w-full justify-end col-span-3">
-                <input className="my-auto h-12 w-1/2 px-5 rounded-full text-black focus:outline-blue-100" 
+            {/* Search */}
+            <div className="hidden md:block">
+                <input className="my-auto max-w-sm px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
                     onChange={(e) => setSearch(e.target.value)} 
                     onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
                     type="text" size="75" placeholder="Search..."/>
             </div>
-
-            <div className="ml-auto pl-3 flex gap-5 w-fit justify-end">
+            
+            {/* Nav Links */}
+            <div className="h-full hidden md:flex items-center gap-6">
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
                     <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
                         onClick={() => handlePost()}>
                         <i className="fa fa-plus-circle text-[24px] pr-2" />
                         <Link href="/addpost">New Post</Link>
                     </div>
-                    
                 </div>
-
                 <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
-                
-
-                <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="signup_link">
-                    <Link href="/signup" className="hover:transition duration-300 hover:text-violet-800">Sign Up</Link>
-                </div>
-
-                <div className={`my-auto ${currUser ? "hidden" : ""}`} data-testid="login_link">
-                    <Link href="/login" className="hover:transition duration-300 hover:text-violet-800">Login</Link>
-                </div>
-
+                <Link data-testid="signup_link" href="/signup" className={`transition duration-300 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
+                <Link data-testid="login_link" href="/login" className={`transition duration-300 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Login</Link>
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
                     <Link href={`/profile/${currUser}`}  className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
                 </div>
-                
+      
                 {
                     currUser && isAdmin &&
                     <>
@@ -116,10 +107,36 @@ export default function Navbar() {
                 }
                 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <p className="hover:transition duration-300 hover:text-violet-800 cursor-pointer" onClick={() => logout()}>Logout</p>
+                    <p className="transition duration-300 hover:text-violet-800 cursor-pointer" onClick={() => logout()}>Logout</p>
                 </div>
-                
             </div>
-        </div>
+
+            <button className="md:hidden" onClick={() => setMobileMenuOpen((prev) => !prev)}>
+              <FiMenu className={`my-auto w-6 h-6 transition duration-300 hover:text-violet-800 ${mobileMenuOpen ? 'text-violet-800' : 'text-white'}`} />
+            </button>
+
+            {/* Mobile Nav Links */}
+            <div id="mobile-menu" className={`bg-nav_bg z-10 left-0 top-20 absolute ${mobileMenuOpen ? 'flex' : 'hidden'} flex-col items-center w-full md:hidden`}>
+                <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
+                    <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
+                        onClick={() => handlePost()}>
+                        <i className="fa fa-plus-circle text-[24px] pr-2" />
+                        <Link href="/addpost">New Post</Link>
+                    </div>   
+                </div>
+                <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
+                <div className={`my-auto w-full ${currUser ? "hidden" : ""}`} data-testid="signup_link">
+                    <Link href="/signup" className="hover:transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Sign Up</Link>
+                </div>
+                <div className={`my-auto w-full ${currUser ? "hidden" : ""}`} data-testid="login_link">
+                    <Link href="/login" className="hover:transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Login</Link>
+                </div>
+                <div className={`my-auto ${currUser ? "" : "hidden"}`}>
+                    <Link href={`/profile/${currUser}`}  className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
+                </div>
+            </div>
+
+          </div>
+        </nav>
     )
 }
