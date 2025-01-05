@@ -88,7 +88,7 @@ export default function Signup(){
                 </div>
                 
                 <div className="flex flex-col mx-auto sm:max-w-sm h-auto rounded-xl bg-white shadow-lg">
-                    <form className="flex flex-col mx-auto w-full px-8 py-4 rounded-xl" data-testid="form" onSubmit={(e) => { handleSubmit(e) }}>
+                    <form className="flex flex-col mx-auto w-full p-8 rounded-xl" data-testid="form" onSubmit={(e) => { handleSubmit(e) }}>
                         <div className="grid grid-cols-1 mb-8">
                             <label className="text-lg" htmlFor="email">Email</label>
                             <input className="border border-black rounded-md p-2" placeholder="sample@email.com" type="email" name="email" id="email" onChange={(e) => setEmail(e.target.value) } data-testid="email_input" required/>
@@ -104,13 +104,12 @@ export default function Signup(){
                             <input className="border border-black rounded-md p-2" placeholder="Re-enter Password..." type="password" name="rep_pass" id="rep_pass" onChange={(e) => setRepPass(e.target.value) } data-testid="rep_pass_input" required minLength={6} maxLength={16}/>
                         </div>
                         
-
-                        <button className="mb-8 py-2 rounded-[20px] bg-nav-bg uppercase text-white hover:transition duration-300 hover:bg-nav-bg-dark" type="submit" data-testid="submit_btn">
+                        <button className="mb-4 py-2 rounded-[20px] bg-nav-bg uppercase text-white hover:transition duration-300 hover:bg-nav-bg-dark" type="submit" data-testid="submit_btn">
                             Sign Up
                         </button>
                         
-                        <span className={`${errorExists ? "" : "hidden"} text-red-500`} id='email-error'>{errorMessage}</span>
-                        <span className={`${samePass ? "hidden" : ""} text-red-500 mb-4`} id='password-error'>Passwords do not match</span>
+                        <span className={`${errorExists ? "" : "hidden"} mb-4 text-center text-red-500`} id='email-error'>{errorMessage}</span>
+                        <span className={`${samePass ? "hidden" : ""} mb-4 text-center text-red-500`} id='password-error'>Passwords do not match</span>
 
                         <div className="text-center">
                             <span className='pr-1'>Already have an account?</span>
