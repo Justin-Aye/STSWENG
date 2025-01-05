@@ -17,17 +17,17 @@ module.exports = {
       'logo': ['Righteous', 'ui-sans-serif'],
       },
       colors:{
-        'card_bg': 'white',
-        'nav_bg': '#50C5B7',
-        'nav_bg_dark': '#3AA1A3',
-        'doc_bg': '#ECF9FF',
-        'feed_bg': '#D0DBE5',
-        'icon_color': '#583A71', 
-        'card_comment': '#F2F2F2'
+        'card-bg': 'white',
+        'nav-bg': '#50C5B7',
+        'nav-bg-dark': '#3AA1A3',
+        'doc-bg': '#ECF9FF',
+        'feed-bg': '#D0DBE5',
+        'icon-color': '#583A71', 
+        'card-comment': '#F2F2F2'
       },
       backgroundImage: {
-        'signup_page': "url('/images/signup_bg.png')",
-        'login_page': "url('/images/login_bg.png')",
+        'signup-page': "url('/images/signup_bg.png')",
+        'login-page': "url('/images/login_bg.png')",
       },
     },
   },

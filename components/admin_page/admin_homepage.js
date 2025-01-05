@@ -217,7 +217,7 @@ export default function Admin_homepage(){
         <div className="flex w-full h-screen px-20">
             <div className="flex flex-col w-1/5 h-full min-h-screen bg-[#F8FAFC]">
 
-                <div className={`flex w-full h-10 bg-nav_bg_dark hover:brightness-110 border cursor-pointer shadow-lg`}                    >
+                <div className={`flex w-full h-10 bg-nav-bg-dark hover:brightness-110 border cursor-pointer shadow-lg`}                    >
                     <p className="w-full h-auto mx-auto my-auto px-5 text-white"
                         onClick={() => {
                             setViewUsers(!viewUsers)
@@ -278,7 +278,7 @@ export default function Admin_homepage(){
                             postBuffer?.posts.map((val, index) => {
                                 
                                 return(
-                                    <div key={index} className="relative mx-auto mb-28 w-4/5 sm:w-4/5 md:w-3/5 lg:w-3/5 xl:w-4/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+                                    <div key={index} className="relative mx-auto mb-28 w-4/5 sm:w-4/5 md:w-3/5 lg:w-3/5 xl:w-4/5 h-fit bg-card-bg rounded-lg p-5 shadow-lg drop-shadow-md">
         
                                         {/* USER PROFILE PIC */}
                                         <div className="flex mb-5 gap-5 relative" data-testid="user_container">
@@ -420,7 +420,7 @@ export default function Admin_homepage(){
                                             }
         
                                             {/* SHOW COMMENTS BUTTON */}                
-                                            <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                                            <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card-bg rounded-lg select-none"
                                                 onClick={() => {
                                                     setShowComments(!showComments)
                                                     setCurrent(index)

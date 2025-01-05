@@ -63,7 +63,7 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="w-full px-4 h-20 bg-nav_bg drop-shadow-md shadow-sm text-white sticky top-0 z-50" data-testid="nav_container">
+        <nav className="w-full px-4 h-20 bg-nav-bg drop-shadow-md shadow-sm text-white sticky top-0 z-50" data-testid="nav_container">
           <div className="mx-auto max-w-screen-xl h-full flex flex-row items-center justify-between">
 
             <Link href="/" className="transition duration-300 hover:text-violet-800 h-full gap-2 flex items-center">
@@ -116,7 +116,7 @@ export default function Navbar() {
             </button>
 
             {/* Mobile Nav Links & Search */}
-            <div id="mobile-menu" className={`bg-nav_bg z-10 left-0 top-20 absolute ${mobileMenuOpen ? 'flex' : 'hidden'} flex-col items-center w-full md:hidden`}>
+            <div id="mobile-menu" className={`bg-nav-bg z-10 left-0 top-20 absolute ${mobileMenuOpen ? 'flex' : 'hidden'} flex-col items-center w-full md:hidden`}>
                 <div className="w-full px-4 py-2">
                     <input className="w-full px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
                         onChange={(e) => setSearch(e.target.value)} 

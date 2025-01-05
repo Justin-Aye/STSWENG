@@ -46,7 +46,7 @@ export default function Login(){
     }
 
     return (
-        <div className='bg-login_page bg-no-repeat bg-cover bg-fixed w-full h-screen'>
+        <div className='bg-login-page bg-no-repeat bg-cover bg-fixed w-full h-screen'>
             <div className="flex flex-col p-10">
                 <h1 className="mx-auto mb-8 text-[32px] font-logo text-white" data-testid="page_title">LOGIN</h1>
                 
@@ -72,7 +72,7 @@ export default function Login(){
                             onChange={(e) => setPass(e.target.value) } required onKeyDown={(e) => {e.key == 'enter' ? handleSubmit() : ""}} data-testid="pass_input" 
                         />
                         
-                        <button className="w-1/3 mx-auto mb-8 py-2 rounded-[20px] bg-nav_bg font-bold text-white hover:transition duration-300 hover:bg-nav_bg_dark" 
+                        <button className="w-1/3 mx-auto mb-8 py-2 rounded-[20px] bg-nav-bg font-bold text-white hover:transition duration-300 hover:bg-nav-bg-dark" 
                             data-testid="submit_btn">
                             LOGIN
                         </button>

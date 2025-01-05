@@ -342,7 +342,7 @@ export default function Comment({
 
                 <div
                     key={index}
-                    className="flex flex-col mt-5 bg-card_bg p-5 drop-shadow-lg rounded-lg border border-gray-300"
+                    className="flex flex-col mt-5 bg-card-bg p-5 drop-shadow-lg rounded-lg border border-gray-300"
                 >
                     <div className="flex w-full mb-2">
                         <div className="flex relative w-[30px] h-[30px]">

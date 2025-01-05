@@ -18,7 +18,7 @@ export default function Document() {
 
       {/* Overflow is now made to default hidden in order to track child component's scroll */}
       {/* Make sure to enable overflow on child component */}
-      <body className='bg-doc_bg text-gray-800 overflow-hidden'>
+      <body className='bg-doc-bg text-gray-800 overflow-hidden'>
         <Main />
         <NextScript />
       </body>

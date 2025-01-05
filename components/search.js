@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 export default function SearchResult({ uid, data }) {
 
     return (
-    <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav_bg rounded-full py-2 cursor-pointer hover:transition duration-300
-    hover:bg-nav_bg_dark">
+    <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav-bg rounded-full py-2 cursor-pointer hover:transition duration-300
+    hover:bg-nav-bg-dark">
         <Link className="flex flex-row justify-center items-center"href={`../profile/${uid}`}>
                 <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
                     <Image className="rounded-[50%]" src={data.profPic} alt="" width={60} height={51} />

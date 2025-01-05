@@ -213,9 +213,9 @@ export default function Profile({ props }) {
                                 :                                    
                                 <div>
                                     { !followingState ? 
-                                        <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-sky-600" onClick={followUser}> Follow </span>
+                                        <span className="border-2 rounded-xl bg-nav-bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-sky-600" onClick={followUser}> Follow </span>
                                         :
-                                        <span className="border-2 rounded-xl bg-nav_bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
+                                        <span className="border-2 rounded-xl bg-nav-bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
                                     }
                                 </div>
                                 }
@@ -224,7 +224,7 @@ export default function Profile({ props }) {
                         </div>
 
                         <div className="col-span-2 grid">
-                            <span className="font-bold text-3xl text-icon_color my-4"> {props.data.displayName}</span>
+                            <span className="font-bold text-3xl text-icon-color my-4"> {props.data.displayName}</span>
 
                             <div className="grid gap-y-4 grid-cols-2 mb-4 w-1/3">
                                 <span className="text-xl font-bold hover:cursor-pointer hover:transition duration-300 hover:text-sky-500" onClick={getFollowerDetails}>

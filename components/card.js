@@ -343,7 +343,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     return (
         <>
-        <div className="relative mx-auto mb-28 w-4/5 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-2/5 h-fit bg-card_bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <div className="relative mx-auto mb-28 w-4/5 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-2/5 h-fit bg-card-bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
             <div className="flex mb-5 gap-5 relative" data-testid="user_container">
@@ -466,8 +466,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             value={addComment} onChange={(e) => {setAddComment(e.target.value)}} 
                         />
                         <div className="flex">
-                            <button className="w-1/4 ml-auto p-1 rounded-full bg-nav_bg text-white hover:transition duration-300
-                                 hover:bg-nav_bg_dark"
+                            <button className="w-1/4 ml-auto p-1 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                 hover:bg-nav-bg-dark"
                                 onClick={() => {
                                     if(currUser)
                                         handleInsertComment()
@@ -527,7 +527,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 }
 
                 {/* SHOW COMMENTS BUTTON */}                
-                <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card_bg rounded-lg select-none"
+                <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card-bg rounded-lg select-none"
                     onClick={() => {
                         setShowComments(!showComments)
 

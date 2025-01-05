@@ -147,8 +147,8 @@ export default function Settings() {
                                     onChange={handleProfPicChange}
                                     required
                                     />
-                                    <button onClick={saveProfPic} className="py-1 px-3 my-4 rounded-full bg-nav_bg text-white hover:transition duration-300
-                                    hover:bg-nav_bg_dark"> Save Profile Picture </button>
+                                    <button onClick={saveProfPic} className="py-1 px-3 my-4 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                    hover:bg-nav-bg-dark"> Save Profile Picture </button>
                                 </form>
                             </div>
                         </div>
@@ -161,8 +161,8 @@ export default function Settings() {
                                 value={displayName}
                                 onChange={handleNameChange}
                                 />
-                                <button onClick={saveName} className="py-1 px-3 my-2 rounded-full bg-nav_bg text-white hover:transition duration-300
-                                    hover:bg-nav_bg_dark"> Save Username </button>
+                                <button onClick={saveName} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                    hover:bg-nav-bg-dark"> Save Username </button>
                             </form>
 
                             <span className="text-xl font-bold">
@@ -181,8 +181,8 @@ export default function Settings() {
                                                 onChange={(e) => {handleBioChange(e)}}>
                                         {bio}
                                     </textarea>
-                                    <button onClick={saveBio} className="py-1 px-3 my-2 rounded-full bg-nav_bg text-white hover:transition duration-300
-                                    hover:bg-nav_bg_dark"> Save Bio </button>
+                                    <button onClick={saveBio} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                    hover:bg-nav-bg-dark"> Save Bio </button>
                                 </form>
                             </div>
 
