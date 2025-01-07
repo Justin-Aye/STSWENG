@@ -152,47 +152,44 @@ export default function Homepage() {
     }
 
     return (
-        <div id="homepage" className="text-center mt-0 flex flex-col h-[calc(100vh_-_80px)] overflow-y-auto "
-        onScroll={(e) => { handleScroll(e) }}
-        >
-            <div className="bg-doc-bg w-full self-center pt-8"> 
-                <div className="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav-bg rounded-full py-2 px-5 cursor-pointer hover:transition duration-300
-                                 hover:bg-nav-bg-dark flex justify-center items-center"
-                    onClick={() => handlePost()}
-                >
-                    <Image src="/images/add_image_icon_w.png" alt="" width={60} height={51} />
-                    <span className="text-[20px] text-white w-fit h-fit">Create New Post</span>
-                </div>
+        <section id="homepage" className="h-screen w-full overflow-y-auto" onScroll={(e) => { handleScroll(e) }}>
+          <div className="flex flex-col mx-auto max-w-screen-xl px-4 py-8 lg:py-16">
+            <div className="bg-doc-bg w-full mb-8 lg:mb-16"> 
+              <div className="flex flex-row gap-4 items-center justify-center p-4 bg-nav-bg rounded-full cursor-pointer transition duration-100 hover:bg-nav-bg-dark" onClick={() => handlePost()}>
+                <Image src="/images/add_image_icon_w.png" alt="" width={50} height={50} />
+                <span className="text-lg sm:text-2xl text-white">Create New Post</span>
+              </div>
             </div>
             {
-                posts.map((post, index) => {
-                    return (
-                        <Card key={index} 
-                        post={post.data} 
-                        profpic={post.userData.profPic} 
-                        postID={post.id}
-                        currUser={currUser}   
-                        />
-                    )
-                })
+              posts.map((post, index) => {
+                return (
+                  <Card key={index} 
+                  post={post.data} 
+                  profpic={post.userData.profPic} 
+                  postID={post.id}
+                  currUser={currUser}   
+                  />
+                )
+              })
             }
 
             <div className="w-full h-[500px] pb-[100px]">
                 {
-                    loading && 
-                    <div className="w-[75px] h-[75px] mx-auto mb-5 relative justify-center">
-                        <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
-                    </div>
+                  loading && 
+                  <div className="w-[75px] h-[75px] mx-auto mb-5 relative justify-center">
+                      <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
+                  </div>
                 }
 
                 {
-                    lastPost &&
-                    <p className="text-center text-[20px]">
-                        Sorry, there are no more posts.
-                    </p>
+                  lastPost &&
+                  <p className="text-center text-[20px]">
+                      Sorry, there are no more posts.
+                  </p>
                 }
             </div>
+          </div>
 
-        </div>
+        </section>
     )
 }

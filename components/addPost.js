@@ -157,7 +157,7 @@ export default function AddPost(){
                 */}
 
                 <div className="mx-auto mb-10 py-2 relative w-full justify-center bg-gray-100 rounded-md border-2 border-black border-dashed cursor-pointer
-                                hover:transition duration-100 hover:bg-gray-300">
+                                transition duration-100 hover:bg-gray-300">
                     <input
                         id="image_files"
                         type="file"
@@ -183,7 +183,7 @@ export default function AddPost(){
                         <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] bg-gray-100 relative" data-testid="image">
                             <Image className="rounded-lg object-contain" src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)" priority/>    
                         </div>
-                        <button className="my-5 w-1/4 bg-red-500 px-5 py-1 text-white rounded-full hover:transition duration-300
+                        <button className="my-5 w-1/4 bg-red-500 px-5 py-1 text-white rounded-full transition duration-100
                                         hover:bg-red-800" 
                             onClick={() => removeImage()}
                         >
@@ -204,14 +204,14 @@ export default function AddPost(){
                 }
 
                 <div className="flex w-full mt-5 gap-5">
-                    <button className="ml-auto mb-5 w-1/4 bg-gray-400 px-5 py-1 text-white rounded-full hover:transition duration-300
+                    <button className="ml-auto mb-5 w-1/4 bg-gray-400 px-5 py-1 text-white rounded-full transition duration-100
                                     hover:bg-gray-500" 
                         onClick={() => {router.push("/")}}
                     >
                         Cancel
                     </button>
 
-                    <button className="mb-5 w-1/4 bg-nav-bg px-5 py-1 text-white rounded-full hover:transition duration-300
+                    <button className="mb-5 w-1/4 bg-nav-bg px-5 py-1 text-white rounded-full transition duration-100
                                     hover:bg-nav-bg-dark" 
                         onClick={() => uploadPost()}
                     >

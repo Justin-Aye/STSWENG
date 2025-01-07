@@ -82,8 +82,8 @@ export default function Signup(){
 
     return (
         <section className='bg-signup-page bg-no-repeat bg-cover bg-fixed w-full h-screen'>
-            <div className="mx-auto max-w-screen-xl px-4 py-8 lg:py-16">
-                <div className="mb-8 lg:mb-16">
+            <div className="mx-auto h-full flex flex-col py-16 md:justify-center items-center max-w-screen-xl px-4">
+                <div className="mb-8">
                     <h1 className="text-center text-3xl md:text-5xl font-logo text-white" data-testid="page_title">SIGN UP</h1>
                 </div>
                 
@@ -104,7 +104,7 @@ export default function Signup(){
                             <input className="border border-black rounded-md p-2" placeholder="Re-enter Password..." type="password" name="rep_pass" id="rep_pass" onChange={(e) => setRepPass(e.target.value) } data-testid="rep_pass_input" required minLength={6} maxLength={16}/>
                         </div>
                         
-                        <button className="mb-4 py-2 rounded-[20px] bg-nav-bg uppercase text-white hover:transition duration-300 hover:bg-nav-bg-dark" type="submit" data-testid="submit_btn">
+                        <button className="mb-4 py-2 rounded-[20px] bg-nav-bg uppercase text-white transition duration-100 hover:bg-nav-bg-dark" type="submit" data-testid="submit_btn">
                             Sign Up
                         </button>
                         
@@ -113,7 +113,7 @@ export default function Signup(){
 
                         <div className="text-center">
                             <span className='pr-1'>Already have an account?</span>
-                            <Link href="/login" className="text-violet-600 transition duration-300 hover:text-violet-800 hover:underline">Login</Link>
+                            <Link href="/login" className="text-violet-600 transition duration-100 hover:text-violet-800 hover:underline">Login</Link>
                         </div>   
                     </form>
                 </div>

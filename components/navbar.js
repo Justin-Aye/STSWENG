@@ -66,7 +66,7 @@ export default function Navbar() {
         <nav className="w-full px-4 h-20 bg-nav-bg drop-shadow-md shadow-sm text-white sticky top-0 z-50" data-testid="nav_container">
           <div className="mx-auto max-w-screen-xl h-full flex flex-row items-center justify-between">
 
-            <Link href="/" className="transition duration-300 hover:text-violet-800 h-full gap-2 flex items-center">
+            <Link href="/" className="transition duration-100 hover:text-violet-800 h-full gap-2 flex items-center">
                 <Image src={"/images/logo.png"} width={50} height={50} alt="FaceGram logo" />
                 <span className="hidden md:block text-4xl font-logo">FaceGram</span>
             </Link>
@@ -82,17 +82,17 @@ export default function Navbar() {
             {/* Nav Links */}
             <div className="h-full hidden md:flex items-center gap-6">
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
-                    <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
+                    <div className="transition duration-100 hover:text-violet-800 cursor-pointer flex items-center"
                         onClick={() => handlePost()}>
                         <i className="fa fa-plus-circle text-[24px] pr-2" />
                         <Link href="/addpost">New Post</Link>
                     </div>
                 </div>
                 <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
-                <Link data-testid="signup_link" href="/signup" className={`transition duration-300 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
-                <Link data-testid="login_link" href="/login" className={`transition duration-300 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Login</Link>
+                <Link data-testid="signup_link" href="/signup" className={`transition duration-100 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
+                <Link data-testid="login_link" href="/login" className={`transition duration-100 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Login</Link>
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <Link href={`/profile/${currUser}`}  className="hover:transition duration-300 hover:text-violet-800"> {currName} </Link>
+                    <Link href={`/profile/${currUser}`}  className="transition duration-100 hover:text-violet-800"> {currName} </Link>
                 </div>
       
                 {
@@ -100,19 +100,19 @@ export default function Navbar() {
                     <>
                         <span className={`mx-3 text-[24px] m-auto`}>|</span>
                         <div className={`my-auto`}>
-                            <Link href={`/profile/${currUser}/admin`} className="hover:transition duration-300 hover:text-violet-800"> Admin Dashboard </Link>
+                            <Link href={`/profile/${currUser}/admin`} className="transition duration-100 hover:text-violet-800"> Admin Dashboard </Link>
                         </div>
                         <span className={`mx-3 text-[24px] m-auto`}>|</span>    
                     </>
                 }
                 
                 <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <p className="transition duration-300 hover:text-violet-800 cursor-pointer" onClick={() => logout()}>Logout</p>
+                    <p className="transition duration-100 hover:text-violet-800 cursor-pointer" onClick={() => logout()}>Logout</p>
                 </div>
             </div>
 
             <button className="md:hidden" onClick={() => setMobileMenuOpen((prev) => !prev)}>
-              <FiMenu className={`my-auto w-6 h-6 transition duration-300 hover:text-violet-800 ${mobileMenuOpen ? 'text-violet-800' : 'text-white'}`} />
+              <FiMenu className={`my-auto w-6 h-6 transition duration-100 hover:text-violet-800 ${mobileMenuOpen ? 'text-violet-800' : 'text-white'}`} />
             </button>
 
             {/* Mobile Nav Links & Search */}
@@ -125,16 +125,16 @@ export default function Navbar() {
                 </div>
 
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
-                    <div className="hover:transition duration-300 hover:text-violet-800 cursor-pointer flex items-center"
+                    <div className="transition duration-100 hover:text-violet-800 cursor-pointer flex items-center"
                         onClick={() => handlePost()}>
                         <i className="fa fa-plus-circle text-[24px] pr-2" />
                         <Link href="/addpost">New Post</Link>
                     </div>   
                 </div>
                 <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
-                <Link data-testid="signup_link" href="/signup" className={`transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
-                <Link data-testid="login_link" href="/login" className={`transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Login</Link>
-                <Link href={`/profile/${currUser}`}  className={`transition duration-300 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "" : "hidden"}`}> {currName} </Link>
+                <Link data-testid="signup_link" href="/signup" className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
+                <Link data-testid="login_link" href="/login" className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Login</Link>
+                <Link href={`/profile/${currUser}`}  className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "" : "hidden"}`}> {currName} </Link>
             </div>
 
           </div>

@@ -343,82 +343,66 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     return (
         <>
-        <div className="relative mx-auto mb-28 w-4/5 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-2/5 h-fit bg-card-bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <div className="mx-auto mb-28 w-full h-fit bg-card-bg rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
-            <div className="flex mb-5 gap-5 relative" data-testid="user_container">
-                <div className="flex relative w-[50px] h-[50px] cursor-pointer"
-                    onClick={() => {
-                        router.push(`/profile/${post.creatorID}`)
-                    }}
-                >
-                    <Image className="rounded-[50%] hover:brightness-95" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
+            <div className="relative flex justify-between items-center mb-4 gap-4" data-testid="user_container">
+                <div className="flex items-center flex-wrap gap-4 cursor-pointer" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
+                    <div className="relative w-8 h-8 sm:w-12 sm:h-12">
+                      <Image className="rounded-full hover:brightness-90" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
+                    </div>
+                    <p className="cursor-pointer hover:underline" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
+                        {postOwner}
+                    </p>
                 </div>
 
-                <p className="my-auto text-left cursor-pointer hover:underline"
-                    onClick={() => {
-                        router.push(`/profile/${post.creatorID}`)
-                    }}
-                >
-                    {postOwner}
-                </p>
-
                 {/* Triple Dot Button */}
-                {
-                    (currUser && currUser.uid == post.creatorID) &&
-                    <div className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
-                        onClick={() => setShowOptions(true)}>
-                        <Image src={"/images/triple_dot.png"} alt={""} fill sizes="(max-width: 500px)"/>
-                    </div>
-                }
+                {(currUser && currUser.uid == post.creatorID) &&
+                  <span className="w-6 h-6 relative cursor-pointer" onClick={() => setShowOptions(!showOptions)}>
+                      <Image src={"/images/triple_dot.png"} alt={"Actions Button"} fill sizes="(max-width: 500px)"/>
+                  </span>}
 
                 {/* EDIT / DELETE OPTION */}
-                {   
-                    showOptions &&
-                    <div className="absolute top-0 right-0 w-1/4 h-fit drop-shadow-xl shadow-xl flex flex-col z-10">
-                        <p className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
-                            onClick={() => {router.push({
-                                pathname: '/editpost',
-                                query: {
-                                    caption: post.caption,
-                                    postID: postID,
-                                    profpic: profpic,
-                                    imageSrc: post.imageSrc,
-                                    username: postOwner
-                                },
-                            }, 'edit_post')}}
-                        >
-                            Edit
-                        </p>
-                        <p className="hover:brightness-95 bg-white text-red-500 border-separate border-black cursor-pointer"
-                            onClick={() => {setaskDeletePost(true); setShowOptions(false)}}
-                        >
-                            Delete
-                        </p>
+                {showOptions &&
+                  <div className="z-20 w-32 absolute top-0 right-2 2xl:top-0 2xl:-right-40 border rounded-lg text-center drop-shadow-xl shadow-xl overflow-hidden">
+                      <p className="py-2 bg-white text-gray-500 cursor-pointer hover:bg-gray-100" onClick={() => setShowOptions(false)}>
+                          Cancel
+                      </p>
 
-                        <p className="hover:brightness-95 bg-white text-gray-400 border-separate border-black cursor-pointer"
-                            onClick={() => setShowOptions(false)}
-                        >
-                            Cancel
-                        </p>
-                    </div>
-                }
+                      <p className="py-2 bg-white text-gray-900 cursor-pointer hover:bg-gray-100 "
+                          onClick={() => {
+                            router.push({
+                              pathname: '/editpost',
+                              query: {
+                                  caption: post.caption,
+                                  postID: postID,
+                                  profpic: profpic,
+                                  imageSrc: post.imageSrc,
+                                  username: postOwner
+                              },
+                            }, 'edit_post')}
+                          }>
+                          Edit
+                      </p>
+
+                      <p className="py-2 bg-white text-red-500 cursor-pointer hover:bg-gray-100 " onClick={() => {setaskDeletePost(true); setShowOptions(!showOptions)}}>
+                          Delete
+                      </p>
+                  </div>}
             </div>
             
             {/* Warns User before deleting the post */}
             {
                 askDeletePost &&
-                <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                    <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5">
-                        <p className="text-center text-[20px] font-bold">ARE YOU SURE ?</p>
-                        <p>You are about to delete a post.</p>
-                        <div className="flex mt-10 justify-center gap-5">
-                            <button className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => deletePost()}
-                            >
+                <div className="w-full h-full p-4 absolute top-0 left-0 z-10 bg-gray-900 bg-opacity-60 rounded-lg">
+                    <div className="text-center w-full p-4 bg-white rounded-lg">
+                        <p className="mb-6 text-2xl sm:text-4xl font-bold">ARE YOU SURE ?</p>
+                        <p className="mb-16 text-lg sm:text-xl">This post will be deleted forever!</p>
+                        <div className="flex justify-center gap-5">
+                            <button className="w-full py-6 bg-red-300 font-bold rounded-lg hover:brightness-90" onClick={() => deletePost()}>
                                 Delete Post
                             </button>
-                            <button className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                            <button className="w-full py-6 bg-gray-200 font-bold rounded-lg hover:brightness-90"
                                 onClick={() => setaskDeletePost(false)}
                             >
                                 Cancel
@@ -431,26 +415,26 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* IMAGE OF POST, IF AVAILABLE */}
             {
                 post.imageSrc != 0 &&
-                <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] mb-5 relative" data-testid="image">
-                    <Image className="rounded-lg object-contain" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)" priority/>    
+                <div className="mb-4 w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[600px] relative" data-testid="image">
+                    <Image className="rounded-lg object-contain w-full h-full" src={post.imageSrc} alt={""} fill sizes="(max-width: 900px)" priority/>    
                 </div>
             }   
 
             {/* CAPTION OF POST */}
-            <p className="mb-5 text-left whitespace-pre-wrap" data-testid="caption">{post.caption}</p>
+            <p className="mb-4 text-center whitespace-pre-wrap" data-testid="caption">{post.caption}</p>
 
             {/* LIKE AND DISLIKE BUTTON CONTAINER */}
-            <div className="flex gap-5 mb-5" data-testid="buttons_container">
+            <div className="flex flex-wrap gap-4 mb-4" data-testid="buttons_container">
                 <div className="flex gap-1">
-                    <button onClick={handleLikePost} data-testid="postLikeBtn">
-                        <HiThumbUp className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasLiked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
+                    <button onClick={handleLikePost} data-testid="postLikeBtn" {...(hasDisliked) && {disabled:true}}>
+                        <HiThumbUp className={`text-3xl cursor-pointer rounded-lg align-middle ${hasLiked ? "text-green-300" : "text-gray-900"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postLikeCount">{postLikeCount}</p>
                 </div>
                 
                 <div className="flex gap-1">
-                    <button onClick={handleDislikePost} data-testid="postDislikeBtn">
-                        <HiThumbDown className={`text-[30px] cursor-pointer rounded-lg align-middle ${hasDisliked ? "text-gray-400" : "text-gray-800"} hover:opacity-75`}/>
+                    <button onClick={handleDislikePost} data-testid="postDislikeBtn" {...(hasLiked) && {disabled:true}}>
+                        <HiThumbDown className={`text-3xl cursor-pointer rounded-lg align-middle ${hasDisliked ? "text-red-400" : "text-gray-900"} hover:opacity-75`}/>
                     </button>
                     <p className="my-auto" data-testid="postDislikeCount">{postDislikeCount}</p>
                 </div>
@@ -459,40 +443,44 @@ export default function Card( { currUser, post, profpic, postID } ) {
             {/* COMMENTS CONTAINER */}
             <div className="flex flex-col w-full rounded-lg">
                 {/* ADD COMMENT INPUT */}
-                {
-                    showComments &&
-                    <div className="flex flex-col gap-5">
+                {showComments &&
+                    <div className="flex flex-col gap-4 mb-4">
                         <textarea className="border border-gray-400 h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
                             value={addComment} onChange={(e) => {setAddComment(e.target.value)}} 
                         />
                         <div className="flex">
-                            <button className="w-1/4 ml-auto p-1 rounded-full bg-nav-bg text-white hover:transition duration-300
-                                 hover:bg-nav-bg-dark"
-                                onClick={() => {
-                                    if(currUser)
-                                        handleInsertComment()
-                                    else
-                                        router.push("/login")
-                                }}
-                            >
+                            <button className="ml-auto py-2 px-4 rounded-full bg-nav-bg text-white transition duration-100 hover:bg-nav-bg-dark" onClick={() => { (currUser) ? handleInsertComment() : router.push("/login")}}>
                                 Add Comment
                             </button>
                         </div>
-                        <p className="text-left">Number of Comments: {commentsCount}</p>
                     </div>
                 }
 
+                {/* SHOW COMMENTS BUTTON */}                
+                <p className="mb-4 px-4 py-2 cursor-pointer bg-gray-100 rounded-lg hover:bg-gray-200"
+                  onClick={() => {
+                      setShowComments(!showComments)
+
+                      if(commentsid.length > 0){
+                          fetchComments()
+                      }
+                  }}
+                >
+                    <i className="fa fa-comment mr-2" />{showComments ? "Hide Comments" : "View Comments"}
+                </p>
+                
+                
+                {/* SHOW ALL COMMENTS */}
+                { showComments && <p className="text-left">Total Comments: {commentsCount}</p>}
+
                 {/* LOADING SYMBOL */}
-                {
-                    loading && 
+                {loading && 
                     <div className="w-[50px] h-[50px] mx-auto mb-5 relative justify-center">
                         <Image src={"/images/loading.gif"} alt={""} fill sizes="(max-width: 500px)"/>
                     </div>
                 }
-                
-                {/* SHOW ALL COMMENTS */}
-                {
-                    showComments &&
+
+                { showComments &&
                     comments.map((item, index) => {
                         return (
                             <Comment 
@@ -512,32 +500,10 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
                 {
                     comments.length < commentsid.length && showComments &&
-                    <p className="my-5 text-purple-800 cursor-pointer"
-                        onClick={() => fetchNextComments()}
-                    >
+                    <p className="text-purple-800 cursor-pointer" onClick={() => fetchNextComments()}>
                         View More
                     </p>
                 }
-
-                {
-                    comments.length == commentsid.length && showComments &&
-                    <p className="my-5">
-                        There are no more comments.
-                    </p>
-                }
-
-                {/* SHOW COMMENTS BUTTON */}                
-                <p className="mt-5 px-5 py-2 w-full text-left brightness-95 hover:brightness-90 cursor-pointer bg-card-bg rounded-lg select-none"
-                    onClick={() => {
-                        setShowComments(!showComments)
-
-                        if(commentsid.length > 0){
-                            fetchComments()
-                        }
-                    }}
-                >
-                    <i className="fa fa-comment pr-2" />{showComments ? "Hide Comments" : "View Comments"}
-                </p>
             </div>
         </div>
         </>

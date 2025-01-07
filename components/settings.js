@@ -147,7 +147,7 @@ export default function Settings() {
                                     onChange={handleProfPicChange}
                                     required
                                     />
-                                    <button onClick={saveProfPic} className="py-1 px-3 my-4 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                    <button onClick={saveProfPic} className="py-1 px-3 my-4 rounded-full bg-nav-bg text-white transition duration-100
                                     hover:bg-nav-bg-dark"> Save Profile Picture </button>
                                 </form>
                             </div>
@@ -161,7 +161,7 @@ export default function Settings() {
                                 value={displayName}
                                 onChange={handleNameChange}
                                 />
-                                <button onClick={saveName} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                <button onClick={saveName} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white transition duration-100
                                     hover:bg-nav-bg-dark"> Save Username </button>
                             </form>
 
@@ -181,7 +181,7 @@ export default function Settings() {
                                                 onChange={(e) => {handleBioChange(e)}}>
                                         {bio}
                                     </textarea>
-                                    <button onClick={saveBio} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white hover:transition duration-300
+                                    <button onClick={saveBio} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white transition duration-100
                                     hover:bg-nav-bg-dark"> Save Bio </button>
                                 </form>
                             </div>

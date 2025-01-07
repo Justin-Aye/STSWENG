@@ -48,8 +48,8 @@ export default function Login(){
 
     return (
         <section className='bg-login-page bg-no-repeat bg-cover bg-fixed w-full h-screen'>
-            <div className="mx-auto max-w-screen-xl px-4 py-8 lg:py-16">
-                <div className="mb-8 lg:mb-16">
+            <div className="mx-auto h-full flex flex-col py-16 md:justify-center items-center max-w-screen-xl px-4">
+                <div className="mb-8">
                   <h1 className="text-center text-3xl md:text-5xl font-logo text-white" data-testid="page_title">LOGIN</h1>
                 </div>
                 
@@ -61,11 +61,11 @@ export default function Login(){
                         </div>
                         
                         <div className="grid grid-cols-1 mb-8">
-                            <label className="text-lg" htmlFor="email">Password:</label>
+                            <label className="text-lg" htmlFor="email">Password</label>
                             <input className="border border-black rounded-md p-2" placeholder="Password..." type="password" name="password" id="password" onChange={(e) => setPass(e.target.value) } required onKeyDown={(e) => {e.key == 'enter' ? handleSubmit() : ""}} data-testid="pass_input" />
                         </div>
 
-                        <button className="mb-4 py-2 rounded-[20px] bg-nav-bg uppercase text-white hover:transition duration-300 hover:bg-nav-bg-dark" data-testid="submit_btn">
+                        <button className="mb-4 py-2 rounded-[20px] bg-nav-bg uppercase text-white transition duration-100 hover:bg-nav-bg-dark" data-testid="submit_btn">
                             LOGIN
                         </button>
 
@@ -73,7 +73,7 @@ export default function Login(){
 
                         <div className="text-center">
                             <span className="pr-1">Don&apos;t have an account yet?</span>
-                            <Link href="/signup" className="text-violet-600 transition duration-300 hover:text-violet-800 hover:underline">Sign Up</Link>
+                            <Link href="/signup" className="text-violet-600 transition duration-100 hover:text-violet-800 hover:underline">Sign Up</Link>
                         </div>   
                     </form>
                 </div>

@@ -213,9 +213,9 @@ export default function Profile({ props }) {
                                 :                                    
                                 <div>
                                     { !followingState ? 
-                                        <span className="border-2 rounded-xl bg-nav-bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-sky-600" onClick={followUser}> Follow </span>
+                                        <span className="border-2 rounded-xl bg-nav-bg p-2 text-white font-bold hover:cursor-pointer transition duration-100 hover:bg-sky-600" onClick={followUser}> Follow </span>
                                         :
-                                        <span className="border-2 rounded-xl bg-nav-bg p-2 text-white font-bold hover:cursor-pointer hover:transition duration-300 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
+                                        <span className="border-2 rounded-xl bg-nav-bg p-2 text-white font-bold hover:cursor-pointer transition duration-100 hover:bg-red-500" onClick={unfollowUser}> Unfollow </span>
                                     }
                                 </div>
                                 }
@@ -227,11 +227,11 @@ export default function Profile({ props }) {
                             <span className="font-bold text-3xl text-icon-color my-4"> {props.data.displayName}</span>
 
                             <div className="grid gap-y-4 grid-cols-2 mb-4 w-1/3">
-                                <span className="text-xl font-bold hover:cursor-pointer hover:transition duration-300 hover:text-sky-500" onClick={getFollowerDetails}>
+                                <span className="text-xl font-bold hover:cursor-pointer transition duration-100 hover:text-sky-500" onClick={getFollowerDetails}>
                                     Followers: {followers.length}
                                 </span>
 
-                                <span className="text-xl font-bold hover:cursor-pointer hover:transition duration-300 hover:text-sky-500" onClick={getFollowingDetails}>
+                                <span className="text-xl font-bold hover:cursor-pointer transition duration-100 hover:text-sky-500" onClick={getFollowingDetails}>
                                     Following: {following.length}
                                 </span>
                             </div>
@@ -273,7 +273,7 @@ export default function Profile({ props }) {
                                                 <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
                                                     <Image className="rounded-[50%]" src={follower.data.profPic} alt="" width={60} height={51} />
                                                 </div>
-                                                <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {follower.data.displayName} </span>
+                                                <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-sky-500"> {follower.data.displayName} </span>
                                             </div>
                                         </Link>
                                     </div>
@@ -281,7 +281,7 @@ export default function Profile({ props }) {
                             })}
                             </>
                             :
-                            <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> No users found! </span>
+                            <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-sky-500"> No users found! </span>
                         }
                     </div>
                 </div>
@@ -302,7 +302,7 @@ export default function Profile({ props }) {
                                                 <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
                                                     <Image className="rounded-[50%]" src={following.data.profPic} alt="" width={60} height={51} />
                                                 </div>
-                                                <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> {following.data.displayName} </span>
+                                                <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-sky-500"> {following.data.displayName} </span>
                                             </div>
                                         </Link>
                                     </div>
@@ -310,7 +310,7 @@ export default function Profile({ props }) {
                             })} 
                             </>
                             :
-                            <span className="text-[20px] text-black w-fit h-fit hover:transition duration-300 hover:text-sky-500"> No users found! </span>
+                            <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-sky-500"> No users found! </span>
                         }
                     </div>
                 </div>
