@@ -347,8 +347,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
             {/* USER PROFILE PIC */}
             <div className="relative flex justify-between items-center mb-4 gap-4" data-testid="user_container">
-                <div className="flex items-center flex-wrap gap-4 cursor-pointer" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
-                    <div className="relative w-8 h-8 sm:w-12 sm:h-12">
+                <div className="flex items-center flex-wrap gap-4 cursor-pointer">
+                    <div className="relative w-8 h-8 sm:w-12 sm:h-12" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
                       <Image className="rounded-full hover:brightness-90" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                     </div>
                     <p className="cursor-pointer hover:underline" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
@@ -364,12 +364,12 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
                 {/* EDIT / DELETE OPTION */}
                 {showOptions &&
-                  <div className="z-20 w-32 absolute top-0 right-2 2xl:top-0 2xl:-right-40 border rounded-lg text-center drop-shadow-xl shadow-xl overflow-hidden">
+                  <div className="z-20 w-32 absolute top-0 right-6 2xl:top-0 2xl:-right-40 border rounded-lg text-center drop-shadow-xl shadow-xl overflow-hidden">
                       <p className="py-2 bg-white text-gray-500 cursor-pointer hover:bg-gray-100" onClick={() => setShowOptions(false)}>
                           Cancel
                       </p>
 
-                      <p className="py-2 bg-white text-gray-900 cursor-pointer hover:bg-gray-100 "
+                      <p className="py-2 bg-white text-gray-900 cursor-pointer hover:bg-gray-100"
                           onClick={() => {
                             router.push({
                               pathname: '/editpost',
@@ -385,7 +385,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                           Edit
                       </p>
 
-                      <p className="py-2 bg-white text-red-500 cursor-pointer hover:bg-gray-100 " onClick={() => {setaskDeletePost(true); setShowOptions(!showOptions)}}>
+                      <p className="py-2 bg-white text-red-500 cursor-pointer hover:bg-gray-100" onClick={() => {setaskDeletePost(true); setShowOptions(!showOptions)}}>
                           Delete
                       </p>
                   </div>}
@@ -402,9 +402,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                             <button className="w-full py-6 bg-red-300 font-bold rounded-lg hover:brightness-90" onClick={() => deletePost()}>
                                 Delete Post
                             </button>
-                            <button className="w-full py-6 bg-gray-200 font-bold rounded-lg hover:brightness-90"
-                                onClick={() => setaskDeletePost(false)}
-                            >
+                            <button className="w-full py-6 bg-gray-200 font-bold rounded-lg hover:brightness-90" onClick={() => setaskDeletePost(false)}>
                                 Cancel
                             </button>
                         </div>
@@ -445,7 +443,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 {/* ADD COMMENT INPUT */}
                 {showComments &&
                     <div className="flex flex-col gap-4 mb-4">
-                        <textarea className="border border-gray-400 h-[100px] p-5 rounded-md" placeholder="Enter a comment..."
+                        <textarea className="border border-gray-400 h-[100px] p-4 rounded-md" placeholder="Enter a comment..."
                             value={addComment} onChange={(e) => {setAddComment(e.target.value)}} 
                         />
                         <div className="flex">
@@ -471,7 +469,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
                 
                 
                 {/* SHOW ALL COMMENTS */}
-                { showComments && <p className="text-left">Total Comments: {commentsCount}</p>}
+                { showComments && <p className="text-left mb-4">Total Comments: {commentsCount}</p>}
 
                 {/* LOADING SYMBOL */}
                 {loading && 
@@ -500,7 +498,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
                 {
                     comments.length < commentsid.length && showComments &&
-                    <p className="text-purple-800 cursor-pointer" onClick={() => fetchNextComments()}>
+                    <p className="text-purple-900 hover:text-purple-500 hover:underline cursor-pointer" onClick={() => fetchNextComments()}>
                         View More
                     </p>
                 }

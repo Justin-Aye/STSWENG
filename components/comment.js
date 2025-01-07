@@ -31,7 +31,9 @@ export default function Comment({
     setCommIDs,
     showComments
 }) {
-    var hasVoted = false;
+    const [ hasLiked, setLiked ] = useState(false)
+    const [ hasDisliked, setDisliked ] = useState(false)
+
     const [commentLikeCount, setCommentLikeCount] = useState(
         item.commentData.likes || 0
     );
@@ -99,13 +101,11 @@ export default function Comment({
                                 likes: increment(-1),
                             });
                             await updateDoc(userRef, {
-                                liked: userSnap
-                                    .data()
-                                    .liked.filter((val, i, arr) => {
-                                        return val != item.commentID;
-                                    }),
+                                // liked: userSnap.data().liked.filter((val, i, arr) => {return val != item.commentID;})
+                                liked: arrayRemove(item.commentID)
                             });
                         }
+                        setLiked(hasDisliked ? hasLiked : !hasLiked);
                     } else {
                         alert("liking own comment prohibited"); // TODO:
                     }
@@ -135,7 +135,7 @@ export default function Comment({
                             userSnap.data().liked.indexOf(item.commentID) == -1
                         ) {
                             await updateDoc(commentRef, {
-                                dislikes: increment(1),
+                                dislikes: increment(-1),
                             });
                             await updateDoc(userRef, {
                                 disliked: arrayUnion(item.commentID),
@@ -145,16 +145,15 @@ export default function Comment({
                             userSnap.data().liked.indexOf(item.commentID) == -1
                         ) {
                             await updateDoc(commentRef, {
-                                dislikes: increment(-1),
+                                dislikes: increment(1),
                             });
                             await updateDoc(userRef, {
-                                disliked: userSnap
-                                    .data()
-                                    .disliked.filter((val, i, arr) => {
-                                        return val != item.commentID;
-                                    }),
+                                // disliked: userSnap.data().disliked.filter((val, i, arr) => {return val != item.commentID;})
+                                disliked: arrayRemove(item.commentID)
                             });
                         }
+
+                        setDisliked(hasLiked ? hasDisliked : !hasDisliked);
                     } else {
                         alert("disliking own comment prohibited"); // TODO:
                     }
@@ -277,29 +276,18 @@ export default function Comment({
             <div data-testid="comment_container">
                 <div>
                     {showEditComment && (
-                        <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                            <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
-                                <p className="text-center text-[20px] font-bold">
-                                    EDIT COMMENT
-                                </p>
+                        <div className="w-full h-full p-4 absolute top-0 left-0 z-10 bg-gray-900 bg-opacity-60 rounded-lg">
+                            <div className="text-center w-full p-4 bg-white rounded-lg">
+                                <p className="mb-6 text-2xl sm:text-4xl font-bold"> EDIT COMMENT </p>
 
-                                <textarea
-                                    className="border border-black h-[100px] p-5 rounded-md"
-                                    placeholder="Enter a comment..."
-                                    value={selectedCommentVal}
-                                    onChange={(e) => {
-                                        setSelectedCommentVal(e.target.value);
-                                    }}
-                                />
-                                <div className="flex mt-10 justify-center gap-5">
-                                    <button
-                                        className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                        onClick={() => saveCommentEdit()}
-                                    >
-                                        Save Edits
+                                <textarea className="w-full mb-16 p-4 border border-gray-400 h-[100px] rounded-md" placeholder="Enter a comment..." value={selectedCommentVal} onChange={(e) => {setSelectedCommentVal(e.target.value);}}/>
+                                
+                                <div className="flex justify-center gap-5">
+                                    <button className="w-full py-6 bg-green-300 font-bold rounded-lg hover:brightness-90" onClick={() => saveCommentEdit()}>
+                                        Save Edit
                                     </button>
                                     <button
-                                        className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
+                                        className="w-full py-6 bg-gray-200 font-bold rounded-lg hover:brightness-90"
                                         onClick={() =>
                                             setShowEditComment(false)
                                         }
@@ -313,25 +301,15 @@ export default function Comment({
 
                     {/* Warns User before deleting the comment */}
                     {askDeleteComment && (
-                        <div className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-40 p-5">
-                            <div className="w-full h-fit flex flex-col p-5 bg-white rounded-lg gap-5 mt-40">
-                                <p className="text-center text-[20px] font-bold">
-                                    ARE YOU SURE ?
-                                </p>
-                                <p>You are about to delete a comment.</p>
-                                <div className="flex mt-10 justify-center gap-5">
-                                    <button
-                                        className="w-full bg-green-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                        onClick={() => deleteComment()}
-                                    >
+                        <div className="w-full h-full p-4 absolute top-0 left-0 z-10 bg-gray-900 bg-opacity-60 rounded-lg">
+                            <div className="text-center w-full p-4 bg-white rounded-lg">
+                                <p className="mb-6 text-2xl sm:text-4xl font-bold">ARE YOU SURE ?</p>
+                                <p className="mb-16 text-lg sm:text-xl">This comment will be deleted forever!</p>
+                                <div className="flex justify-center gap-5">
+                                    <button className="w-full py-6 bg-red-300 font-bold rounded-lg hover:brightness-90" onClick={() => deleteComment()}>
                                         Delete Comment
                                     </button>
-                                    <button
-                                        className="w-full bg-red-200 py-5 font-bold rounded-lg hover:brightness-90"
-                                        onClick={() =>
-                                            setAskDeleteComment(false)
-                                        }
-                                    >
+                                    <button className="w-full py-6 bg-gray-200 font-bold rounded-lg hover:brightness-90" onClick={() => setAskDeleteComment(false)}>
                                         Cancel
                                     </button>
                                 </div>
@@ -340,109 +318,55 @@ export default function Comment({
                     )}
                 </div>
 
-                <div
-                    key={index}
-                    className="flex flex-col mt-5 bg-card-bg p-5 drop-shadow-lg rounded-lg border border-gray-300"
-                >
-                    <div className="flex w-full mb-2">
-                        <div className="flex relative w-[30px] h-[30px]">
-                            <Image
-                                className="rounded-full"
-                                src={item.userData.profPic}
-                                alt=""
-                                fill
-                                sizes="(max-width: 30px)"
-                            />
+                <div key={index} className="mb-4 p-4 flex flex-col bg-card-bg drop-shadow-lg rounded-lg border border-gray-300">
+                    <div className="relative flex justify-between items-center mb-4 gap-4">
+                        <div className="w-full flex items-center flex-wrap gap-4">
+                            <div className="relative w-8 h-8 sm:w-12 sm:h-12">
+                                <Image className="rounded-full" src={item.userData.profPic} alt={`${item.userData.displayName} profpic`} fill sizes="(max-width: 50px)"/>
+                            </div>
+                            <p className="">
+                                {item.userData.displayName}
+                            </p>
                         </div>
 
-                        <p className="ml-5 w-full text-left my-auto">
-                            {item.userData.displayName}
-                        </p>
-
                         {/* Triple Dot Button */}
-                        {currUser &&
-                            currUser.uid == item.commentData.creator && (
-                                <div
-                                    className="w-[20px] h-[20px] ml-auto mb-5 relative justify-center cursor-pointer"
-                                    onClick={() => setShowOptions(true)}
-                                >
-                                    <Image
-                                        src={"/images/triple_dot.png"}
-                                        alt={""}
-                                        fill
-                                        sizes="(max-width: 500px)"
-                                    />
-                                </div>
-                            )}
+                        {currUser && currUser.uid == item.commentData.creator && (
+                            <span className="w-6 h-6 relative cursor-pointer" onClick={() => setShowOptions(true)}>
+                                <Image src={"/images/triple_dot.png"} alt="Comment Actions" fill sizes="(max-width: 500px)"/>
+                            </span>
+                        )}
 
                         {/* EDIT / DELETE OPTION */}
                         {showOptions && (
-                            <div className="absolute top-0 right-0 w-1/4 h-fit drop-shadow-xl shadow-xl flex flex-col z-10">
-                                <p
-                                    className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
-                                    onClick={() => {
-                                        setShowEditComment(true);
-                                    }}
-                                >
-                                    Edit
-                                </p>
-                                <p
-                                    className="hover:brightness-95 bg-white border-separate border-black cursor-pointer"
-                                    onClick={() => {
-                                        setAskDeleteComment(true);
-                                        setShowOptions(false);
-                                    }}
-                                >
-                                    Delete
+                            <div className="z-20 w-32 absolute top-0 right-6 2xl:top-0 2xl:-right-40 border rounded-lg text-center drop-shadow-xl shadow-xl overflow-hidden">
+                                <p className="py-2 bg-white text-gray-500 cursor-pointer hover:bg-gray-100" onClick={() => setShowOptions(false)}>
+                                    Cancel
                                 </p>
 
-                                <p
-                                    className="hover:brightness-95 bg-white text-red-400 border-separate border-black cursor-pointer"
-                                    onClick={() => setShowOptions(false)}
-                                >
-                                    Cancel
+                                <p className="py-2 bg-white text-gray-900 cursor-pointer hover:bg-gray-100" onClick={() => {setShowEditComment(true);}}>
+                                    Edit
+                                </p>
+                                <p className="py-2 bg-white text-red-500 cursor-pointer hover:bg-gray-100" onClick={() => { setAskDeleteComment(true); setShowOptions(false);}}>
+                                    Delete
                                 </p>
                             </div>
                         )}
                     </div>
 
-                    <p className="text-left w-full">{commentText}</p>
+                    <p className="text-left w-full mb-4">{commentText}</p>
 
                     {/* TEMPORARY COMMENT LIKE & DISLIKE BUTTONS TODO: change if needed */}
-                    <div
-                        className="flex gap-5 mt-3"
-                        data-testid="buttons_container"
-                    >
+                    <div className="flex flex-wrap gap-4" data-testid="buttons_container">
                         <div className="flex gap-1">
-                            <button
-                                onClick={() => {
-                                    handleLikeComment(item);
-                                }}
-                            >
-                                <HiThumbUp
-                                    className={`text-[30px] cursor-pointer rounded-lg align-middle ${
-                                        hasVoted
-                                            ? "text-red-500"
-                                            : "text-gray-800"
-                                    } hover:opacity-75`}
-                                />
+                            <button onClick={() => {handleLikeComment(item);}} {...(hasDisliked) && {disabled:true}}>
+                                <HiThumbUp className={`text-3xl cursor-pointer rounded-lg align-middle ${hasLiked ? "text-green-300" : "text-gray-900"} hover:opacity-75`}/>
                             </button>
                             <span className="my-auto">{commentLikeCount}</span>
                         </div>
 
                         <div className="flex gap-1">
-                            <button
-                                onClick={() => {
-                                    handleDislikeComment(item);
-                                }}
-                            >
-                                <HiThumbDown
-                                    className={`text-[30px] cursor-pointer rounded-lg align-middle ${
-                                        hasVoted
-                                            ? "text-red-500"
-                                            : "text-gray-800"
-                                    } hover:opacity-75`}
-                                />
+                            <button onClick={() => {handleDislikeComment(item);}} {...(hasLiked) && {disabled:true}}>
+                                <HiThumbDown className={`text-3xl cursor-pointer rounded-lg align-middle ${hasDisliked ? "text-red-400" : "text-gray-900"} hover:opacity-75`}/>
                             </button>
                             <span className="my-auto">
                                 {commentDislikeCount}
