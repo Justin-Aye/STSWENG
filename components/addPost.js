@@ -143,7 +143,7 @@ export default function AddPost(){
     return (
         <section className="h-screen w-full overflow-y-auto pb-24">
             <div className="mx-auto flex flex-col py-16 justify-center items-center max-w-screen-xl px-4">
-                <h1 className="mb-8 font-logo text-center text-gray-900 text-3xl md:text-5xl"><i className="fa fa-pencil mr-2" />CREATE NEW POST</h1>
+                <h1 className="mb-8 font-logo text-center text-gray-900 text-3xl md:text-5xl"><i className="fa fa-pencil-square-o mr-2"/>CREATE NEW POST</h1>
                 <div className="flex flex-col w-full md:max-w-screen-lg mx-auto h-auto bg-white rounded-lg p-5 shadow-lg">
                     <div className="mb-8 flex items-center flex-wrap gap-4" data-testid="user_container">
                         <div className="relative w-8 h-8 sm:w-12 sm:h-12">
@@ -159,8 +159,7 @@ export default function AddPost(){
                     </div>
                     
                     {/* Image will only show when user has uploaded one */}
-                    {
-                        imgUrl &&
+                    {imgUrl &&
                         <div className="relative mb-8 flex flex-col">
                             <button className="absolute top-0 right-0 z-10 text-gray-600 text-2xl md:text-4xl hover:text-gray-400" onClick={() => removeImage()}>
                                 <i className="fa fa-times fa-lg mr-2"/>
