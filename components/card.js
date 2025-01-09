@@ -343,7 +343,7 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
     return (
         <>
-        <div className="mx-auto mb-28 w-full h-fit bg-card-bg rounded-lg p-5 shadow-lg drop-shadow-md">
+        <div className="mx-auto mb-28 w-full h-fit bg-white rounded-lg p-5 shadow-lg drop-shadow-md">
 
             {/* USER PROFILE PIC */}
             <div className="relative flex justify-between items-center mb-4 gap-4" data-testid="user_container">

@@ -141,85 +141,52 @@ export default function AddPost(){
         )
 
     return (
-        <div className="h-[calc(100vh_-_80px)] overflow-y-scroll">
-            <p className="my-10 text-center text-[38px]"><i className="fa fa-pencil mr-2" />CREATE NEW POST</p>
-            <div className="flex flex-col mx-auto mb-28 w-3/4 sm:w-3/5 md:w-3/5 lg:w-1/2 xl:w-5/12 h-fit bg-card-bg rounded-lg p-5 shadow-lg drop-shadow-md">
-                <div className="flex mb-5 gap-5" data-testid="user_container">
-                    <div className="flex relative w-[50px] h-[50px]">
-                        <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>
-                    </div>
-                    <p className="my-auto text-left">{displayName}</p>
-                </div>
-
-                {/*
-                    !imgUrl &&
-                    <p className="mb-2 text-red-500 text-center text-[14px]">Reminder: The image below is only a default image, and this will not be uploaded.</p>
-                */}
-
-                <div className="mx-auto mb-10 py-2 relative w-full justify-center bg-gray-100 rounded-md border-2 border-black border-dashed cursor-pointer
-                                transition duration-100 hover:bg-gray-300">
-                    <input
-                        id="image_files"
-                        type="file"
-                        onChange={(e) => {handleImageUpload(e)}}
-                        className="absolute h-full w-full bg-transparent opacity-0 z-10 cursor-pointer"
-                    />
-
-                    <img
-                        src="/images/add_image_icon.png"
-                        alt=""
-                        className="max-h-[40px] m-auto cursor-pointer"
-                    />
-
-                    <p className="w-full text-center font-bold text-[12px] cursor-pointer">
-                        Upload an Image
-                    </p>
-                </div>
-                
-                {/* Image will only show when user has uploaded one */}
-                {
-                    imgUrl &&
-                    <div className="grid justify-items-center">
-                        <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[400px] bg-gray-100 relative" data-testid="image">
-                            <Image className="rounded-lg object-contain" src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)" priority/>    
+        <section className="h-screen w-full overflow-y-auto pb-24">
+            <div className="mx-auto flex flex-col py-16 justify-center items-center max-w-screen-xl px-4">
+                <h1 className="mb-8 font-logo text-center text-gray-900 text-3xl md:text-5xl"><i className="fa fa-pencil mr-2" />CREATE NEW POST</h1>
+                <div className="flex flex-col w-full md:max-w-screen-lg mx-auto h-auto bg-white rounded-lg p-5 shadow-lg">
+                    <div className="mb-8 flex items-center flex-wrap gap-4" data-testid="user_container">
+                        <div className="relative w-8 h-8 sm:w-12 sm:h-12">
+                            <Image className="rounded-[50%]" src={profpic ? profpic : "/images/user_icon.png"} alt="" fill sizes="(max-width: 50px)"/>
                         </div>
-                        <button className="my-5 w-1/4 bg-red-500 px-5 py-1 text-white rounded-full transition duration-100
-                                        hover:bg-red-800" 
-                            onClick={() => removeImage()}
-                        >
-                        <i className="fa fa-times mr-2" /> Delete Image
+                        <p>{displayName}</p>
+                    </div>
+
+                    <div className="mx-auto mb-8 p-4 relative w-full flex items-center justify-center gap-4 bg-nav-bg rounded-full cursor-pointer transition duration-100 hover:bg-nav-bg-dark">
+                        <input id="image_files" type="file" onChange={(e) => {handleImageUpload(e)}} className="absolute h-full w-full bg-transparent opacity-0 z-10 cursor-pointer"/>
+                        <Image className="w-8 h-8 sm:w-14 sm:h-14" src="/images/add_image_icon_w.png" alt="Upload an Image Icon" width={50} height={50} />
+                        <span className="text-lg sm:text-2xl text-white">Upload an Image</span>
+                    </div>
+                    
+                    {/* Image will only show when user has uploaded one */}
+                    {
+                        imgUrl &&
+                        <div className="relative mb-8 flex flex-col">
+                            <button className="absolute top-0 right-0 z-10 text-gray-600 text-2xl md:text-4xl hover:text-gray-400" onClick={() => removeImage()}>
+                                <i className="fa fa-times fa-lg mr-2"/>
+                            </button>
+                            <div className="mb-8 w-full h-[200px] sm:h-[300px] md:h-[400px] max-h-96 bg-gray-100 relative" data-testid="image">
+                                <Image className="rounded-lg object-contain" src={imgUrl ? imgUrl : "/images/mountain.jpg"} alt={""} fill sizes="(max-width: 900px)" priority/>    
+                            </div>
+                        </div> 
+                    }
+
+                    <textarea className="mb-4 p-4 w-full h-[100px] border border-gray-400 rounded-lg" placeholder="Write your text here..." onChange={(e) => {setCaption(e.target.value)}}/>
+
+                    {mustFill &&
+                        <span className="text-lg text-center text-red-500 mb-4">Post must have at least an Image or Caption</span>
+                    }
+
+                    <div className="flex w-full gap-4">
+                        <button className="ml-auto bg-gray-400 py-2 px-4 text-white rounded-full transition duration-100 hover:bg-gray-500" onClick={() => {router.push("/")}}>
+                            Cancel
                         </button>
-                    </div> 
-                }
-
-                
-
-                <textarea className="w-full h-[100px] p-5 mx-auto border border-black mb-5" placeholder="Write your text here..." 
-                    onChange={(e) => {setCaption(e.target.value)}}
-                />
-
-                {   
-                    mustFill &&
-                    <span className=" text-center text-red-500 my-5 font-bold">Post must have at least an Image or Caption</span>
-                }
-
-                <div className="flex w-full mt-5 gap-5">
-                    <button className="ml-auto mb-5 w-1/4 bg-gray-400 px-5 py-1 text-white rounded-full transition duration-100
-                                    hover:bg-gray-500" 
-                        onClick={() => {router.push("/")}}
-                    >
-                        Cancel
-                    </button>
-
-                    <button className="mb-5 w-1/4 bg-nav-bg px-5 py-1 text-white rounded-full transition duration-100
-                                    hover:bg-nav-bg-dark" 
-                        onClick={() => uploadPost()}
-                    >
-                        Upload Post
-                    </button>
+                        <button className="bg-nav-bg py-2 px-4 text-white rounded-full transition duration-100 hover:bg-nav-bg-dark" onClick={() => uploadPost()}>
+                            Upload Post
+                        </button>
+                    </div>
                 </div>
-                
             </div>
-        </div>
+        </section>
     )
 }

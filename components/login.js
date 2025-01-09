@@ -48,7 +48,7 @@ export default function Login(){
 
     return (
         <section className='bg-login-page bg-no-repeat bg-cover bg-fixed w-full h-screen'>
-            <div className="mx-auto h-full flex flex-col py-16 md:justify-center items-center max-w-screen-xl px-4">
+            <div className="mx-auto h-full flex flex-col py-16 justify-center items-center max-w-screen-xl px-4">
                 <div className="mb-8">
                   <h1 className="text-center text-3xl md:text-5xl font-logo text-white" data-testid="page_title">LOGIN</h1>
                 </div>

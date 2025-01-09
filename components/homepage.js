@@ -156,7 +156,7 @@ export default function Homepage() {
           <div className="flex flex-col mx-auto max-w-screen-xl px-4 py-8 lg:py-16">
             <div className="bg-doc-bg w-full mb-8 lg:mb-16"> 
               <div className="flex flex-row gap-4 items-center justify-center p-4 bg-nav-bg rounded-full cursor-pointer transition duration-100 hover:bg-nav-bg-dark" onClick={() => handlePost()}>
-                <Image src="/images/add_image_icon_w.png" alt="" width={50} height={50} />
+                <Image className="w-8 h-8 sm:w-14 sm:h-14" src="/images/add_image_icon_w.png" alt="Add New Post Icon" width={50} height={50} />
                 <span className="text-lg sm:text-2xl text-white">Create New Post</span>
               </div>
             </div>

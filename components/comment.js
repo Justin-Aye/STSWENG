@@ -318,7 +318,7 @@ export default function Comment({
                     )}
                 </div>
 
-                <div key={index} className="mb-4 p-4 flex flex-col bg-card-bg drop-shadow-lg rounded-lg border border-gray-300">
+                <div key={index} className="mb-4 p-4 flex flex-col bg-white drop-shadow-lg rounded-lg border border-gray-300">
                     <div className="relative flex justify-between items-center mb-4 gap-4">
                         <div className="w-full flex items-center flex-wrap gap-4">
                             <div className="relative w-8 h-8 sm:w-12 sm:h-12">

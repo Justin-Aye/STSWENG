@@ -17,7 +17,6 @@ module.exports = {
       'logo': ['Righteous', 'ui-sans-serif'],
       },
       colors:{
-        'card-bg': 'white',
         'nav-bg': '#50C5B7',
         'nav-bg-dark': '#3AA1A3',
         'doc-bg': '#ECF9FF',
