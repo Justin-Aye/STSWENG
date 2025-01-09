@@ -68,7 +68,7 @@ export default function Navbar() {
 
             <Link href="/" className="transition duration-100 hover:text-violet-800 h-full gap-2 flex items-center">
                 <Image src={"/images/logo.png"} width={50} height={50} alt="FaceGram logo" />
-                <span className="hidden md:block text-4xl font-logo">FaceGram</span>
+                <span className="hidden lg:block text-4xl font-logo">FaceGram</span>
             </Link>
             
             {/* Search */}
@@ -82,27 +82,26 @@ export default function Navbar() {
             {/* Nav Links */}
             <div className="h-full hidden md:flex items-center gap-6">
                 <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
-                    <div className="transition duration-100 hover:text-violet-800 cursor-pointer flex items-center"
-                        onClick={() => handlePost()}>
+                    <div className="transition duration-100 hover:text-violet-800 cursor-pointer flex items-center" onClick={() => handlePost()}>
                         <i className="fa fa-plus-circle text-[24px] pr-2" />
                         <Link href="/addpost">New Post</Link>
                     </div>
                 </div>
-                <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
-                <Link data-testid="signup_link" href="/signup" className={`transition duration-100 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
-                <Link data-testid="login_link" href="/login" className={`transition duration-100 hover:text-violet-800 ${currUser ? "hidden" : ""}`}>Login</Link>
-                <div className={`my-auto ${currUser ? "" : "hidden"}`}>
-                    <Link href={`/profile/${currUser}`}  className="transition duration-100 hover:text-violet-800"> {currName} </Link>
-                </div>
-      
-                {
-                    currUser && isAdmin &&
+
+                {currUser ?
                     <>
-                        <span className={`mx-3 text-[24px] m-auto`}>|</span>
-                        <div className={`my-auto`}>
-                            <Link href={`/profile/${currUser}/admin`} className="transition duration-100 hover:text-violet-800"> Admin Dashboard </Link>
-                        </div>
-                        <span className={`mx-3 text-[24px] m-auto`}>|</span>    
+                        <Link href={`/profile/${currUser}`}  className="transition duration-100 hover:text-violet-800"> {currName} </Link>
+                    </>
+                    :
+                    <>
+                        <Link data-testid="signup_link" href="/signup" className="transition duration-100 hover:text-violet-800">Sign Up</Link>
+                        <Link data-testid="login_link" href="/login" className="transition duration-100 hover:text-violet-800">Login</Link>
+                    </>
+                }
+                
+                {currUser && isAdmin &&
+                    <>
+                        <Link href={`/profile/${currUser}/admin`} className="transition duration-100 hover:text-violet-800"> Admin Dashboard </Link>
                     </>
                 }
                 
@@ -124,17 +123,25 @@ export default function Navbar() {
                         type="text" placeholder="Search..."/>
                 </div>
 
-                <div className={`my-auto flex items-center ${currUser ? "" : "hidden"}`} >
-                    <div className="transition duration-100 hover:text-violet-800 cursor-pointer flex items-center"
-                        onClick={() => handlePost()}>
-                        <i className="fa fa-plus-circle text-[24px] pr-2" />
-                        <Link href="/addpost">New Post</Link>
-                    </div>   
+                <div className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center items-center text-lg p-4  ${currUser ? "" : "hidden"}`} onClick={() => handlePost()}>
+                    <i className="fa fa-plus-circle text-[24px] pr-2" />
+                    <Link href="/addpost">New Post</Link>
                 </div>
-                <span className={`mx-3 text-[24px] m-auto ${currUser ? "" : "hidden"}`}>|</span>
-                <Link data-testid="signup_link" href="/signup" className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Sign Up</Link>
-                <Link data-testid="login_link" href="/login" className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "hidden" : ""}`}>Login</Link>
-                <Link href={`/profile/${currUser}`}  className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4 ${currUser ? "" : "hidden"}`}> {currName} </Link>
+                {currUser ?
+                    <>
+                        <Link href={`/profile/${currUser}`}  className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4"> {currName} </Link>
+                    </>
+                    :
+                    <>
+                        <Link data-testid="signup_link" href="/signup" className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Sign Up</Link>
+                        <Link data-testid="login_link" href="/login" className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Login</Link>
+                    </> 
+                }
+                {currUser && isAdmin &&
+                    <>
+                        <Link href={`/profile/${currUser}/admin`} className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4"> Admin Dashboard </Link>
+                    </>
+                }
             </div>
 
           </div>
