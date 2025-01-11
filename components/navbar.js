@@ -72,12 +72,14 @@ export default function Navbar() {
             </Link>
             
             {/* Search */}
-            <div className="hidden md:block">
-                <input className="my-auto max-w-sm px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
-                    onChange={(e) => setSearch(e.target.value)} 
-                    onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
-                    type="text" placeholder="Search..."/>
-            </div>
+            {currUser &&
+              <div className="hidden md:block">
+                  <input className="my-auto max-w-sm px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
+                      onChange={(e) => setSearch(e.target.value)} 
+                      onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
+                      type="text" placeholder="Search..."/>
+              </div>
+            }
             
             {/* Nav Links */}
             <div className="h-full hidden md:flex items-center gap-6">
@@ -116,12 +118,14 @@ export default function Navbar() {
 
             {/* Mobile Nav Links & Search */}
             <div id="mobile-menu" className={`bg-nav-bg z-10 left-0 top-20 absolute ${mobileMenuOpen ? 'flex' : 'hidden'} flex-col items-center w-full md:hidden`}>
-                <div className="w-full px-4 py-2">
-                    <input className="w-full px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
-                        onChange={(e) => setSearch(e.target.value)} 
-                        onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
-                        type="text" placeholder="Search..."/>
-                </div>
+                {currUser &&
+                  <div className="w-full px-4 py-2">
+                      <input className="w-full px-5 h-12 rounded-full text-black focus:ring-blue-100 focus:outline-blue-200" 
+                          onChange={(e) => setSearch(e.target.value)} 
+                          onKeyDown={(e) => {e.key == 'Enter' ? handleSearch(e) : ""}} 
+                          type="text" placeholder="Search..."/>
+                  </div>
+                }
 
                 <div className={`transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center items-center text-lg p-4  ${currUser ? "" : "hidden"}`} onClick={() => handlePost()}>
                     <i className="fa fa-plus-circle text-[24px] pr-2" />

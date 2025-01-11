@@ -347,8 +347,8 @@ export default function Card( { currUser, post, profpic, postID } ) {
 
             {/* USER PROFILE PIC */}
             <div className="relative flex justify-between items-center mb-4 gap-4" data-testid="user_container">
-                <div className="flex items-center flex-wrap gap-4 cursor-pointer">
-                    <div className="relative w-8 h-8 sm:w-12 sm:h-12" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
+                <div className="flex items-center flex-wrap gap-4">
+                    <div className="cursor-pointer relative w-8 h-8 sm:w-12 sm:h-12" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
                       <Image className="rounded-full hover:brightness-90" src={profpic} alt="" fill sizes="(max-width: 50px)"/>
                     </div>
                     <p className="cursor-pointer hover:underline" onClick={() => {(currUser) ? router.push(`/profile/${post.creatorID}`) : router.push("/login")}}>
