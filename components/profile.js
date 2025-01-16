@@ -232,7 +232,7 @@ export default function Profile({ props }) {
                             </span>
                         </div>
                         <div>
-                            <span className="text-lg md:text-xl font-bold">Email: <span className="">{props.data.email}</span></span>
+                            <span className="text-lg md:text-xl font-bold">Email: <span className="break-all">{props.data.email}</span></span>
                             
                         </div>
 
@@ -245,28 +245,22 @@ export default function Profile({ props }) {
 
                 {/* FOLLOWER/FOLLOWING LIST MODALS */}
                 { showFollowers && (
-                    <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-20 backdrop-blur-sm" onClick={() => setShowFollowers(false)}>
-                        <div className="w-1/3 max-h-2/3 flex flex-col fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-md shadow-lg p-6 overflow-auto">
-                            <h2 className="text-2xl font-bold mb-5"> Followers </h2>
+                    <div className="px-4 flex items-center justify-center fixed inset-0 z-50 bg-gray-500 bg-opacity-20 backdrop-blur-sm" onClick={() => setShowFollowers(false)}>
+                        <div className="w-full max-w-screen-sm flex flex-col transform bg-white rounded-md shadow-lg py-6">
+                            <h2 className="pl-4 text-lg lg:text-2xl font-bold mb-5"> Followers </h2>
                             { followerDetails.length > 0 ? 
                                 <>
                                 {followerDetails.map((follower, index) => {
                                     return (
-                                        <div key={index} className="mb-3 flex justify-start">
-                                            <Link href={`../profile/${follower.uid}`}>
-                                                <div className="flex items-center">
-                                                    <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
-                                                        <Image className="rounded-[50%]" src={follower.data.profPic} alt="" width={60} height={51} />
-                                                    </div>
-                                                    <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-violet-800"> {follower.data.displayName} </span>
-                                                </div>
-                                            </Link>
-                                        </div>
+                                        <Link className="py-1 pl-4 w-full flex items-center transition duration-100 hover:bg-gray-100" key={index} href={`../profile/${follower.uid}`}>
+                                            <Image className="flex relative w-10 h-10 lg:w-14 lg:h-14 cursor-pointer mr-3 rounded-full" src={follower.data.profPic} alt="" width={60} height={60} />
+                                            <span className="text-lg lg:text-xl break-all"> {follower.data.displayName} </span>
+                                        </Link>
                                     )
                                 })}
                                 </>
                                 :
-                                <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-violet-800"> No users found! </span>
+                                <span className="pl-4 text-lg lg:text-2xl font-bold "> No users found! </span>
                             }
                         </div>
                     </div>
@@ -274,28 +268,22 @@ export default function Profile({ props }) {
                 }
 
                 { showFollowing && (
-                    <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-20 backdrop-blur-sm" onClick={() => setShowFollowing(false)}>
-                        <div className="w-1/3 max-h-2/3 flex flex-col fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-md shadow-lg p-6 overflow-auto">
-                            <h2 className="text-2xl font-bold mb-5"> Following </h2>
+                    <div className="px-4 flex items-center justify-center fixed inset-0 z-50 bg-gray-500 bg-opacity-20 backdrop-blur-sm" onClick={() => setShowFollowing(false)}>
+                        <div className="w-full max-w-screen-sm flex flex-col transform bg-white rounded-md shadow-lg py-6">
+                            <h2 className="pl-4 text-lg lg:text-2xl font-bold mb-5"> Following </h2>
                             { followingDetails.length > 0 ? 
                                 <>
                                 {followingDetails.map((following, index) => {
                                     return (
-                                        <div key={index} className="mb-3 flex justify-start">
-                                            <Link href={`../profile/${following.uid}`}>
-                                                <div className="flex items-center">
-                                                    <div className="flex relative w-[50px] h-[50px] cursor-pointer mr-3">
-                                                        <Image className="rounded-[50%]" src={following.data.profPic} alt="" width={60} height={51} />
-                                                    </div>
-                                                    <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-violet-800"> {following.data.displayName} </span>
-                                                </div>
-                                            </Link>
-                                        </div>
+                                        <Link className="py-1 pl-4 w-full flex items-center transition duration-100 hover:bg-gray-100"  key={index} href={`../profile/${following.uid}`}>
+                                            <Image className="flex relative w-10 h-10 lg:w-14 lg:h-14 cursor-pointer mr-3 rounded-full" src={following.data.profPic} alt="" width={60} height={51} />
+                                            <span className="text-lg lg:text-xl break-all">{following.data.displayName}</span>
+                                        </Link>
                                     )
                                 })} 
                                 </>
                                 :
-                                <span className="text-[20px] text-black w-fit h-fit transition duration-100 hover:text-violet-800"> No users found! </span>
+                                <span className="pl-4 text-lg lg:text-2xl font-bold "> No users found! </span>
                             }
                         </div>
                     </div>
