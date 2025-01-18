@@ -137,8 +137,8 @@ export default function Navbar() {
                     </>
                     :
                     <>
-                        <Link data-testid="signup_link" href="/signup" className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Sign Up</Link>
-                        <Link data-testid="login_link" href="/login" className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Login</Link>
+                        <Link data-testid="signup_link_mobile" href="/signup" className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Sign Up</Link>
+                        <Link data-testid="login_link_mobile" href="/login" className="transition duration-100 hover:text-violet-800 hover:bg-gray-50 w-full flex justify-center text-lg p-4">Login</Link>
                     </> 
                 }
                 {currUser && isAdmin &&

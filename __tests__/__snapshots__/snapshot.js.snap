@@ -2,47 +2,57 @@
 
 exports[`renders homepage unchanged 1`] = `
 <div>
-  <div
-    class="text-center mt-0 flex flex-col"
+  <section
+    class="h-screen w-full overflow-y-auto"
+    id="homepage"
   >
     <div
-      class="bg-doc-bg w-full self-center pt-8"
+      class="flex flex-col mx-auto max-w-screen-xl px-4 py-8 lg:py-16"
     >
       <div
-        class="mb-5 w-3/5 md:w-2/5 mx-auto bg-nav-bg rounded-full py-2 px-5 cursor-pointer transition duration-100 hover:bg-nav-bg-dark flex justify-center items-center"
+        class="bg-doc-bg w-full mb-8 lg:mb-16"
       >
-        <img
-          alt=""
-          data-nimg="1"
-          decoding="async"
-          height="51"
-          loading="lazy"
-          src="/_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=128&q=75"
-          srcset="/_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=64&q=75 1x, /_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=128&q=75 2x"
-          style="color: transparent;"
-          width="60"
-        />
-        <span
-          class="text-[20px] text-white w-fit h-fit"
+        <div
+          class="flex flex-row gap-4 items-center justify-center p-4 bg-nav-bg rounded-full cursor-pointer transition duration-100 hover:bg-nav-bg-dark"
         >
-          Create New Post
-        </span>
+          <img
+            alt="Add New Post Icon"
+            class="w-8 h-8 sm:w-14 sm:h-14"
+            data-nimg="1"
+            decoding="async"
+            height="50"
+            loading="lazy"
+            src="/_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=128&q=75"
+            srcset="/_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=64&q=75 1x, /_next/image?url=%2Fimages%2Fadd_image_icon_w.png&w=128&q=75 2x"
+            style="color: transparent;"
+            width="50"
+          />
+          <span
+            class="text-lg sm:text-2xl text-white"
+          >
+            Create New Post
+          </span>
+        </div>
+      </div>
+      <div
+        class="w-full h-[500px] pb-[100px]"
+      >
+        <div
+          class="w-[75px] h-[75px] mx-auto mb-5 relative justify-center"
+        >
+          <img
+            alt=""
+            data-nimg="fill"
+            decoding="async"
+            loading="lazy"
+            sizes="(max-width: 500px)"
+            src="/_next/image?url=%2Fimages%2Floading.gif&w=3840&q=75"
+            srcset="/_next/image?url=%2Fimages%2Floading.gif&w=16&q=75 16w, /_next/image?url=%2Fimages%2Floading.gif&w=32&q=75 32w, /_next/image?url=%2Fimages%2Floading.gif&w=48&q=75 48w, /_next/image?url=%2Fimages%2Floading.gif&w=64&q=75 64w, /_next/image?url=%2Fimages%2Floading.gif&w=96&q=75 96w, /_next/image?url=%2Fimages%2Floading.gif&w=128&q=75 128w, /_next/image?url=%2Fimages%2Floading.gif&w=256&q=75 256w, /_next/image?url=%2Fimages%2Floading.gif&w=384&q=75 384w, /_next/image?url=%2Fimages%2Floading.gif&w=640&q=75 640w, /_next/image?url=%2Fimages%2Floading.gif&w=750&q=75 750w, /_next/image?url=%2Fimages%2Floading.gif&w=828&q=75 828w, /_next/image?url=%2Fimages%2Floading.gif&w=1080&q=75 1080w, /_next/image?url=%2Fimages%2Floading.gif&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Floading.gif&w=1920&q=75 1920w, /_next/image?url=%2Fimages%2Floading.gif&w=2048&q=75 2048w, /_next/image?url=%2Fimages%2Floading.gif&w=3840&q=75 3840w"
+            style="position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"
+          />
+        </div>
       </div>
     </div>
-    <div
-      class="w-[50px] h-[50px] mx-auto mb-5 relative justify-center"
-    >
-      <img
-        alt=""
-        data-nimg="fill"
-        decoding="async"
-        loading="lazy"
-        sizes="(max-width: 500px)"
-        src="/_next/image?url=%2Fimages%2Floading.gif&w=3840&q=75"
-        srcset="/_next/image?url=%2Fimages%2Floading.gif&w=16&q=75 16w, /_next/image?url=%2Fimages%2Floading.gif&w=32&q=75 32w, /_next/image?url=%2Fimages%2Floading.gif&w=48&q=75 48w, /_next/image?url=%2Fimages%2Floading.gif&w=64&q=75 64w, /_next/image?url=%2Fimages%2Floading.gif&w=96&q=75 96w, /_next/image?url=%2Fimages%2Floading.gif&w=128&q=75 128w, /_next/image?url=%2Fimages%2Floading.gif&w=256&q=75 256w, /_next/image?url=%2Fimages%2Floading.gif&w=384&q=75 384w, /_next/image?url=%2Fimages%2Floading.gif&w=640&q=75 640w, /_next/image?url=%2Fimages%2Floading.gif&w=750&q=75 750w, /_next/image?url=%2Fimages%2Floading.gif&w=828&q=75 828w, /_next/image?url=%2Fimages%2Floading.gif&w=1080&q=75 1080w, /_next/image?url=%2Fimages%2Floading.gif&w=1200&q=75 1200w, /_next/image?url=%2Fimages%2Floading.gif&w=1920&q=75 1920w, /_next/image?url=%2Fimages%2Floading.gif&w=2048&q=75 2048w, /_next/image?url=%2Fimages%2Floading.gif&w=3840&q=75 3840w"
-        style="position: absolute; height: 100%; width: 100%; left: 0px; top: 0px; right: 0px; bottom: 0px; color: transparent;"
-      />
-    </div>
-  </div>
+  </section>
 </div>
 `;
