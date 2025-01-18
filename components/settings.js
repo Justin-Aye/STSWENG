@@ -8,235 +8,159 @@ import { useRouter } from "next/router";
 
 
 export default function Settings() {
-    const [currUser, setCurrUser] = useState("");
-    const [displayName, setDisplayName] = useState("");
-    const [bio, setBio] = useState("");
-    const [email, setEmail] = useState("");
-    const [profPic, setProfPic] = useState(null);
-    const [preview, setProfPicPreview] = useState("")
-    const router = useRouter()
-    
-    // get logged in user's data
-    useEffect(() => {
-        auth.onAuthStateChanged((user) => {
-            try {
-                if (user) {
-                    setCurrUser(user.uid);
-                    const docRef = doc(db, "users", user.uid);
-                    getDoc(docRef).then((doc) => {
-                        setDisplayName(doc?.data()?.displayName);
-                        setBio(doc?.data()?.bio);
-                        setProfPicPreview(doc?.data()?.profPic);
-                        setEmail(doc?.data()?.email);
-                    })
-                }
-                else
-                    router.push("/login");
-            } catch (err) {
-                console.log(err);
-            }
-        })
-    }, []);
+	const [currUser, setCurrUser] = useState("");
+	const [displayName, setDisplayName] = useState("");
+	const [bio, setBio] = useState("");
+	const [email, setEmail] = useState("");
+	const [profPic, setProfPic] = useState(null);
+	const [preview, setProfPicPreview] = useState("")
+	const router = useRouter()
 
-    const handleNameChange = function (e) {
-        setDisplayName(e.target.value);
-    };
+	// get logged in user's data
+	useEffect(() => {
+		auth.onAuthStateChanged((user) => {
+			try {
+				if (user) {
+					setCurrUser(user.uid);
+					const docRef = doc(db, "users", user.uid);
+					getDoc(docRef).then((doc) => {
+						setDisplayName(doc?.data()?.displayName);
+						setBio(doc?.data()?.bio);
+						setProfPicPreview(doc?.data()?.profPic);
+						setEmail(doc?.data()?.email);
+					})
+				}
+				else
+					router.push("/login");
+			} catch (err) {
+				console.log(err);
+			}
+		})
+	}, []);
 
-    const handleBioChange = function (e) {
-        setBio(e.target.value);
-    }
+	const handleNameChange = function (e) {
+		setDisplayName(e.target.value);
+	};
 
-    const handleProfPicChange = function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            setProfPic(file);
-            const reader = new FileReader();
-            reader.onload = function () {
-                setProfPicPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-        
-    }
+	const handleBioChange = function (e) {
+		setBio(e.target.value);
+	}
 
-    const saveName = async function () {
-        try {
-            const usersRef = collection(db, "users")
-            const qDisplayName = query(usersRef, where("displayName", "==", displayName))
-            const matchingUsers = await getDocs(qDisplayName);
+	const handleProfPicChange = function (e) {
+		const file = e.target.files[0];
+		if (file) {
+			setProfPic(file);
+			const reader = new FileReader();
+			reader.onload = function () {
+				setProfPicPreview(reader.result);
+			};
+			reader.readAsDataURL(file);
+		}
+
+	}
+
+	const saveName = async function () {
+		try {
+			const usersRef = collection(db, "users")
+			const qDisplayName = query(usersRef, where("displayName", "==", displayName))
+			const matchingUsers = await getDocs(qDisplayName);
 
 
-            if (matchingUsers.size > 0) {
-                console.log("entered displayname already exists");
-                alert("name already exists");
-                return
-            }
-            else {
-                if (!displayName.includes("/") && !displayName.startsWith(".") && displayName.match(/(.*[a-z]){3}/i)) {
-                    const docRef = doc(db, "users", currUser);
-                    updateDoc(docRef, {
-                        displayName: displayName,
-                        lowerCaseDisplayName: displayName.toLowerCase()
-                    });
-                 }
-                 else {
-                    alert("display name should have at least 3 letters and cannot have a / or start with a .")
-                 }
-            }
+			if (matchingUsers.size > 0) {
+				console.log("entered displayname already exists");
+				alert("name already exists");
+				return
+			}
+			else {
+				if (!displayName.includes("/") && !displayName.startsWith(".") && displayName.match(/(.*[a-z]){3}/i)) {
+					const docRef = doc(db, "users", currUser);
+					updateDoc(docRef, {
+						displayName: displayName,
+						lowerCaseDisplayName: displayName.toLowerCase()
+					});
+				}
+				else {
+					alert("display name should have at least 3 letters and cannot have a / or start with a .")
+				}
+			}
 
-        } catch {
-            console.log("error saving displayname");
-        }
-    }
+		} catch {
+			console.log("error saving displayname");
+		}
+	}
 
-    const saveBio = function () {
-        try {
-        const docRef = doc(db, "users", currUser);
-            updateDoc(docRef, {
-                bio: bio
-            });
-        } catch {
-            console.log("error saving bio");
-        }
-    }
+	const saveBio = function () {
+		try {
+			const docRef = doc(db, "users", currUser);
+			updateDoc(docRef, {
+				bio: bio
+			});
+		} catch {
+			console.log("error saving bio");
+		}
+	}
 
-    const saveProfPic = async function () {
-        // TODO:
-        if (profPic) {
-            const storageRef = ref(storage, `images/${profPic.name}`)
-            await uploadBytes(storageRef, profPic);
-        
+	const saveProfPic = async function () {
+		// TODO:
+		if (profPic) {
+			const storageRef = ref(storage, `images/${profPic.name}`)
+			await uploadBytes(storageRef, profPic);
 
-            const profPicUrl = await getDownloadURL(storageRef);
-            const docRef = doc(db, "users", currUser);
-            try {
-                updateDoc(docRef, {
-                    profPic: profPicUrl
-                });
-            } catch {
-                console.log("error uploading profPic");
-            }
-        }
-    }
 
-    return (
-        <div className="m-auto flex flex-col h-full">
-            { currUser ? (
-                <div className="m-5 w-full mx-auto">
+			const profPicUrl = await getDownloadURL(storageRef);
+			const docRef = doc(db, "users", currUser);
+			try {
+				updateDoc(docRef, {
+					profPic: profPicUrl
+				});
+			} catch {
+				console.log("error uploading profPic");
+			}
+		}
+	}
 
-                    <div className="my-4 mx-10 px-10 flex justify-between h-fit border-b border-black">
-                            <span className="w-fit font-bold text-3xl"><i className="fa fa-pencil mr-2 mb-2" />EDIT PROFILE</span>
-                            <Link href={`/profile/${currUser}`} className="w-fit my-auto hover:underline">
-                                Back to Profile Page</Link>
-                    </div>
+	return (
+		<section className="overflow-y-auto w-full h-screen">
+			<div className="mx-auto max-w-screen-xl px-4 py-8 lg:py-16">
+				{currUser &&
+					<>
+						<div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-between gap-2 mb-8">
+							<h1 className="font-logo text-gray-900 text-3xl md:text-5xl"><i className="fa fa-pencil-square-o mr-2 mb-2" />EDIT PROFILE</h1>
+							<Link href={`/profile/${currUser}`} className="rounded-full bg-nav-bg hover:bg-nav-bg-dark px-4 py-2 text-white transition duration-100">Back to Profile</Link>
+						</div>
 
-                    <div className="m-5 h-full w-3/4">
-
-                        <div className="grid grid-cols-3">
-                        <div className="justify-self-end pr-5 mr-5 border-r-2 border-gray-300">
-                            <div className="w-[200px] h-[200px] rounded-full relative">
-                                <Image className="rounded-full drop-shadow-md" src={preview} alt="" fill/>
-                            </div>
-
-                            <div className="mt-5 flex justify-center">
-                                <form className="w-fit grid justify-items-center" onSubmit={(e) => e.preventDefault()}>
-                                    <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="w-56"
-                                    onChange={handleProfPicChange}
-                                    required
-                                    />
-                                    <button onClick={saveProfPic} className="py-1 px-3 my-4 rounded-full bg-nav-bg text-white transition duration-100
-                                    hover:bg-nav-bg-dark"> Save Profile Picture </button>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="col-span-2 grid">
-                            <span className="font-bold text-2xl my-4"> Username:</span>
-                            <form className="mb-4" onSubmit={(e) => e.preventDefault()}>
-                                <input 
-                                type="text"
-                                className="w-full border border-gray-400 p-2 rounded-md" 
-                                value={displayName}
-                                onChange={handleNameChange}
-                                />
-                                <button onClick={saveName} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white transition duration-100
-                                    hover:bg-nav-bg-dark"> Save Username </button>
-                            </form>
-
-                            <span className="text-xl font-bold">
-                                Email:
-                            </span>
-                            <span className="mb-4">
-                                {email}
-                            </span>
-                            
-                            <span className="text-xl font-bold">
-                                Bio:
-                            </span>
-                            <div className="mb-4">
-                                <form onSubmit={(e) => e.preventDefault()}>
-                                    <textarea className="border border-gray-400 h-[100px] p-2 rounded-md w-full h-48"
-                                                onChange={(e) => {handleBioChange(e)}}>
-                                        {bio}
-                                    </textarea>
-                                    <button onClick={saveBio} className="py-1 px-3 my-2 rounded-full bg-nav-bg text-white transition duration-100
-                                    hover:bg-nav-bg-dark"> Save Bio </button>
-                                </form>
-                            </div>
-
-                            
-                        </div>
-                        
-                        
-                    </div>
+						<div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-8 md:gap-16 pb-2">
+              <div className="flex flex-col justify-center items-center">
+                <div className="mb-4 w-32 h-32 md:w-52 md:h-52 rounded-full relative">
+                  <Image className="rounded-full" src={preview} alt="" fill />
                 </div>
-                {/* Original Profile Settings Page */}
-                    {/* <div>
-                        <h2> change displayname </h2>
-                        <form onSubmit={(e) => e.preventDefault()}>
-                            <input 
-                            type="text" 
-                            value={displayName}
-                            onChange={handleNameChange}
-                            />
-                            <button onClick={saveName}> Save displayName </button>
-                        </form>
-                    </div>   
+                <form className="flex flex-col items-center justify-center gap-4" onSubmit={(e) => e.preventDefault()}>
+                  <input type="file" accept="image/*" className="w-56" onChange={handleProfPicChange} required />
+                  <button onClick={saveProfPic} className="w-fit rounded-full bg-nav-bg hover:bg-nav-bg-dark px-4 py-2 text-white transition duration-100"> Save Profile Picture </button>
+                </form>
+              </div>
+              
+              <div className="flex flex-col w-full">
+                <span className="text-lg md:text-xl font-bold">Email: <span className="break-all">{email}</span></span>
 
-                    <div>
-                        <h2> change bio </h2>
-                        <form onSubmit={(e) => e.preventDefault()}>
-                            <input 
-                            type="text" 
-                            value={bio}
-                            onChange={handleBioChange}
-                            />
-                            <button onClick={saveBio}> Save Bio </button>
-                        </form>
-                    </div>
+                <form className="flex flex-col my-8" onSubmit={(e) => e.preventDefault()}>
+                  <span className="text-lg md:text-xl font-bold"> Username</span>
+                  <input type="text" className="w-full md:max-w-md border border-gray-400 p-2 mb-2 rounded-md" value={displayName} onChange={handleNameChange} />
+                  <button onClick={saveName} className="w-fit rounded-full bg-nav-bg hover:bg-nav-bg-dark px-4 py-2 text-white transition duration-100"> Save Username </button>
+                </form>
 
-                    <div>
-                        <h2> change profpic </h2>
-                        <form onSubmit={(e) => e.preventDefault()}>
-                            <input
-                            type="file"
-                            accept="/image/*"
-                            onChange={handleProfPicChange}
-                            required
-                            />
-                            <button onClick={saveProfPic}> Save profPic </button>
-                            <Image src={preview} alt="" width={100} height={100}/>
+                <form className="flex flex-col my-8" onSubmit={(e) => e.preventDefault()}>
+                  <span className="text-lg md:text-xl font-bold">Bio:</span>
+                  <textarea className="w-full border border-gray-400 p-2 mb-2 rounded-md" onChange={(e) => { handleBioChange(e) }}>{bio}</textarea>
+                  <button onClick={saveBio} className="w-fit rounded-full bg-nav-bg hover:bg-nav-bg-dark px-4 py-2 text-white transition duration-100"> Save Bio </button>
+                </form>
+              </div>
+						</div>
+					</>
+				}
 
-                        </form>
-                    </div>   */}
+			</div>
+		</section>
+	)
 
-                </div>
-            ) :
-                    // TODO: Redirect to login page if /settings is called w/o a logged in user
-                <span className="text-center text-2xl mt-20"> Please log in to edit your profile page. </span>}
-        </div>
-    )
-    
 }
